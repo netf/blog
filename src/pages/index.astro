@@ -9,31 +9,37 @@ const posts = await getPosts();
 const recent = posts.slice(0, 5);
 const tags = [...getTags(posts)].slice(0, 10);
 
-const nameWidth = 36;
-const tableHead = `${'NAME'.padEnd(nameWidth)}  PUBLISHED   STATUS`;
-const tableRows = recent
-	.slice(0, 3)
-	.map((p) => {
-		const name = p.id.length > nameWidth ? `${p.id.slice(0, nameWidth - 1)}…` : p.id.padEnd(nameWidth);
-		return `${name}  ${p.data.pubDate.toISOString().slice(0, 10)}  ${p.data.draft ? 'Pending' : 'Running'}`;
-	})
-	.join('\n');
+const session: [string, string[]][] = [
+	['whoami', ['netf: platform engineer, YAML whisperer, recovering 3am hero']],
+	['uptime', ['up since the first pager went off, load average: coffee, coffee, more coffee']],
+	[
+		'cat ~/.plan',
+		[
+			'- make the right way the lazy way',
+			'- delete more config than I write',
+			'- never deploy on a Friday   # deploys on a Friday',
+		],
+	],
+];
 ---
 
 <Base>
 	<section class="hero container">
-		<p class="eyebrow">devops / platform engineering</p>
+		<p class="eyebrow">hi, I'm netf</p>
 		<h1>
-			Building the paved road<span class="dim">, one</span>
-			<code class="inline">terraform apply</code><span class="dim"> at a time.</span>
+			I make production <del>exciting</del>{' '}<span class="boring">boring.</span>
 		</h1>
 		<p class="intro">
-			I write about platform engineering, Kubernetes, CI/CD, infrastructure as code, observability and
-			the people side of running production systems.
+			Boring means green dashboards, quiet pagers and Friday deploys nobody notices. I build the platforms
+			that get teams there, and write down everything that broke on the way.
 		</p>
 		<div class="terminal" aria-hidden="true">
-			<div class="bar"><span></span><span></span><span></span></div>
-			<pre><span class="p">$</span> kubectl get posts -n blog{'\n'}<span class="c">{tableHead}</span>{'\n'}{tableRows}{'\n'}<span class="p">$</span> <span class="blink">▍</span></pre>
+			<div class="bar"><span></span><span></span><span></span><em>~/netf</em></div>
+			<pre>{
+				session.map(([cmd, out]) => (
+					<Fragment><span class="p">$</span> <span class="cmd">{cmd}</span>{'\n'}{out.join('\n')}{'\n'}</Fragment>
+				))
+			}<span class="p">$</span> <span class="blink">▍</span></pre>
 		</div>
 	</section>
 
@@ -70,18 +76,21 @@ const tableRows = recent
 		letter-spacing: -0.035em;
 		font-weight: 700;
 	}
-	.dim {
+	del {
 		color: var(--subtle);
-	}
-	.inline {
-		padding: 0 0.3em;
-		border: 1px solid var(--border-strong);
-		border-radius: 8px;
-		background: var(--surface);
-		font-size: 0.8em;
 		font-weight: 500;
-		letter-spacing: -0.02em;
-		white-space: nowrap;
+		text-decoration-thickness: 0.08em;
+		text-decoration-color: var(--muted);
+	}
+	.boring {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-weight: 500;
+		letter-spacing: -0.04em;
+		background: linear-gradient(180deg, #ffffff 30%, #7a7a7a);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
 	}
 	.intro {
 		margin: 1.5rem 0 0;
@@ -111,12 +120,28 @@ const tableRows = recent
 		border-radius: 50%;
 		background: var(--border-strong);
 	}
+	.bar em {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-style: normal;
+		line-height: 10px;
+		color: var(--subtle);
+	}
+	.cmd {
+		color: var(--fg);
+	}
 	.terminal pre {
 		margin: 0;
 		border: 0;
 		border-radius: 0;
 		font-size: 0.8rem;
 		color: var(--muted);
+	}
+	@media (max-width: 640px) {
+		.terminal pre {
+			white-space: pre-wrap;
+		}
 	}
 	.p {
 		color: var(--fg);
