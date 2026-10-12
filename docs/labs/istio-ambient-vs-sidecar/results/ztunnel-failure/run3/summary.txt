@@ -1,0 +1,8 @@
+graceful sidecar: requests=6000 sockets=4 codes={"200":6000} max_ms=6
+graceful ambient: requests=6000 sockets=8 codes={"200":6000} max_ms=9
+graceful ambient-wp: requests=6000 sockets=8 codes={"200":6000} max_ms=6
+crash sidecar: requests=6000 sockets=4 codes={"200":6000} max_ms=6
+crash ambient: requests=6000 sockets=8 codes={"-1":40,"200":5960} max_ms=9
+  crash ambient: 80 error log lines between 16:29:46 and +360ms; kinds: Unable to lookup server | Unable to resolve hostname
+crash ambient-wp: requests=6000 sockets=8 codes={"-1":40,"200":5960} max_ms=10
+  crash ambient-wp: 80 error log lines between 16:29:46 and +360ms; kinds: Unable to lookup server | Unable to resolve hostname

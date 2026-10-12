@@ -1,0 +1,10 @@
+14:45:21.515 load started (300s, 100 qps, 4 conns) in sidecar ambient ambient-wp
+14:45:41.521 helm upgrade istio-base
+14:45:43.627 helm upgrade istiod
+14:45:46.495 istiod done
+14:46:06.499 helm upgrade istio-cni
+14:46:30.892 istio-cni done
+14:46:50.897 helm upgrade ztunnel
+14:47:21.173 ztunnel done
+14:47:21.295 ztunnel + waypoint rollouts complete
+14:50:21.680 load finished

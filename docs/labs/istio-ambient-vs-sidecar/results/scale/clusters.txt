@@ -1,0 +1,6 @@
+before sidecar-client envoy clusters: 22
+before waypoint envoy clusters: 10
+before ztunnel known services: 8
+after-200-services sidecar-client envoy clusters: 422
+after-200-services waypoint envoy clusters: 10
+after-200-services ztunnel known services: 208

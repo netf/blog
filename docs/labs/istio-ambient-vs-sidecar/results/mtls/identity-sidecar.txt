@@ -1,0 +1,1 @@
+X-Forwarded-Client-Cert: By=spiffe://cluster.local/ns/sidecar/sa/server;Hash=2f4e8131f55b09a77d5dd8d598e649e27a88a55c78ac01b2d2242016e42f0dd3;Subject="";URI=spiffe://cluster.local/ns/sidecar/sa/client

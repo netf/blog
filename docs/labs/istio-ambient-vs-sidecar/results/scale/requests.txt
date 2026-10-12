@@ -1,0 +1,4 @@
+sidecar per-pod: fortio requests cpu=100m mem=64Mi
+sidecar per-pod: istio-proxy requests cpu=100m mem=128Mi
+ambient per-pod: fortio requests cpu=100m mem=64Mi
+ztunnel per-node: requests {"cpu":"200m","memory":"512Mi"}

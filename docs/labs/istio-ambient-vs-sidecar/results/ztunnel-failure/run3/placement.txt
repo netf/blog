@@ -1,0 +1,13 @@
+ambient-wp client-b66f74955-nsmmd mesh-lab-worker
+ambient-wp server-d87c87d86-nkh5x mesh-lab-worker2
+ambient-wp waypoint-5c4d4dbd4-bfq5b mesh-lab-worker
+ambient client-b66f74955-rqhgg mesh-lab-worker
+ambient server-d87c87d86-hbwnz mesh-lab-worker2
+baseline client-b66f74955-lh5jb mesh-lab-worker
+baseline server-d87c87d86-bndq5 mesh-lab-worker2
+istio-system ztunnel-7tp5b mesh-lab-worker2
+istio-system ztunnel-ltm54 mesh-lab-control-plane
+istio-system ztunnel-q7m8j 2m14s
+kube-system kube-apiserver-mesh-lab-control-plane mesh-lab-control-plane
+sidecar client-7c87b5b5bd-9jk4z mesh-lab-worker
+sidecar server-7fdd9bcfdb-b7mgp mesh-lab-worker2

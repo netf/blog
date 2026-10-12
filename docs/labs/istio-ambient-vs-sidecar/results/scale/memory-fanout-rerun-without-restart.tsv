@@ -1,0 +1,10 @@
+before	mesh-lab-worker	istio-system	ztunnel-956j8	13.3
+before	mesh-lab-worker	sidecar	client-b66f74955-5vjpz	89.7
+before	mesh-lab-worker2	sidecar	server-d87c87d86-gdkp9	66.4
+before	mesh-lab-worker2	ambient-wp	waypoint-f587fbfc4-4268n	96.8
+before	mesh-lab-worker2	istio-system	ztunnel-dmws4	13
+after-200-services	mesh-lab-worker	istio-system	ztunnel-956j8	13.5
+after-200-services	mesh-lab-worker	sidecar	client-b66f74955-5vjpz	91.8
+after-200-services	mesh-lab-worker2	sidecar	server-d87c87d86-gdkp9	71.6
+after-200-services	mesh-lab-worker2	ambient-wp	waypoint-f587fbfc4-4268n	96.9
+after-200-services	mesh-lab-worker2	istio-system	ztunnel-dmws4	13.1

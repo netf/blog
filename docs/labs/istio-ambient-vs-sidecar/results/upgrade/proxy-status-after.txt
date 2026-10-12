@@ -1,0 +1,7 @@
+NAME                                    CLUSTER        ISTIOD                     VERSION     SUBSCRIBED TYPES
+client-85d8795866-r7jw5.sidecar         Kubernetes     istiod-574cc458f-6mp92     1.30.5      5 (CDS,LDS,EDS,RDS,WDS)
+server-74f4f4cff6-kbwx2.sidecar         Kubernetes     istiod-574cc458f-6mp92     1.30.5      5 (CDS,LDS,EDS,RDS,WDS)
+waypoint-f587fbfc4-4268n.ambient-wp     Kubernetes     istiod-574cc458f-6mp92     1.31.1      4 (CDS,LDS,EDS,WDS)
+ztunnel-5jdzk.istio-system              Kubernetes     istiod-574cc458f-6mp92     1.31.1      2 (WADS,WDS)
+ztunnel-956j8.istio-system              Kubernetes     istiod-574cc458f-6mp92     1.31.1      2 (WADS,WDS)
+ztunnel-dmws4.istio-system              Kubernetes     istiod-574cc458f-6mp92     1.31.1      2 (WADS,WDS)

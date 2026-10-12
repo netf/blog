@@ -1,0 +1,33 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"security.istio.io/v1","kind":"AuthorizationPolicy","metadata":{"annotations":{},"name":"deny-debug","namespace":"ambient"},"spec":{"action":"DENY","rules":[{"to":[{"operation":{"paths":["/debug"]}}]}],"selector":{"matchLabels":{"app":"server"}}}}
+  creationTimestamp: "2026-10-12T15:44:26Z"
+  generation: 1
+  name: deny-debug
+  namespace: ambient
+  resourceVersion: "10389"
+  uid: b389b63f-58e7-4e5a-9a77-1d490e0e5c8a
+spec:
+  action: DENY
+  rules:
+  - to:
+    - operation:
+        paths:
+        - /debug
+  selector:
+    matchLabels:
+      app: server
+status:
+  conditions:
+  - lastTransitionTime: "2026-10-12T15:44:26.885022372Z"
+    message: 'ztunnel does not support HTTP attributes (found: paths). In ambient
+      mode you must use a waypoint proxy to enforce HTTP rules. DENY policy with HTTP
+      attributes is enforced without the HTTP rules. This will be more restrictive
+      than requested.'
+    observedGeneration: "1"
+    reason: UnsupportedValue
+    status: "True"
+    type: ZtunnelAccepted

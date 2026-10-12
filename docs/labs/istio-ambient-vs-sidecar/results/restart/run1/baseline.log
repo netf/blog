@@ -1,0 +1,67 @@
+{"ts":1791816674.760448,"level":"info","r":1,"file":"scli.go","line":124,"msg":"Starting","command":"Φορτίο","version":"1.76.0 h1:CSeuqtbKDwX34cTsjcV0VDYjCCJeQ/sYTPDtIakFmrs= go1.26.9 amd64 linux","go-max-procs":4}
+Fortio 1.76.0 running at 100 queries per second, 4->4 procs, for 1m0s: http://server:8080/echo
+{"ts":1791816674.761490,"level":"info","r":1,"file":"httprunner.go","line":121,"msg":"Starting http test","run":0,"url":"http://server:8080/echo","threads":4,"qps":"100.0","warmup":"parallel","conn-reuse":""}
+Starting at 100 qps with 4 thread(s) [gomax 4] for 1m0s : 1500 calls each (total 6000)
+{"ts":1791816685.414479,"level":"info","r":53,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":3,"run":0}
+{"ts":1791816685.414482,"level":"info","r":52,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":2,"run":0}
+{"ts":1791816685.414725,"level":"info","r":51,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":1,"run":0}
+{"ts":1791816685.415279,"level":"info","r":50,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":0,"run":0}
+{"ts":1791816685.417826,"level":"err","r":52,"file":"http_client.go","line":950,"msg":"Unable to connect","dest":{"IP":"10.96.115.0","Port":8080,"Zone":""},"err":"dial tcp 10.96.115.0:8080: connect: connection refused","numfd":8,"thread":2,"run":0}
+{"ts":1791816685.417913,"level":"err","r":51,"file":"http_client.go","line":950,"msg":"Unable to connect","dest":{"IP":"10.96.115.0","Port":8080,"Zone":""},"err":"dial tcp 10.96.115.0:8080: connect: connection refused","numfd":7,"thread":1,"run":0}
+{"ts":1791816685.417946,"level":"err","r":50,"file":"http_client.go","line":950,"msg":"Unable to connect","dest":{"IP":"10.96.115.0","Port":8080,"Zone":""},"err":"dial tcp 10.96.115.0:8080: connect: connection refused","numfd":9,"thread":0,"run":0}
+{"ts":1791816685.459774,"level":"err","r":50,"file":"http_client.go","line":950,"msg":"Unable to connect","dest":{"IP":"10.96.115.0","Port":8080,"Zone":""},"err":"dial tcp 10.96.115.0:8080: connect: connection refused","numfd":9,"thread":0,"run":0}
+{"ts":1791816734.768120,"level":"info","r":53,"file":"periodic.go","line":896,"msg":"T003 ended after 1m0.000900998s : 1500 calls. qps=24.999624589804064"}
+{"ts":1791816734.768336,"level":"info","r":51,"file":"periodic.go","line":896,"msg":"T001 ended after 1m0.001192158s : 1500 calls. qps=24.99950327736953"}
+{"ts":1791816734.768324,"level":"info","r":52,"file":"periodic.go","line":896,"msg":"T002 ended after 1m0.001155383s : 1500 calls. qps=24.9995185996867"}
+{"ts":1791816734.768328,"level":"info","r":50,"file":"periodic.go","line":896,"msg":"T000 ended after 1m0.00116527s : 1500 calls. qps=24.999514480262693"}
+Ended after 1m0.001265936s : 6000 calls. qps=99.998
+{"ts":1791816734.768611,"level":"info","r":1,"file":"periodic.go","line":598,"msg":"Run ended","run":0,"elapsed":60001265936,"calls":6000,"qps":99.99789015118222}
+Sleep times : count 5996 avg 0.039172126 +/- 0.0004662 min 0.03115979 max 0.039878182 sum 234.876068
+Aggregated Function Time : count 6000 avg 0.00021551018 +/- 0.0003145 min 3.9411e-05 max 0.008097338 sum 1.29306111
+# range, mid point, percentile, count
+>= 3.9411e-05 <= 0.001 , 0.000519706 , 99.18, 5951
+> 0.001 <= 0.002 , 0.0015 , 99.48, 18
+> 0.002 <= 0.003 , 0.0025 , 99.60, 7
+> 0.003 <= 0.004 , 0.0035 , 99.78, 11
+> 0.004 <= 0.005 , 0.0045 , 99.87, 5
+> 0.005 <= 0.006 , 0.0055 , 99.97, 6
+> 0.006 <= 0.007 , 0.0065 , 99.98, 1
+> 0.008 <= 0.00809734 , 0.00804867 , 100.00, 1
+# target 50% 0.00052358
+# target 75% 0.000765745
+# target 90% 0.000911045
+# target 99% 0.000998224
+# target 99.9% 0.00533333
+Error cases : count 4 avg 0.0039052682 +/- 0.0005564 min 0.003527325 max 0.004866662 sum 0.015621073
+# range, mid point, percentile, count
+>= 0.00352732 <= 0.004 , 0.00376366 , 75.00, 3
+> 0.004 <= 0.00486666 , 0.00443333 , 100.00, 1
+# target 50% 0.00376366
+# target 75% 0.004
+# target 90% 0.00452
+# target 99% 0.004832
+# target 99.9% 0.0048632
+# Socket and IP used for each connection:
+[0]   4 socket used, resolved to 10.96.115.0:8080, connection timing : count 4 avg 0.0006855615 +/- 0.0003948 min 7.9938e-05 max 0.001126364 sum 0.002742246
+[1]   3 socket used, resolved to 10.96.115.0:8080, connection timing : count 3 avg 0.00059824767 +/- 0.0003265 min 0.000364166 max 0.001059944 sum 0.001794743
+[2]   3 socket used, resolved to 10.96.115.0:8080, connection timing : count 3 avg 0.00040754067 +/- 0.0001829 min 0.00016977 max 0.000614495 sum 0.001222622
+[3]   2 socket used, resolved to 10.96.115.0:8080, connection timing : count 2 avg 0.0008653375 +/- 0.0003535 min 0.000511877 max 0.001218798 sum 0.001730675
+Connection time histogram (s) : count 12 avg 0.0006241905 +/- 0.0003614 min 7.9938e-05 max 0.001218798 sum 0.007490286
+# range, mid point, percentile, count
+>= 7.9938e-05 <= 0.001 , 0.000539969 , 75.00, 9
+> 0.001 <= 0.0012188 , 0.0011094 , 100.00, 3
+# target 50% 0.000654977
+# target 75% 0.001
+# target 90% 0.00113128
+# target 99% 0.00121005
+# target 99.9% 0.00121792
+Sockets used: 12 (for perfect keepalive, would be 4)
+Uniform: false, Jitter: false, Catchup allowed: true
+IP addresses distribution:
+10.96.115.0:8080: 12
+Code  -1 : 4 (0.1 %)
+Code 200 : 5996 (99.9 %)
+Response Header Sizes : count 6000 avg 74.95 +/- 1.936 min 0 max 75 sum 449700
+Response Body/Total Sizes : count 6000 avg 74.95 +/- 1.936 min 0 max 75 sum 449700
+All done 6000 calls (plus 4 warmup) 0.216 ms avg, 100.0 qps
+Successfully wrote 5321 bytes of Json data to stdout

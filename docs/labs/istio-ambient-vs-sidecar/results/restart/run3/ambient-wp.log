@@ -1,0 +1,84 @@
+{"ts":1791816839.287110,"level":"info","r":1,"file":"scli.go","line":124,"msg":"Starting","command":"Φορτίο","version":"1.76.0 h1:CSeuqtbKDwX34cTsjcV0VDYjCCJeQ/sYTPDtIakFmrs= go1.26.9 amd64 linux","go-max-procs":4}
+Fortio 1.76.0 running at 100 queries per second, 4->4 procs, for 1m0s: http://server:8080/echo
+{"ts":1791816839.287840,"level":"info","r":1,"file":"httprunner.go","line":121,"msg":"Starting http test","run":0,"url":"http://server:8080/echo","threads":4,"qps":"100.0","warmup":"parallel","conn-reuse":""}
+Starting at 100 qps with 4 thread(s) [gomax 4] for 1m0s : 1500 calls each (total 6000)
+{"ts":1791816850.238912,"level":"warn","r":13,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":0,"run":0}
+{"ts":1791816850.239368,"level":"warn","r":15,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":2,"run":0}
+{"ts":1791816850.239424,"level":"warn","r":16,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":3,"run":0}
+{"ts":1791816850.239460,"level":"warn","r":14,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":1,"run":0}
+{"ts":1791816850.279895,"level":"warn","r":13,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":0,"run":0}
+{"ts":1791816850.281432,"level":"warn","r":16,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":3,"run":0}
+{"ts":1791816850.281476,"level":"warn","r":15,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":2,"run":0}
+{"ts":1791816850.281490,"level":"warn","r":14,"file":"http_client.go","line":1151,"msg":"Non ok http code","code":503,"status":"HTTP/1.1 503","thread":1,"run":0}
+{"ts":1791816853.319217,"level":"err","r":14,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.8:43780->10.96.1.142:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.1.142","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":1,"run":0}
+{"ts":1791816853.319267,"level":"err","r":16,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.8:43786->10.96.1.142:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.1.142","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":3,"run":0}
+{"ts":1791816853.319281,"level":"err","r":13,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.8:43764->10.96.1.142:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.1.142","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":0,"run":0}
+{"ts":1791816853.319475,"level":"err","r":15,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.8:43750->10.96.1.142:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.1.142","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":2,"run":0}
+{"ts":1791816899.310415,"level":"info","r":16,"file":"periodic.go","line":896,"msg":"T003 ended after 1m0.002052537s : 1500 calls. qps=24.999144805505306"}
+{"ts":1791816899.310534,"level":"info","r":15,"file":"periodic.go","line":896,"msg":"T002 ended after 1m0.002193721s : 1500 calls. qps=24.99908598300164"}
+{"ts":1791816899.310546,"level":"info","r":13,"file":"periodic.go","line":896,"msg":"T000 ended after 1m0.002206352s : 1500 calls. qps=24.999080720470904"}
+{"ts":1791816899.310552,"level":"info","r":14,"file":"periodic.go","line":896,"msg":"T001 ended after 1m0.002198483s : 1500 calls. qps=24.99908399898021"}
+Ended after 1m0.002261278s : 6000 calls. qps=99.996
+{"ts":1791816899.310676,"level":"info","r":1,"file":"periodic.go","line":598,"msg":"Run ended","run":0,"elapsed":60002261278,"calls":6000,"qps":99.99623134536627}
+Aggregated Sleep Time : count 5996 avg -0.03955606 +/- 0.3883 min -2.963795801 max 0.039381833 sum -237.178134
+# range, mid point, percentile, count
+>= -2.9638 <= -0.001 , -1.4824 , 5.07, 304
+> 0.017 <= 0.019 , 0.018 , 5.14, 4
+> 0.024 <= 0.029 , 0.0265 , 5.20, 4
+> 0.029 <= 0.034 , 0.0315 , 5.25, 3
+> 0.034 <= 0.039 , 0.0365 , 99.63, 5659
+> 0.039 <= 0.0393818 , 0.0391909 , 100.00, 22
+# target 50% 0.0363706
+WARNING 5.07% of sleep were falling behind
+Aggregated Function Time : count 6000 avg 0.0031715849 +/- 0.07747 min 0.000272255 max 3.002646366 sum 19.0295094
+# range, mid point, percentile, count
+>= 0.000272255 <= 0.001 , 0.000636127 , 27.63, 1658
+> 0.001 <= 0.002 , 0.0015 , 98.68, 4263
+> 0.002 <= 0.003 , 0.0025 , 99.50, 49
+> 0.003 <= 0.004 , 0.0035 , 99.68, 11
+> 0.004 <= 0.005 , 0.0045 , 99.85, 10
+> 0.005 <= 0.006 , 0.0055 , 99.87, 1
+> 0.012 <= 0.014 , 0.013 , 99.88, 1
+> 0.014 <= 0.016 , 0.015 , 99.93, 3
+> 3 <= 3.00265 , 3.00132 , 100.00, 4
+# target 50% 0.0013148
+# target 75% 0.00166667
+# target 90% 0.00187779
+# target 99% 0.00238776
+# target 99.9% 0.0146667
+Error cases : count 12 avg 1.0030683 +/- 1.414 min 0.002045257 max 3.002646366 sum 12.0368196
+# range, mid point, percentile, count
+>= 0.00204526 <= 0.003 , 0.00252263 , 33.33, 4
+> 0.003 <= 0.004 , 0.0035 , 41.67, 1
+> 0.004 <= 0.005 , 0.0045 , 66.67, 3
+> 3 <= 3.00265 , 3.00132 , 100.00, 4
+# target 50% 0.00433333
+# target 75% 3.00066
+# target 90% 3.00185
+# target 99% 3.00257
+# target 99.9% 3.00264
+# Socket and IP used for each connection:
+[0]   4 socket used, resolved to 10.96.1.142:8080, connection timing : count 4 avg 8.374775e-05 +/- 4.338e-05 min 3.9664e-05 max 0.000129478 sum 0.000334991
+[1]   4 socket used, resolved to 10.96.1.142:8080, connection timing : count 4 avg 4.6336e-05 +/- 2.457e-05 min 2.7517e-05 max 8.8511e-05 sum 0.000185344
+[2]   4 socket used, resolved to 10.96.1.142:8080, connection timing : count 4 avg 0.0005989345 +/- 0.0005092 min 3.8539e-05 max 0.00124359 sum 0.002395738
+[3]   4 socket used, resolved to 10.96.1.142:8080, connection timing : count 4 avg 0.00039030875 +/- 0.0004417 min 7.9729e-05 max 0.001150085 sum 0.001561235
+Connection time histogram (s) : count 16 avg 0.00027983175 +/- 0.0004074 min 2.7517e-05 max 0.00124359 sum 0.004477308
+# range, mid point, percentile, count
+>= 2.7517e-05 <= 0.001 , 0.000513758 , 87.50, 14
+> 0.001 <= 0.00124359 , 0.0011218 , 100.00, 2
+# target 50% 0.000551162
+# target 75% 0.000850387
+# target 90% 0.00104872
+# target 99% 0.0012241
+# target 99.9% 0.00124164
+Sockets used: 16 (for perfect keepalive, would be 4)
+Uniform: false, Jitter: false, Catchup allowed: true
+IP addresses distribution:
+10.96.1.142:8080: 16
+Code  -1 : 4 (0.1 %)
+Code 200 : 5988 (99.8 %)
+Code 503 : 8 (0.1 %)
+Response Header Sizes : count 6000 avg 202.59433 +/- 9.069 min 0 max 204 sum 1215566
+Response Body/Total Sizes : count 6000 avg 203.005 +/- 6.494 min 0 max 308 sum 1218030
+All done 6000 calls (plus 4 warmup) 3.172 ms avg, 100.0 qps
+Successfully wrote 5836 bytes of Json data to stdout

@@ -1,0 +1,25 @@
+external server at 172.18.0.5:8080
+[ALLOW_ANY (default)] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] sidecar -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] sidecar -> 172.18.0.5:8080 : HTTP/1.1 502
+[REGISTRY_ONLY] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] sidecar -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+
+{"conditions":[{"lastTransitionTime":"2026-10-12T16:58:02.565568834Z","message":"Successfully attached to waypoint ambient-wp/waypoint","reason":"WaypointAccepted","status":"True","type":"istio.io/WaypointBound"}]}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":null}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":{"destination":"ambient-wp/waypoint.ambient-wp.svc.cluster.local"}}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":null}
+[ambient-wp SE with addresses] istio.io/WaypointBound=True Successfully attached to waypoint ambient-wp/waypoint
+[ambient-wp SE with addresses] http://ext-http.lab.internal:8080/debug : HTTP/1.1 200 OK
+[ambient-wp SE with addresses] http://172.18.0.5:8080/debug : HTTP/1.1 200 OK
+[client-node ztunnel] 2026-10-12T16:58:18.253560Z	info	access	connection complete	src.addr=10.244.1.17:55692 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.cluster="Kubernetes" dst.addr=172.18.0.5:8080 dst.service="ext-http.lab.internal" dst.workload="ext-http" dst.namespace="ambient-wp" dst.cluster="Kubernetes" direction="outbound" bytes_sent=84 bytes_recv=394 duration="1ms"
+[ambient-wp SE without addresses] auto-allocated VIP: 240.240.0.3
+[ambient-wp SE without addresses] http://ext-noaddr.lab.internal:8080/debug : HTTP/1.1 200 OK server: istio-envoy x-envoy-decorator-operation: ext-noaddr.lab.internal:8080/*
+[ambient-wp SE without addresses] http://172.18.0.5:8080/debug : HTTP/1.1 200 OK

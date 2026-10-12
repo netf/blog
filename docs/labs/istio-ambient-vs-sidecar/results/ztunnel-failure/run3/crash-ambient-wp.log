@@ -1,0 +1,141 @@
+{"ts":1791822571.417975,"level":"info","r":1,"file":"scli.go","line":124,"msg":"Starting","command":"Φορτίο","version":"1.76.0 h1:CSeuqtbKDwX34cTsjcV0VDYjCCJeQ/sYTPDtIakFmrs= go1.26.9 amd64 linux","go-max-procs":4}
+Fortio 1.76.0 running at 100 queries per second, 4->4 procs, for 1m0s: http://server:8080/echo
+{"ts":1791822571.418813,"level":"info","r":1,"file":"httprunner.go","line":121,"msg":"Starting http test","run":0,"url":"http://server:8080/echo","threads":4,"qps":"100.0","warmup":"parallel","conn-reuse":""}
+Starting at 100 qps with 4 thread(s) [gomax 4] for 1m0s : 1500 calls each (total 6000)
+{"ts":1791822586.602293,"level":"info","r":52,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":3,"run":0}
+{"ts":1791822586.602332,"level":"info","r":51,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":2,"run":0}
+{"ts":1791822586.602358,"level":"info","r":50,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":1,"run":0}
+{"ts":1791822586.602378,"level":"info","r":49,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":0,"run":0}
+{"ts":1791822586.602779,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.602805,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.602819,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.602828,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.602835,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.602843,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.602850,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.602857,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:59315->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.642506,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.642747,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.642605,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.642921,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.642639,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.642933,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:33662->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.643399,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:39909->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.643422,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:39909->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.682866,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.682875,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.682881,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.682893,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.682901,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.682888,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.682920,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.682925,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:54900->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.722541,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.722550,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.722564,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.722580,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.722581,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.722590,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.722544,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.722601,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:40504->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.763144,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.763150,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.763167,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.763171,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.763174,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.763194,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.763185,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.763242,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:57820->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.802772,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.802787,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.802796,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.802796,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.802815,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.802817,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.802823,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.802865,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35113->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.842385,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.842781,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.842599,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.842838,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.842616,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.842870,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.842719,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.842879,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:46836->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.882479,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.882502,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.882511,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.882523,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.882522,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.882545,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.882556,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.882554,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:35106->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.923382,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.923385,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.923408,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.923404,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.923421,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.923428,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.923475,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.923487,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:48225->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822586.963282,"level":"err","r":50,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.963307,"level":"err","r":50,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused","thread":1,"run":0}
+{"ts":1791822586.963299,"level":"err","r":52,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.963328,"level":"err","r":52,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused","thread":3,"run":0}
+{"ts":1791822586.963322,"level":"err","r":49,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.963356,"level":"err","r":49,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused","thread":0,"run":0}
+{"ts":1791822586.963524,"level":"err","r":51,"file":"network.go","line":430,"msg":"Unable to lookup \"server\": lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused"}
+{"ts":1791822586.963536,"level":"err","r":51,"file":"http_client.go","line":926,"msg":"Unable to resolve hostname","hostname":"server","err":"lookup server on 10.96.0.10:53: read udp 10.244.1.17:39155->10.96.0.10:53: read: connection refused","thread":2,"run":0}
+{"ts":1791822631.433224,"level":"info","r":52,"file":"periodic.go","line":896,"msg":"T003 ended after 1m0.001704017s : 1500 calls. qps=24.999290013080497"}
+{"ts":1791822631.433435,"level":"info","r":50,"file":"periodic.go","line":896,"msg":"T001 ended after 1m0.001925157s : 1500 calls. qps=24.999197876986877"}
+{"ts":1791822631.433967,"level":"info","r":49,"file":"periodic.go","line":896,"msg":"T000 ended after 1m0.002461276s : 1500 calls. qps=24.998974510400217"}
+{"ts":1791822631.434536,"level":"info","r":51,"file":"periodic.go","line":896,"msg":"T002 ended after 1m0.003029501s : 1500 calls. qps=24.998737771648702"}
+Ended after 1m0.003056614s : 6000 calls. qps=99.995
+{"ts":1791822631.434608,"level":"info","r":1,"file":"periodic.go","line":598,"msg":"Run ended","run":0,"elapsed":60003056614,"calls":6000,"qps":99.9949059028448}
+Sleep times : count 5996 avg 0.038081974 +/- 0.000577 min 0.026242781 max 0.039321284 sum 228.339519
+Aggregated Function Time : count 6000 avg 0.0013079042 +/- 0.0003845 min 0.000168269 max 0.010720846 sum 7.84742512
+# range, mid point, percentile, count
+>= 0.000168269 <= 0.001 , 0.000584134 , 12.15, 729
+> 0.001 <= 0.002 , 0.0015 , 97.93, 5147
+> 0.002 <= 0.003 , 0.0025 , 99.83, 114
+> 0.003 <= 0.004 , 0.0035 , 99.92, 5
+> 0.005 <= 0.006 , 0.0055 , 99.93, 1
+> 0.01 <= 0.0107208 , 0.0103604 , 100.00, 4
+# target 50% 0.00144123
+# target 75% 0.00173266
+# target 90% 0.00190752
+# target 99% 0.0025614
+# target 99.9% 0.0038
+Error cases : count 40 avg 0.00052157565 +/- 0.0002011 min 0.000168269 max 0.001016247 sum 0.020863026
+# range, mid point, percentile, count
+>= 0.000168269 <= 0.001 , 0.000584134 , 97.50, 39
+> 0.001 <= 0.00101625 , 0.00100812 , 100.00, 1
+# target 50% 0.000584134
+# target 75% 0.000803011
+# target 90% 0.000934337
+# target 99% 0.00100975
+# target 99.9% 0.0010156
+# Socket and IP used for each connection:
+[0]   2 socket used, resolved to [10.96.1.142:8080 (2), <nil> (10)], connection timing : count 2 avg 0.0001116965 +/- 2.49e-05 min 8.6801e-05 max 0.000136592 sum 0.000223393
+[1]   2 socket used, resolved to [10.96.1.142:8080 (2), <nil> (10)], connection timing : count 2 avg 9.7045e-05 +/- 2.157e-06 min 9.4888e-05 max 9.9202e-05 sum 0.00019409
+[2]   2 socket used, resolved to [10.96.1.142:8080 (2), <nil> (10)], connection timing : count 2 avg 4.5857e-05 +/- 7.302e-06 min 3.8555e-05 max 5.3159e-05 sum 9.1714e-05
+[3]   2 socket used, resolved to [<nil> (10), 10.96.1.142:8080 (2)], connection timing : count 2 avg 0.0001120815 +/- 4.079e-05 min 7.1295e-05 max 0.000152868 sum 0.000224163
+Connection time histogram (s) : count 8 avg 9.167e-05 +/- 3.635e-05 min 3.8555e-05 max 0.000152868 sum 0.00073336
+# range, mid point, percentile, count
+>= 3.8555e-05 <= 0.000152868 , 9.57115e-05 , 100.00, 8
+# target 50% 8.75463e-05
+# target 75% 0.000120207
+# target 90% 0.000139804
+# target 99% 0.000151562
+# target 99.9% 0.000152737
+Sockets used: 8 (for perfect keepalive, would be 4)
+Uniform: false, Jitter: false, Catchup allowed: true
+IP addresses distribution:
+<nil>: 40
+10.96.1.142:8080: 8
+Code  -1 : 40 (0.7 %)
+Code 200 : 5960 (99.3 %)
+Response Header Sizes : count 6000 avg 201.64667 +/- 16.52 min 0 max 203 sum 1209880
+Response Body/Total Sizes : count 6000 avg 201.64667 +/- 16.52 min 0 max 203 sum 1209880
+All done 6000 calls (plus 4 warmup) 1.308 ms avg, 100.0 qps
+Successfully wrote 5093 bytes of Json data to stdout

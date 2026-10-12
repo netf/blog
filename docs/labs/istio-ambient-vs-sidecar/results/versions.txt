@@ -1,0 +1,39 @@
+# captured 2026-10-12T14:58:26Z
+## host
+Ubuntu 24.04.5 LTS
+6.12.94+
+4
+MemTotal:       16398384 kB
+## docker
+client 29.9.0 server 29.9.0
+## kind
+kind v0.33.0 go1.26.7 linux/amd64
+## kubectl
+Client Version: v1.37.1
+Kustomize Version: v5.8.1
+Server Version: v1.36.4
+## nodes
+NAME                     STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION     CONTAINER-RUNTIME
+mesh-lab-control-plane   Ready    control-plane   16m   v1.36.4   172.18.0.4    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+mesh-lab-worker          Ready    <none>          16m   v1.36.4   172.18.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+mesh-lab-worker2         Ready    <none>          16m   v1.36.4   172.18.0.3    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+## helm
+v3.22.0+g144ca65
+## istioctl
+client version: 1.31.1
+control plane version: 1.31.1
+data plane version: 1.31.1 (6 proxies)
+## helm releases
+NAME      	NAMESPACE   	REVISION	UPDATED                                	STATUS  	CHART         	APP VERSION
+istio-base	istio-system	2       	2026-10-12 14:45:41.844853181 +0000 UTC	deployed	base-1.31.1   	1.31.1     
+istio-cni 	istio-system	2       	2026-10-12 14:46:06.573095243 +0000 UTC	deployed	cni-1.31.1    	1.31.1     
+istiod    	istio-system	2       	2026-10-12 14:45:43.717214374 +0000 UTC	deployed	istiod-1.31.1 	1.31.1     
+ztunnel   	istio-system	2       	2026-10-12 14:46:50.980452304 +0000 UTC	deployed	ztunnel-1.31.1	1.31.1     
+## kube-proxy mode
+mode: nftables
+## CNI
+docker.io/kindest/kindnetd:v20260820-69b56db7
+## fortio
+fortio/fortio:1.76.0
+## gateway api
+v1.5.1

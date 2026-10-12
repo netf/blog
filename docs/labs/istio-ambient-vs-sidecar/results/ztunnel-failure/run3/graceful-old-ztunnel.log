@@ -1,0 +1,184 @@
+2026-10-12T16:27:17.629429Z	info	ztunnel	version: version.BuildInfo{Version:"a5cced0a5ade43273e9ba9b9c7a419450a9dacf3", GitRevision:"a5cced0a5ade43273e9ba9b9c7a419450a9dacf3", RustVersion:"1.94.0", BuildProfile:"release", BuildStatus:"Clean", IstioVersion:"1.31.1", CryptoProvider:"tls-aws-lc"}	
+2026-10-12T16:27:17.629476Z	info	ztunnel	set file descriptor limits from 1073741816 to 1073741816	
+2026-10-12T16:27:17.629691Z	info	ztunnel	running with config: proxy: true
+dnsProxy: true
+windowSize: 4194304
+connectionWindowSize: 16777216
+frameSize: 1048576
+poolMaxStreamsPerConn: 100
+poolUnusedReleaseTimeout:
+  secs: 300
+  nanos: 0
+socks5Addr: null
+adminAddr: !Localhost
+- true
+- 15000
+statsAddr: !SocketAddr '[::]:15020'
+readinessAddr: !SocketAddr '[::]:15021'
+inboundAddr: '[::]:15008'
+inboundPlaintextAddr: '[::]:15006'
+outboundAddr: '[::]:15001'
+dnsProxyAddr: !Localhost
+- true
+- 15053
+illegalPorts:
+- 15008
+- 15006
+- 15001
+network: ''
+localNode: mesh-lab-worker
+proxyMode: Shared
+proxyWorkloadInformation: null
+clusterId: Kubernetes
+clusterDomain: cluster.local
+caAddress: https://istiod.istio-system.svc:15012
+caRootCert: !File ./var/run/secrets/istio/root-cert.pem
+altCaHostname: null
+xdsAddress: https://istiod.istio-system.svc:15012
+xdsRootCert: !File ./var/run/secrets/istio/root-cert.pem
+altXdsHostname: null
+preferedServiceNamespace: null
+secretTtl:
+  secs: 86400
+  nanos: 0
+xdsOnDemand: false
+fakeCa: false
+fakeSelfInbound: false
+selfTerminationDeadline:
+  secs: 25
+  nanos: 0
+proxyMetadata:
+  ISTIO_VERSION: 1.31.1
+  CLUSTER_ID: Kubernetes
+numWorkerThreads: 2
+requireOriginalSource: null
+proxyArgs: proxy ztunnel
+dnsResolverCfg:
+  domain: null
+  search:
+  - istio-system.svc.cluster.local
+  - svc.cluster.local
+  - cluster.local
+  name_servers:
+  - ip: 10.96.0.10
+    trust_negative_responses: true
+    connections:
+    - port: 53
+      protocol:
+        type: udp
+      bind_addr: null
+    - port: 53
+      protocol:
+        type: tcp
+      bind_addr: null
+dnsResolverOpts:
+  ndots: 5
+  timeout: 5
+  attempts: 2
+  edns0: false
+  ip_strategy: Ipv4AndIpv6
+  cache_size: 4096
+  use_hosts_file: Auto
+  positive_min_ttl: null
+  negative_min_ttl: null
+  positive_max_ttl: null
+  negative_max_ttl: null
+  num_concurrent_reqs: 2
+  max_active_requests: 32
+  preserve_intermediates: true
+  try_tcp_on_error: false
+  server_ordering_strategy: QueryStatistics
+  recursion_desired: true
+  avoid_local_udp_ports: []
+  os_port_selection: false
+  case_randomization: false
+  trust_anchor: null
+  allow_answers: []
+  deny_answers: []
+  edns_payload_len: 1232
+inpodUds: /var/run/ztunnel/ztunnel.sock
+inpodPortReuse: true
+packetMark: 1337
+socketConfig:
+  keepaliveTime:
+    secs: 180
+    nanos: 0
+  keepaliveInterval:
+    secs: 180
+    nanos: 0
+  keepaliveRetries: 9
+  keepaliveEnabled: true
+  userTimeoutEnabled: false
+xdsHeaders: []
+caHeaders: []
+localhostAppTunnel: true
+ztunnelIdentity: spiffe://cluster.local/ns/istio-system/sa/ztunnel
+ztunnelWorkload:
+  name: ztunnel-q7m8j
+  namespace: istio-system
+  serviceAccount: ztunnel
+ipv6Enabled: true
+crlPath: null
+enableEnhancedBaggage: true
+	
+2026-10-12T16:27:17.631031Z	info	hyper_util	listener established	address=[::]:15021 component="readiness"
+2026-10-12T16:27:17.631305Z	info	app	shared proxy mode - in-pod mode enabled	
+2026-10-12T16:27:17.631323Z	info	proxyfactory	creating ztunnel self-proxy listener with identity: Spiffe { trust_domain: "cluster.local", namespace: "istio-system", service_account: "ztunnel" }	
+2026-10-12T16:27:17.631355Z	info	proxy::inbound	listener established	address=[::]:15008 component="inbound" transparent=true
+2026-10-12T16:27:17.631464Z	info	hyper_util	listener established	address=127.0.0.1:15000 component="admin"
+2026-10-12T16:27:17.631506Z	info	hyper_util	listener established	address=[::]:15020 component="stats"
+2026-10-12T16:27:17.631523Z	info	readiness	Task 'dns proxy' complete (2.909419ms), still awaiting 3 tasks	
+2026-10-12T16:27:17.631526Z	info	readiness	Task 'proxy' complete (2.912134ms), still awaiting 2 tasks	
+2026-10-12T16:27:17.631702Z	info	app	Starting ztunnel inbound listener task	
+2026-10-12T16:27:17.669993Z	info	xds::client:xds{id=1}	Stream established	
+2026-10-12T16:27:17.670353Z	info	readiness	Task 'state manager' complete (41.739228ms), still awaiting 1 tasks	
+2026-10-12T16:27:17.670435Z	info	inpod::workloadmanager	handling new stream	
+2026-10-12T16:27:17.671366Z	info	inpod::statemanager	pod received, starting proxy	uid="d5dd0713-e20f-4d3b-8331-8e476a896162" name="client-b66f74955-nsmmd" namespace="ambient-wp"
+2026-10-12T16:27:17.672836Z	info	dns::server	starting local DNS server	address=localhost:15053 component="dns"
+2026-10-12T16:27:17.673335Z	info	proxy::inbound	listener established	address=[::]:15008 component="inbound" transparent=true
+2026-10-12T16:27:17.673354Z	info	proxy::inbound_passthrough	listener established	address=[::]:15006 component="inbound plaintext" transparent=true
+2026-10-12T16:27:17.673367Z	info	proxy::outbound	listener established	address=[::]:15001 component="outbound" transparent=true
+2026-10-12T16:27:17.673747Z	info	inpod::statemanager	pod received, starting proxy	uid="2ffc5a76-873b-41a2-8699-54062f51ec37" name="client-b66f74955-rqhgg" namespace="ambient"
+2026-10-12T16:27:17.673888Z	info	dns::server	starting local DNS server	address=localhost:15053 component="dns"
+2026-10-12T16:27:17.673980Z	info	proxy::inbound	listener established	address=[::]:15008 component="inbound" transparent=true
+2026-10-12T16:27:17.673993Z	info	proxy::inbound_passthrough	listener established	address=[::]:15006 component="inbound plaintext" transparent=true
+2026-10-12T16:27:17.674007Z	info	proxy::outbound	listener established	address=[::]:15001 component="outbound" transparent=true
+2026-10-12T16:27:17.674137Z	info	inpod::statemanager	received snapshot sent	
+2026-10-12T16:27:17.674141Z	info	readiness	Task 'workload proxy manager' complete (45.527372ms), marking server ready	
+2026-10-12T16:28:02.266605Z	info	access	connection complete	src.addr=10.244.1.15:59570 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=83625 duration="44590ms"
+2026-10-12T16:28:02.267078Z	info	access	connection complete	src.addr=10.244.1.15:59556 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=83625 duration="44590ms"
+2026-10-12T16:28:02.267090Z	info	access	connection complete	src.addr=10.244.1.15:59548 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=83625 duration="44590ms"
+2026-10-12T16:28:02.267803Z	info	access	connection complete	src.addr=10.244.1.15:59542 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=83625 duration="44591ms"
+2026-10-12T16:28:02.278543Z	info	access	connection complete	src.addr=10.244.1.17:32966 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=226345 duration="44591ms"
+2026-10-12T16:28:02.279553Z	info	access	connection complete	src.addr=10.244.1.17:32980 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=226345 duration="44592ms"
+2026-10-12T16:28:02.279610Z	info	access	connection complete	src.addr=10.244.1.17:32984 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=226345 duration="44592ms"
+2026-10-12T16:28:02.279745Z	info	access	connection complete	src.addr=10.244.1.17:32968 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=88085 bytes_recv=226345 duration="44592ms"
+2026-10-12T16:28:36.247557Z	info	signal::imp	received signal SIGTERM, starting shutdown	
+2026-10-12T16:28:36.247670Z	info	hyper_util	listener drained	address=[::]:15020 component="stats"
+2026-10-12T16:28:36.247747Z	info	hyper_util	listener drained	address=127.0.0.1:15000 component="admin"
+2026-10-12T16:28:36.247763Z	info	hyper_util	listener drained	address=127.0.0.1:15000 component="admin"
+2026-10-12T16:28:36.248179Z	info	hyper_util	listener drained	address=[::]:15021 component="readiness"
+2026-10-12T16:28:36.248257Z	info	drain	shutdown complete	component="inbound"
+2026-10-12T16:28:36.248341Z	info	inpod::protocol	workload proxy manager: drain requested	
+2026-10-12T16:28:36.248373Z	info	inpod::workloadmanager	process stream ended with eof	
+2026-10-12T16:28:36.248383Z	info	inpod::workloadmanager	drain requested	
+2026-10-12T16:28:36.248443Z	info	drain:proxy{wl=ambient-wp/client-b66f74955-nsmmd}	shutdown complete	component="inbound passthrough"
+2026-10-12T16:28:36.248499Z	info	drain:proxy{wl=ambient/client-b66f74955-rqhgg}	shutdown complete	component="inbound passthrough"
+2026-10-12T16:28:36.248612Z	info	drain:proxy{wl=ambient/client-b66f74955-rqhgg}	shutdown complete	component="inbound"
+2026-10-12T16:28:36.248650Z	info	dns::server:dns_proxy{wl=ambient/client-b66f74955-rqhgg}	shutting down the DNS server	
+2026-10-12T16:28:36.248726Z	info	dns::server:dns_proxy{wl=ambient/client-b66f74955-rqhgg}	dns server drained	
+2026-10-12T16:28:36.248755Z	info	drain:proxy{wl=ambient-wp/client-b66f74955-nsmmd}	shutdown complete	component="inbound"
+2026-10-12T16:28:36.248761Z	info	dns::server:dns_proxy{wl=ambient-wp/client-b66f74955-nsmmd}	shutting down the DNS server	
+2026-10-12T16:28:36.248798Z	info	dns::server:dns_proxy{wl=ambient-wp/client-b66f74955-nsmmd}	dns server drained	
+2026-10-12T16:29:01.249405Z	warn	drain:proxy{wl=ambient/client-b66f74955-rqhgg}	drain duration expired with pending connections, forcefully shutting down	component="outbound"
+2026-10-12T16:29:01.249442Z	info	drain:proxy{wl=ambient/client-b66f74955-rqhgg}	shutdown complete	component="outbound"
+2026-10-12T16:29:01.249532Z	error	access	connection complete	src.addr=10.244.1.15:51310 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=75075 duration="40010ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249606Z	error	access	connection complete	src.addr=10.244.1.15:51336 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=75075 duration="40010ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249645Z	error	access	connection complete	src.addr=10.244.1.15:51308 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=75075 duration="40010ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249671Z	warn	drain:proxy{wl=ambient-wp/client-b66f74955-nsmmd}	drain duration expired with pending connections, forcefully shutting down	component="outbound"
+2026-10-12T16:29:01.249673Z	info	drain:proxy{wl=ambient-wp/client-b66f74955-nsmmd}	shutdown complete	component="outbound"
+2026-10-12T16:29:01.249709Z	error	access	connection complete	src.addr=10.244.1.17:47064 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=203203 duration="39998ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249742Z	error	access	connection complete	src.addr=10.244.1.17:47048 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=203203 duration="39999ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249766Z	error	access	connection complete	src.addr=10.244.1.17:47096 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=203203 duration="39999ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249789Z	error	access	connection complete	src.addr=10.244.1.17:47080 src.workload="client-b66f74955-nsmmd" src.namespace="ambient-wp" src.identity="spiffe://cluster.local/ns/ambient-wp/sa/client" src.cluster="Kubernetes" dst.addr=10.244.1.28:15008 dst.hbone_addr=10.96.1.142:8080 dst.service="server.ambient-wp.svc.cluster.local" dst.workload="waypoint-5c4d4dbd4-bfq5b" dst.namespace="ambient-wp" dst.identity="spiffe://cluster.local/ns/ambient-wp/sa/waypoint" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=203203 duration="39998ms" error="connection closed due to connection drain"
+2026-10-12T16:29:01.249795Z	error	access	connection complete	src.addr=10.244.1.15:51326 src.workload="client-b66f74955-rqhgg" src.namespace="ambient" src.identity="spiffe://cluster.local/ns/ambient/sa/client" src.cluster="Kubernetes" dst.addr=10.244.2.24:15008 dst.hbone_addr=10.244.2.24:8080 dst.service="server.ambient.svc.cluster.local" dst.workload="server-d87c87d86-hbwnz" dst.namespace="ambient" dst.identity="spiffe://cluster.local/ns/ambient/sa/server" dst.cluster="Kubernetes" direction="outbound" bytes_sent=79079 bytes_recv=75075 duration="40010ms" error="connection closed due to connection drain"

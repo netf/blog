@@ -1,0 +1,8 @@
+== baseline
+requests=6000 sockets=12 codes={"-1":4,"200":5996} max_ms=8
+== sidecar
+requests=6000 sockets=13 codes={"200":5991,"503":9} max_ms=75
+== ambient
+requests=6000 sockets=20 codes={"-1":12,"200":5988} max_ms=3001
+== ambient-wp
+requests=6000 sockets=16 codes={"200":5988,"503":12} max_ms=13

@@ -1,0 +1,14 @@
+== sidecar ClientHello: dstport SNI ALPN offered-versions
+8080	outbound_.8080_._.server.sidecar.svc.cluster.local	istio-http/1.1,istio,http/1.1	0x0304,0x0303
+8080	outbound_.8080_._.server.sidecar.svc.cluster.local	istio-http/1.1,istio,http/1.1	0x0304,0x0303
+== sidecar ServerHello negotiated version
+0x0304
+0x0304
+== ambient ClientHello: dstport SNI ALPN offered-versions
+15008		h2	0x0304
+== ambient ServerHello negotiated version
+0x0304
+== ambient-wp ClientHello: dstport SNI ALPN offered-versions
+15008		h2	0x0304
+== ambient-wp ServerHello negotiated version
+0x0304

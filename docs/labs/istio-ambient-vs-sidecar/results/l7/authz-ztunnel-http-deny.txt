@@ -1,0 +1,6 @@
+ambient, HTTP-only DENY /debug, fresh pod (sa default): /debug -> HTTP/1.1 200, /echo -> HTTP/1.1 200
+istiod status on that policy:
+  ZtunnelAccepted=True reason=UnsupportedValue: ztunnel does not support HTTP attributes (found: paths). In ambient mode you must use a waypoint proxy to enforce HTTP rules. DENY policy with HTTP attributes is enforced without the HTTP rules. This will be more restrictive than requested.
+policy as pushed to ztunnel (istioctl ztunnel-config policies):
+{"name":"deny-debug","namespace":"ambient","scope":"WorkloadSelector","action":"Deny","rules":[[[{}]]]}
+ambient, L4 DENY principal sa/client: sa/client -> EOF, sa/default (fresh pod) -> HTTP/1.1 200

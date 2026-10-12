@@ -1,0 +1,9 @@
+{"label":"no VirtualService (Istio default retry policy)","ns":"sidecar","codes":{"200":1007,"503":993},"p50_ms":1.6621438263229307,"p99_ms":4.124999999999996}
+{"label":"no VirtualService (Istio default retry policy)","ns":"ambient","codes":{"200":1062,"503":938},"p50_ms":0.977803639185257,"p99_ms":2.9024390243902425}
+{"label":"no VirtualService (Istio default retry policy)","ns":"ambient-wp","codes":{"200":1000,"503":1000},"p50_ms":1.8390705679862305,"p99_ms":4}
+{"label":"VirtualService retries attempts=5 retryOn=5xx","ns":"sidecar","codes":{"200":1969,"503":31},"p50_ms":1.974248927038627,"p99_ms":359.9999999999995}
+{"label":"VirtualService retries attempts=5 retryOn=5xx","ns":"ambient","codes":{"200":991,"503":1009},"p50_ms":1.0471887550200805,"p99_ms":2.7948717948717925}
+{"label":"VirtualService retries attempts=5 retryOn=5xx","ns":"ambient-wp","codes":{"200":1966,"503":34},"p50_ms":1.9698275862068964,"p99_ms":365.3846153846155}
+{"label":"VirtualService retries attempts=0","ns":"sidecar","codes":{"200":975,"503":1025},"p50_ms":1.575625,"p99_ms":2.9585987261146496}
+{"label":"VirtualService retries attempts=0","ns":"ambient","codes":{"200":1006,"503":994},"p50_ms":1.0435222672064777,"p99_ms":2.7142857142857135}
+{"label":"VirtualService retries attempts=0","ns":"ambient-wp","codes":{"200":1007,"503":993},"p50_ms":1.899817850637523,"p99_ms":3.881188118811882}
