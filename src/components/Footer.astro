@@ -1,0 +1,44 @@
+---
+import { SITE_AUTHOR, SOCIALS, url } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="container">
+		<span>&copy; {year} {SITE_AUTHOR}</span>
+		<span class="links">
+			<a href={SOCIALS.github} rel="me noopener" target="_blank">github</a>
+			<a href={url('/rss.xml')}>rss</a>
+			<a href="https://astro.build" rel="noopener" target="_blank">built with astro</a>
+		</span>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		margin-top: 6rem;
+		border-top: 1px solid var(--border);
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--subtle);
+	}
+	.container {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 2rem;
+	}
+	.links {
+		display: flex;
+		gap: 1.25rem;
+	}
+	a {
+		color: var(--muted);
+		text-decoration: none;
+	}
+	a:hover {
+		color: var(--fg);
+	}
+</style>

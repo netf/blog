@@ -1,0 +1,169 @@
+---
+import PostList from '../components/PostList.astro';
+import Tag from '../components/Tag.astro';
+import { url } from '../consts';
+import Base from '../layouts/Base.astro';
+import { getPosts, getTags } from '../lib/posts';
+
+const posts = await getPosts();
+const recent = posts.slice(0, 5);
+const tags = [...getTags(posts)].slice(0, 10);
+
+const nameWidth = 36;
+const tableHead = `${'NAME'.padEnd(nameWidth)}  PUBLISHED   STATUS`;
+const tableRows = recent
+	.slice(0, 3)
+	.map((p) => {
+		const name = p.id.length > nameWidth ? `${p.id.slice(0, nameWidth - 1)}…` : p.id.padEnd(nameWidth);
+		return `${name}  ${p.data.pubDate.toISOString().slice(0, 10)}  ${p.data.draft ? 'Pending' : 'Running'}`;
+	})
+	.join('\n');
+---
+
+<Base>
+	<section class="hero container">
+		<p class="eyebrow">devops / platform engineering</p>
+		<h1>
+			Building the paved road<span class="dim">, one</span>
+			<code class="inline">terraform apply</code><span class="dim"> at a time.</span>
+		</h1>
+		<p class="intro">
+			I write about platform engineering, Kubernetes, CI/CD, infrastructure as code, observability and
+			the people side of running production systems.
+		</p>
+		<div class="terminal" aria-hidden="true">
+			<div class="bar"><span></span><span></span><span></span></div>
+			<pre><span class="p">$</span> kubectl get posts -n blog{'\n'}<span class="c">{tableHead}</span>{'\n'}{tableRows}{'\n'}<span class="p">$</span> <span class="blink">▍</span></pre>
+		</div>
+	</section>
+
+	<section class="container">
+		<div class="section-head">
+			<h2 class="eyebrow">latest posts</h2>
+			<a href={url('/posts')}>all posts &rarr;</a>
+		</div>
+		<PostList posts={recent} />
+	</section>
+
+	{
+		tags.length > 0 && (
+			<section class="container topics">
+				<h2 class="eyebrow">topics</h2>
+				<div class="tags">
+					{tags.map(([tag, count]) => (
+						<Tag tag={tag} count={count} />
+					))}
+				</div>
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.hero {
+		padding-block: 5.5rem 4rem;
+	}
+	h1 {
+		margin: 0;
+		font-size: clamp(2.1rem, 6vw, 3.4rem);
+		line-height: 1.1;
+		letter-spacing: -0.035em;
+		font-weight: 700;
+	}
+	.dim {
+		color: var(--subtle);
+	}
+	.inline {
+		padding: 0 0.3em;
+		border: 1px solid var(--border-strong);
+		border-radius: 8px;
+		background: var(--surface);
+		font-size: 0.8em;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+	.intro {
+		margin: 1.5rem 0 0;
+		max-width: 34rem;
+		font-size: 1.1rem;
+		color: var(--muted);
+	}
+	.terminal {
+		margin-top: 3rem;
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		background: var(--surface);
+		box-shadow:
+			0 0 0 1px rgba(255, 255, 255, 0.02),
+			0 30px 60px -30px rgba(0, 0, 0, 0.8);
+		overflow: hidden;
+	}
+	.bar {
+		display: flex;
+		gap: 6px;
+		padding: 0.7rem 0.9rem;
+		border-bottom: 1px solid var(--border);
+	}
+	.bar span {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--border-strong);
+	}
+	.terminal pre {
+		margin: 0;
+		border: 0;
+		border-radius: 0;
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
+	.p {
+		color: var(--fg);
+	}
+	.c {
+		color: var(--subtle);
+	}
+	.blink {
+		color: var(--fg);
+		animation: blink 1.1s steps(1) infinite;
+	}
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.blink {
+			animation: none;
+		}
+	}
+	.section-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 0.5rem;
+	}
+	.section-head a {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--muted);
+		text-decoration: none;
+	}
+	.section-head a:hover {
+		color: var(--fg);
+	}
+	h2.eyebrow {
+		font-weight: 400;
+		letter-spacing: 0;
+		line-height: 1.7;
+	}
+	.topics {
+		margin-top: 4rem;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+</style>

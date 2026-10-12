@@ -1,0 +1,118 @@
+---
+import { url } from '../consts';
+import type { Post } from '../lib/posts';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="post-list">
+	{
+		posts.map((post) => (
+			<li>
+				<a href={url(`/posts/${post.id}/`)}>
+					<FormattedDate date={post.data.pubDate} />
+					<div>
+						<h3>
+							{post.data.title}
+							{post.data.draft && <span class="draft">draft</span>}
+						</h3>
+						<p>{post.data.description}</p>
+						{post.data.tags.length > 0 && (
+							<span class="tags">{post.data.tags.map((t) => `#${t}`).join('  ')}</span>
+						)}
+					</div>
+					<span class="arrow" aria-hidden="true">
+						&rarr;
+					</span>
+				</a>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.post-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		border-top: 1px solid var(--border);
+	}
+	li {
+		border-bottom: 1px solid var(--border);
+	}
+	a {
+		display: grid;
+		grid-template-columns: 7.5rem 1fr auto;
+		gap: 1.5rem;
+		align-items: baseline;
+		padding: 1.4rem 0.75rem;
+		margin-inline: -0.75rem;
+		color: inherit;
+		text-decoration: none;
+		border-radius: 6px;
+		transition: background 0.15s ease;
+	}
+	a:hover {
+		background: var(--surface);
+	}
+	a :global(time) {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--subtle);
+	}
+	h3 {
+		margin: 0 0 0.35rem;
+		font-size: 1.05rem;
+		font-weight: 600;
+		color: var(--fg);
+		letter-spacing: -0.01em;
+	}
+	p {
+		margin: 0;
+		font-size: 0.925rem;
+		color: var(--muted);
+	}
+	.tags {
+		display: block;
+		margin-top: 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--subtle);
+		white-space: pre;
+	}
+	.draft {
+		margin-left: 0.5rem;
+		padding: 0.05rem 0.4rem;
+		border: 1px dashed var(--border-strong);
+		border-radius: 4px;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 400;
+		color: var(--muted);
+		vertical-align: middle;
+	}
+	.arrow {
+		color: var(--subtle);
+		transition:
+			transform 0.15s ease,
+			color 0.15s ease;
+	}
+	a:hover .arrow {
+		color: var(--fg);
+		transform: translateX(3px);
+	}
+	@media (max-width: 640px) {
+		a {
+			grid-template-columns: 1fr;
+			gap: 0.4rem;
+		}
+		.arrow {
+			display: none;
+		}
+	}
+</style>

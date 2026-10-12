@@ -1,0 +1,54 @@
+{
+	"name": "greyscale",
+	"type": "dark",
+	"colors": {
+		"editor.background": "#121212",
+		"editor.foreground": "#bdbdbd"
+	},
+	"tokenColors": [
+		{
+			"scope": ["comment", "punctuation.definition.comment"],
+			"settings": { "foreground": "#5c5c5c", "fontStyle": "italic" }
+		},
+		{
+			"scope": ["keyword", "storage", "storage.type", "keyword.control", "keyword.operator.new"],
+			"settings": { "foreground": "#ffffff", "fontStyle": "bold" }
+		},
+		{
+			"scope": ["entity.name.tag", "entity.name.function", "support.function", "entity.name.type"],
+			"settings": { "foreground": "#f0f0f0" }
+		},
+		{
+			"scope": ["string", "string.quoted", "string.unquoted", "markup.inline.raw"],
+			"settings": { "foreground": "#8f8f8f" }
+		},
+		{
+			"scope": ["constant", "constant.numeric", "constant.language", "support.constant"],
+			"settings": { "foreground": "#d6d6d6" }
+		},
+		{
+			"scope": ["variable", "variable.parameter", "meta.definition.variable"],
+			"settings": { "foreground": "#c8c8c8" }
+		},
+		{
+			"scope": ["entity.other.attribute-name", "support.type.property-name", "meta.object-literal.key"],
+			"settings": { "foreground": "#e6e6e6" }
+		},
+		{
+			"scope": ["punctuation", "meta.brace", "keyword.operator"],
+			"settings": { "foreground": "#7a7a7a" }
+		},
+		{
+			"scope": ["markup.heading", "markup.bold"],
+			"settings": { "foreground": "#ffffff", "fontStyle": "bold" }
+		},
+		{
+			"scope": ["markup.inserted"],
+			"settings": { "foreground": "#e0e0e0" }
+		},
+		{
+			"scope": ["markup.deleted"],
+			"settings": { "foreground": "#6b6b6b" }
+		}
+	]
+}
