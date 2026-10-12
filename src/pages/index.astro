@@ -1,0 +1,194 @@
+---
+import PostList from '../components/PostList.astro';
+import Tag from '../components/Tag.astro';
+import { url } from '../consts';
+import Base from '../layouts/Base.astro';
+import { getPosts, getTags } from '../lib/posts';
+
+const posts = await getPosts();
+const recent = posts.slice(0, 5);
+const tags = [...getTags(posts)].slice(0, 10);
+
+const session: [string, string[]][] = [
+	['whoami', ['netf: platform engineer, YAML whisperer, recovering 3am hero']],
+	['uptime', ['up since the first pager went off, load average: coffee, coffee, more coffee']],
+	[
+		'cat ~/.plan',
+		[
+			'- make the right way the lazy way',
+			'- delete more config than I write',
+			'- never deploy on a Friday   # deploys on a Friday',
+		],
+	],
+];
+---
+
+<Base>
+	<section class="hero container">
+		<p class="eyebrow">hi, I'm netf</p>
+		<h1>
+			I make production <del>exciting</del>{' '}<span class="boring">boring.</span>
+		</h1>
+		<p class="intro">
+			Boring means green dashboards, quiet pagers and Friday deploys nobody notices. I build the platforms
+			that get teams there, and write down everything that broke on the way.
+		</p>
+		<div class="terminal" aria-hidden="true">
+			<div class="bar"><span></span><span></span><span></span><em>~/netf</em></div>
+			<pre>{
+				session.map(([cmd, out]) => (
+					<Fragment><span class="p">$</span> <span class="cmd">{cmd}</span>{'\n'}{out.join('\n')}{'\n'}</Fragment>
+				))
+			}<span class="p">$</span> <span class="blink">▍</span></pre>
+		</div>
+	</section>
+
+	<section class="container">
+		<div class="section-head">
+			<h2 class="eyebrow">latest posts</h2>
+			<a href={url('/posts')}>all posts &rarr;</a>
+		</div>
+		<PostList posts={recent} />
+	</section>
+
+	{
+		tags.length > 0 && (
+			<section class="container topics">
+				<h2 class="eyebrow">topics</h2>
+				<div class="tags">
+					{tags.map(([tag, count]) => (
+						<Tag tag={tag} count={count} />
+					))}
+				</div>
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.hero {
+		padding-block: 5.5rem 4rem;
+	}
+	h1 {
+		margin: 0;
+		font-size: clamp(2.1rem, 6vw, 3.4rem);
+		line-height: 1.1;
+		letter-spacing: -0.035em;
+		font-weight: 700;
+	}
+	del {
+		color: var(--subtle);
+		font-weight: 500;
+		text-decoration-thickness: 0.08em;
+		text-decoration-color: var(--muted);
+	}
+	.boring {
+		display: inline-block;
+		font-family: var(--font-mono);
+		font-weight: 500;
+		letter-spacing: -0.04em;
+		background: linear-gradient(180deg, #ffffff 30%, #7a7a7a);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+	.intro {
+		margin: 1.5rem 0 0;
+		max-width: 34rem;
+		font-size: 1.1rem;
+		color: var(--muted);
+	}
+	.terminal {
+		margin-top: 3rem;
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		background: var(--surface);
+		box-shadow:
+			0 0 0 1px rgba(255, 255, 255, 0.02),
+			0 30px 60px -30px rgba(0, 0, 0, 0.8);
+		overflow: hidden;
+	}
+	.bar {
+		display: flex;
+		gap: 6px;
+		padding: 0.7rem 0.9rem;
+		border-bottom: 1px solid var(--border);
+	}
+	.bar span {
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--border-strong);
+	}
+	.bar em {
+		margin-left: auto;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-style: normal;
+		line-height: 10px;
+		color: var(--subtle);
+	}
+	.cmd {
+		color: var(--fg);
+	}
+	.terminal pre {
+		margin: 0;
+		border: 0;
+		border-radius: 0;
+		font-size: 0.8rem;
+		color: var(--muted);
+	}
+	@media (max-width: 640px) {
+		.terminal pre {
+			white-space: pre-wrap;
+		}
+	}
+	.p {
+		color: var(--fg);
+	}
+	.c {
+		color: var(--subtle);
+	}
+	.blink {
+		color: var(--fg);
+		animation: blink 1.1s steps(1) infinite;
+	}
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.blink {
+			animation: none;
+		}
+	}
+	.section-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		margin-bottom: 0.5rem;
+	}
+	.section-head a {
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--muted);
+		text-decoration: none;
+	}
+	.section-head a:hover {
+		color: var(--fg);
+	}
+	h2.eyebrow {
+		font-weight: 400;
+		letter-spacing: 0;
+		line-height: 1.7;
+	}
+	.topics {
+		margin-top: 4rem;
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+</style>

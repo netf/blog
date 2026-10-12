@@ -1,0 +1,44 @@
+---
+import { url } from '../consts';
+
+interface Props {
+	tag: string;
+	count?: number;
+}
+
+const { tag, count } = Astro.props;
+---
+
+<a class="tag" href={url(`/tags/${tag}`)}>
+	<span aria-hidden="true">#</span>{tag}{count !== undefined && <sup>{count}</sup>}
+</a>
+
+<style>
+	.tag {
+		display: inline-flex;
+		align-items: baseline;
+		padding: 0.15rem 0.5rem;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		color: var(--muted);
+		text-decoration: none;
+		transition:
+			color 0.15s ease,
+			border-color 0.15s ease,
+			background 0.15s ease;
+	}
+	.tag span {
+		color: var(--subtle);
+	}
+	.tag:hover {
+		color: var(--fg);
+		border-color: var(--border-strong);
+		background: var(--surface);
+	}
+	sup {
+		margin-left: 0.3rem;
+		color: var(--subtle);
+	}
+</style>

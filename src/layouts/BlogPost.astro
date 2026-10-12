@@ -1,0 +1,162 @@
+---
+import type { MarkdownHeading } from 'astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Tag from '../components/Tag.astro';
+import { url } from '../consts';
+import type { Post } from '../lib/posts';
+import Base from './Base.astro';
+
+interface Props {
+	data: Post['data'];
+	headings: MarkdownHeading[];
+	readingTime: string;
+}
+
+const { data, headings, readingTime } = Astro.props;
+const { title, description, pubDate, updatedDate, tags } = data;
+const toc = headings.filter((h) => h.depth === 2);
+---
+
+<Base title={title} description={description} type="article">
+	<article class="container">
+		<header class="post-head">
+			<a class="back" href={url('/posts')}>&larr; cd ..</a>
+			<h1>{title}</h1>
+			<p class="lede">{description}</p>
+			<dl class="meta">
+				<div>
+					<dt>published</dt>
+					<dd><FormattedDate date={pubDate} /></dd>
+				</div>
+				{
+					updatedDate && (
+						<div>
+							<dt>updated</dt>
+							<dd>
+								<FormattedDate date={updatedDate} />
+							</dd>
+						</div>
+					)
+				}
+				<div>
+					<dt>read</dt>
+					<dd>{readingTime}</dd>
+				</div>
+			</dl>
+			{
+				tags.length > 0 && (
+					<div class="tags">
+						{tags.map((tag) => (
+							<Tag tag={tag} />
+						))}
+					</div>
+				)
+			}
+		</header>
+
+		{
+			toc.length > 2 && (
+				<nav class="toc" aria-label="Table of contents">
+					<p class="eyebrow">contents</p>
+					<ol>
+						{toc.map((h) => (
+							<li>
+								<a href={`#${h.slug}`}>{h.text}</a>
+							</li>
+						))}
+					</ol>
+				</nav>
+			)
+		}
+
+		<div class="prose">
+			<slot />
+		</div>
+	</article>
+</Base>
+
+<style>
+	.post-head {
+		padding-block: 3.5rem 2.5rem;
+		margin-bottom: 2.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+	.back {
+		display: inline-block;
+		margin-bottom: 2rem;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		color: var(--subtle);
+		text-decoration: none;
+	}
+	.back:hover {
+		color: var(--fg);
+	}
+	h1 {
+		margin: 0;
+		font-size: clamp(2rem, 5vw, 2.6rem);
+		letter-spacing: -0.03em;
+	}
+	.lede {
+		margin: 1rem 0 0;
+		font-size: 1.125rem;
+		color: var(--muted);
+	}
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 2rem;
+		margin: 2rem 0 0;
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+	}
+	.meta div {
+		display: flex;
+		gap: 0.5rem;
+	}
+	dt {
+		color: var(--subtle);
+	}
+	dt::after {
+		content: ':';
+	}
+	dd {
+		margin: 0;
+		color: var(--muted);
+	}
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 1.25rem;
+	}
+	.toc {
+		margin-bottom: 2.5rem;
+		padding: 1.25rem 1.5rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+	}
+	.toc .eyebrow {
+		margin-bottom: 0.5rem;
+	}
+	.toc ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: 0.925rem;
+	}
+	.toc li::before {
+		content: '›';
+		margin-right: 0.6rem;
+		font-family: var(--font-mono);
+		color: var(--subtle);
+	}
+	.toc a {
+		color: var(--muted);
+		text-decoration: none;
+	}
+	.toc a:hover {
+		color: var(--fg);
+	}
+</style>

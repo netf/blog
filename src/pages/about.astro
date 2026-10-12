@@ -1,0 +1,29 @@
+---
+import { SOCIALS } from '../consts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="About" description="Who writes this blog and why.">
+	<section class="container page-head">
+		<p class="eyebrow">whoami</p>
+		<h1>About</h1>
+	</section>
+	<section class="container prose">
+		<p>
+			Hi, I'm <strong>netf</strong>. I work on DevOps and platform engineering: building the internal
+			platforms, pipelines and guardrails that let product teams ship safely and quickly.
+		</p>
+		<p>This blog is where I write down what I learn along the way, mostly about:</p>
+		<ul>
+			<li>Kubernetes, GitOps and cluster operations</li>
+			<li>Infrastructure as code with Terraform and friends</li>
+			<li>CI/CD, release engineering and developer experience</li>
+			<li>Observability, SLOs and incident response</li>
+			<li>Treating the platform as a product</li>
+		</ul>
+		<p>
+			You can find me on <a href={SOCIALS.github}>GitHub</a>. Opinions are my own and probably
+			eventually consistent.
+		</p>
+	</section>
+</Base>

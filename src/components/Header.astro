@@ -1,0 +1,112 @@
+---
+import { PROMPT, url } from '../consts';
+
+const links = [
+	{ href: '/posts', label: 'posts' },
+	{ href: '/tags', label: 'tags' },
+	{ href: '/about', label: 'about' },
+];
+
+const current = Astro.url.pathname.replace(/\/$/, '');
+const isActive = (href: string) => current === url(href) || current.startsWith(`${url(href)}/`);
+---
+
+<header class="site-header">
+	<nav class="container">
+		<a class="brand" href={url('/')} aria-label="Home">
+			<span class="prompt">{PROMPT}</span><span class="cursor" aria-hidden="true">_</span>
+		</a>
+		<ul>
+			{
+				links.map(({ href, label }) => (
+					<li>
+						<a href={url(href)} class:list={{ active: isActive(href) }}>
+							<span aria-hidden="true">./</span>
+							{label}
+						</a>
+					</li>
+				))
+			}
+			<li>
+				<a href={url('/rss.xml')} aria-label="RSS feed" title="RSS feed">rss</a>
+			</li>
+		</ul>
+	</nav>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		border-bottom: 1px solid var(--border);
+		background: color-mix(in srgb, var(--bg) 80%, transparent);
+		backdrop-filter: blur(12px);
+	}
+	nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		height: 3.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+	}
+	.brand {
+		color: var(--fg);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.prompt {
+		color: var(--fg);
+	}
+	.cursor {
+		margin-left: 0.15em;
+		color: var(--muted);
+		animation: blink 1.1s steps(1) infinite;
+	}
+	ul {
+		display: flex;
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	ul a {
+		color: var(--muted);
+		text-decoration: none;
+		transition: color 0.15s ease;
+	}
+	ul a span {
+		color: var(--subtle);
+	}
+	ul a:hover,
+	ul a.active {
+		color: var(--fg);
+	}
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.cursor {
+			animation: none;
+		}
+	}
+	@media (max-width: 560px) {
+		.prompt {
+			font-size: 0;
+		}
+		.prompt::before {
+			content: '~$';
+			font-size: 0.875rem;
+		}
+		ul {
+			gap: 0.9rem;
+		}
+		ul a span {
+			display: none;
+		}
+	}
+</style>
