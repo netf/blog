@@ -1,0 +1,48 @@
+{"ts":1791822185.991787,"level":"info","r":1,"file":"scli.go","line":124,"msg":"Starting","command":"Φορτίο","version":"1.76.0 h1:CSeuqtbKDwX34cTsjcV0VDYjCCJeQ/sYTPDtIakFmrs= go1.26.9 amd64 linux","go-max-procs":4}
+Fortio 1.76.0 running at 100 queries per second, 4->4 procs, for 1m0s: http://server:8080/echo
+{"ts":1791822185.992371,"level":"info","r":1,"file":"httprunner.go","line":121,"msg":"Starting http test","run":0,"url":"http://server:8080/echo","threads":4,"qps":"100.0","warmup":"parallel","conn-reuse":""}
+Starting at 100 qps with 4 thread(s) [gomax 4] for 1m0s : 1500 calls each (total 6000)
+{"ts":1791822246.018910,"level":"info","r":37,"file":"periodic.go","line":896,"msg":"T002 ended after 1m0.001727789s : 1500 calls. qps=24.999280108647007"}
+{"ts":1791822246.019158,"level":"info","r":38,"file":"periodic.go","line":896,"msg":"T003 ended after 1m0.001992663s : 1500 calls. qps=24.99916975132343"}
+{"ts":1791822246.019174,"level":"info","r":35,"file":"periodic.go","line":896,"msg":"T000 ended after 1m0.00200987s : 1500 calls. qps=24.999162582218347"}
+{"ts":1791822246.019185,"level":"info","r":36,"file":"periodic.go","line":896,"msg":"T001 ended after 1m0.002022243s : 1500 calls. qps=24.999157427148116"}
+Ended after 1m0.002131958s : 6000 calls. qps=99.996
+{"ts":1791822246.019437,"level":"info","r":1,"file":"periodic.go","line":598,"msg":"Run ended","run":0,"elapsed":60002131958,"calls":6000,"qps":99.99644686291899}
+Sleep times : count 5996 avg 0.03812535 +/- 0.0005557 min 0.029660625 max 0.039147236 sum 228.599601
+Aggregated Function Time : count 6000 avg 0.0012755576 +/- 0.0003406 min 0.000672933 max 0.00692155 sum 7.65334571
+# range, mid point, percentile, count
+>= 0.000672933 <= 0.001 , 0.000836467 , 9.43, 566
+> 0.001 <= 0.002 , 0.0015 , 98.45, 5341
+> 0.002 <= 0.003 , 0.0025 , 99.50, 63
+> 0.003 <= 0.004 , 0.0035 , 99.73, 14
+> 0.004 <= 0.005 , 0.0045 , 99.80, 4
+> 0.005 <= 0.006 , 0.0055 , 99.97, 10
+> 0.006 <= 0.00692155 , 0.00646078 , 100.00, 2
+# target 50% 0.00145572
+# target 75% 0.00173657
+# target 90% 0.00190507
+# target 99% 0.00252381
+# target 99.9% 0.0056
+Error cases : no data
+# Socket and IP used for each connection:
+[0]   1 socket used, resolved to 10.96.100.1:8080, connection timing : count 1 avg 6.2129e-05 +/- 0 min 6.2129e-05 max 6.2129e-05 sum 6.2129e-05
+[1]   1 socket used, resolved to 10.96.100.1:8080, connection timing : count 1 avg 0.000120721 +/- 0 min 0.000120721 max 0.000120721 sum 0.000120721
+[2]   1 socket used, resolved to 10.96.100.1:8080, connection timing : count 1 avg 4.2532e-05 +/- 0 min 4.2532e-05 max 4.2532e-05 sum 4.2532e-05
+[3]   1 socket used, resolved to 10.96.100.1:8080, connection timing : count 1 avg 0.000174217 +/- 0 min 0.000174217 max 0.000174217 sum 0.000174217
+Connection time histogram (s) : count 4 avg 9.989975e-05 +/- 5.166e-05 min 4.2532e-05 max 0.000174217 sum 0.000399599
+# range, mid point, percentile, count
+>= 4.2532e-05 <= 0.000174217 , 0.000108374 , 100.00, 4
+# target 50% 8.6427e-05
+# target 75% 0.000130322
+# target 90% 0.000156659
+# target 99% 0.000172461
+# target 99.9% 0.000174041
+Sockets used: 4 (for perfect keepalive, would be 4)
+Uniform: false, Jitter: false, Catchup allowed: true
+IP addresses distribution:
+10.96.100.1:8080: 4
+Code 200 : 6000 (100.0 %)
+Response Header Sizes : count 6000 avg 124 +/- 0 min 124 max 124 sum 744000
+Response Body/Total Sizes : count 6000 avg 124 +/- 0 min 124 max 124 sum 744000
+All done 6000 calls (plus 4 warmup) 1.276 ms avg, 100.0 qps
+Successfully wrote 4112 bytes of Json data to stdout

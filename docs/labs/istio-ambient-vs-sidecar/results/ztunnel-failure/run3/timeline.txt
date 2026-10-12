@@ -1,0 +1,4 @@
+16:28:36.118 graceful: graceful
+16:29:01.815 graceful: new ztunnel ready
+16:29:46.291 crash: crash
+16:29:48.103 crash: ztunnel container ready again (restartCount=1)

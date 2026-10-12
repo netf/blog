@@ -1,0 +1,25 @@
+external server at 172.18.0.5:8080
+[ALLOW_ANY (default)] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] sidecar -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[ALLOW_ANY (default)] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] sidecar -> 172.18.0.5:8080 : HTTP/1.1 502
+[REGISTRY_ONLY] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] baseline -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] sidecar -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] ambient -> 172.18.0.5:8080 : HTTP/1.1 200
+[REGISTRY_ONLY + ServiceEntry] ambient-wp -> 172.18.0.5:8080 : HTTP/1.1 200
+
+{"conditions":[{"lastTransitionTime":"2026-10-12T16:03:52.649591063Z","message":"Successfully attached to waypoint ambient-wp/waypoint","reason":"WaypointAccepted","status":"True","type":"istio.io/WaypointBound"}]}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":null}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":{"destination":"ambient-wp/waypoint.ambient-wp.svc.cluster.local"}}
+{"hostname":"ext-http.lab.internal","vips":["/172.18.0.5"],"waypoint":null}
+[ambient-wp via SE hostname] request from 172.18.0.2:52072
+NODE                     IP
+mesh-lab-control-plane   172.18.0.4
+mesh-lab-worker          172.18.0.2
+mesh-lab-worker2         172.18.0.3
+NAME                       READY   STATUS    RESTARTS   AGE   IP            NODE               NOMINATED NODE   READINESS GATES
+waypoint-f587fbfc4-4268n   1/1     Running   0          78m   10.244.2.10   mesh-lab-worker2   <none>           <none>

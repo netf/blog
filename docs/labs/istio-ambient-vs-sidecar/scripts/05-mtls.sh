@@ -23,23 +23,28 @@ capture() { # mode
     echo "== $ns"
     echo -n "packets containing marker: "
     docker run --rm -v /tmp:/tmp nicolaka/netshoot:v0.15 sh -c "tcpdump -nn -A -r $pcap 2>/dev/null | grep -c PLAINTEXT-CANARY-42 || true"
-    echo "dst ports seen on the wire (SYNs, count port):"
+    echo "client-node -> server-node packets by dst port (count port):"
     docker run --rm -v /tmp:/tmp nicolaka/netshoot:v0.15 sh -c \
-      "tcpdump -nn -r $pcap 'tcp[tcpflags] & tcp-syn != 0 and tcp[tcpflags] & tcp-ack == 0' 2>/dev/null | awk '{print \$5}' | sed 's/.*\\.//; s/://' | sort | uniq -c"
+      "tcpdump -nn -r $pcap 'src net 10.244.1.0/24 and dst net 10.244.2.0/24' 2>/dev/null | awk '{print \$5}' | sed 's/.*\\.//; s/://' | sort | uniq -c"
     echo "TLS ClientHello / SNI:"
     docker run --rm -v /tmp:/tmp nicolaka/netshoot:v0.15 sh -c \
-      "tshark -r $pcap -Y tls.handshake.type==1 -T fields -e tcp.dstport -e tls.handshake.extensions_server_name -e tls.handshake.extensions_alpn_str 2>/dev/null | sort | uniq -c"
+      "tshark -r $pcap -d tcp.port==8080,tls -Y tls.handshake.type==1 -T fields -e tcp.dstport -e tls.handshake.extensions_server_name -e tls.handshake.extensions_alpn_str -e tls.handshake.extensions.supported_version 2>/dev/null | sort | uniq -c"
   } | tee -a "$OUT/wire.txt"
 }
 
 : > "$OUT/wire.txt"
+# Fresh client pods so the capture sees new connections and TLS handshakes
+# instead of connections pooled before the capture started.
+for ns in baseline sidecar ambient ambient-wp; do kubectl -n "$ns" rollout restart deploy/client; done
+for ns in baseline sidecar ambient ambient-wp; do kubectl -n "$ns" rollout status deploy/client; done
+sleep 5
 for ns in baseline sidecar ambient ambient-wp; do capture "$ns"; done
 
 # Identity as seen by the server side
 kubectl -n sidecar exec deploy/client -c fortio -- fortio curl http://server:8080/debug 2>&1 \
   | grep -i x-forwarded-client-cert > "$OUT/identity-sidecar.txt" || true
 kubectl -n istio-system logs "$(kubectl -n istio-system get pod -l app=ztunnel --field-selector spec.nodeName=mesh-lab-worker2 -o name)" --since=60s \
-  | grep 'ns=ambient ' | grep -m3 -E 'src.identity|dst.identity' > "$OUT/identity-ambient-ztunnel.txt" || true
+  | grep access | grep -m2 'src.namespace="ambient"' > "$OUT/identity-ambient-ztunnel.txt" || true
 
 # STRICT mesh-wide, then call each meshed server from the non-mesh client
 kubectl apply -f - <<'EOF'

@@ -1,0 +1,6 @@
+sidecar GET /echo -> HTTP/1.1 200
+sidecar GET /debug -> HTTP/1.1 200
+ambient GET /echo -> HTTP/1.1 200
+ambient GET /debug -> HTTP/1.1 200
+ambient-wp GET /echo -> HTTP/1.1 200
+ambient-wp GET /debug -> HTTP/1.1 403

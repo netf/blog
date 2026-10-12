@@ -1,0 +1,22 @@
+== baseline
+packets containing marker: 5
+client-node -> server-node packets by dst port (count port):
+     30 8080
+TLS ClientHello / SNI:
+== sidecar
+packets containing marker: 0
+client-node -> server-node packets by dst port (count port):
+     20 8080
+TLS ClientHello / SNI:
+== ambient
+packets containing marker: 0
+client-node -> server-node packets by dst port (count port):
+     33 15008
+TLS ClientHello / SNI:
+      1 15008		h2
+== ambient-wp
+packets containing marker: 0
+client-node -> server-node packets by dst port (count port):
+     32 15008
+TLS ClientHello / SNI:
+      1 15008		h2

@@ -1,0 +1,42 @@
+Source: https://github.com/istio/ztunnel/blob/1.31.1/src/rbac.rs (lines 100-181, Authorization::matches)
+istiod pushed rules [[[{}]]]: one rule, one clause, one RbacMatch with every field empty.
+
+        // An Authorization Policy can have multiple rules
+        // If ANY rule matches it's a match...
+        for rule in self.rules.iter() {
+            // Rule typically has 1-3 clauses (from,to,when)
+            // If ALL clauses match, it is a match...
+            let mut rule_match = true;
+            for clause in rule.iter() {
+                // We can have multiple mg (RbacMatch) in a clause, for example "Match ns=A,SA=B or ns=C"
+                // So we need ANY mg to match...
+                let mut clause_match = false;
+                for mg in clause.iter() {
+                    if mg.is_empty() {
+                        trace!(matches = false, "empty clause");
+                        continue;
+                    }
+                    if m {
+                        clause_match = true;
+                        break;
+                    }
+                }
+
+                if clause.is_empty() {
+                    clause_match = true;
+                    trace!(matches = clause_match, "empty clause");
+                } else {
+                    trace!(matches = clause_match, "clause");
+                }
+                rule_match &= clause_match;
+                if !rule_match {
+                    // Short circuit
+                    break;
+                }
+            }
+            trace!(matches = rule_match, "rule");
+            if rule_match {
+                return true;
+            }
+        }
+        false

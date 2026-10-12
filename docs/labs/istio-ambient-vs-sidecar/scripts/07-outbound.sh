@@ -54,9 +54,15 @@ done
 sleep 15
 probe "REGISTRY_ONLY + ServiceEntry"
 kubectl -n ambient-wp get serviceentry ext-http -o jsonpath='{.metadata.labels}{"\n"}{.status}{"\n"}' >> "$OUT/outbound.txt" || true
-# Which proxy served the ServiceEntry in ambient-wp: look for waypoint headers.
-kubectl -n ambient-wp exec deploy/client -c fortio -- fortio curl "http://$EXT_IP:8080/debug" 2>&1 \
-  | grep -iE '^server:|x-envoy' | sed 's/^/[ambient-wp SE headers] /' | tee -a "$OUT/outbound.txt" || true
+# Did the ambient-wp ServiceEntry traffic go through the waypoint? The external
+# fortio prints the peer address it saw: the client node IP means it did not;
+# the waypoint's node IP would mean it did. Also dump ztunnel's view.
+istioctl ztunnel-config service -o json | jq -c '.[] | select(.hostname=="ext-http.lab.internal") | {hostname,vips,waypoint}' \
+  | tee -a "$OUT/outbound.txt"
+kubectl -n ambient-wp exec deploy/client -c fortio -- fortio curl "http://ext-http.lab.internal:8080/debug" 2>&1 \
+  | grep -oE 'request from [0-9.:]+' | sed 's/^/[ambient-wp via SE hostname] /' | tee -a "$OUT/outbound.txt" || true
+kubectl get nodes -o custom-columns=NODE:.metadata.name,IP:.status.addresses[0].address | tee -a "$OUT/outbound.txt"
+kubectl -n ambient-wp get pod -l gateway.networking.k8s.io/gateway-name=waypoint -o wide | tee -a "$OUT/outbound.txt"
 
 for ns in sidecar ambient ambient-wp; do kubectl -n "$ns" delete serviceentry ext-http; done
 helm upgrade istiod "$CHARTS/istio-control/istio-discovery" -n istio-system --set profile=ambient \

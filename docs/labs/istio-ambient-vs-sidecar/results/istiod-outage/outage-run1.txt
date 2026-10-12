@@ -1,0 +1,38 @@
+16:31:08 istiod scaled to 0
+16:31:23 sidecar existing pods, istiod down: {"200":200}
+16:31:27 ambient existing pods, istiod down: {"200":200}
+16:31:31 ambient-wp existing pods, istiod down: {"200":200}
+16:32:31 sidecar pods after scale-up with istiod down:
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE               NOMINATED NODE   READINESS GATES
+server-7fdd9bcfdb-b7mgp   2/2     Running   0          15m   10.244.2.65   mesh-lab-worker2   <none>           <none>
+  rs condition: ReplicaFailure Internal error occurred: failed calling webhook "namespace.sidecar-injector.istio.io": failed to call webhook: Post "https://istiod.istio-system.svc:443/inject?timeout=10s": dial tcp 10.96.186.77:443: connect: connection refused
+16:32:32 sidecar client -> NEW pod pod/server-7fdd9bcfdb-b7mgp (10.244.2.65) directly: {"200":20}
+16:32:32 ambient pods after scale-up with istiod down:
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE               NOMINATED NODE   READINESS GATES
+server-d87c87d86-hbwnz   1/1     Running   0          98m   10.244.2.24   mesh-lab-worker2   <none>           <none>
+server-d87c87d86-xgpg8   1/1     Running   0          61s   10.244.2.86   mesh-lab-worker2   <none>           <none>
+16:33:32 ambient client -> NEW pod pod/server-d87c87d86-xgpg8 (10.244.2.86) directly: {"-1":20}
+16:33:32 ambient-wp pods after scale-up with istiod down:
+NAME                     READY   STATUS    RESTARTS   AGE    IP            NODE               NOMINATED NODE   READINESS GATES
+server-d87c87d86-c5kkc   1/1     Running   0          2m2s   10.244.2.87   mesh-lab-worker2   <none>           <none>
+server-d87c87d86-nkh5x   1/1     Running   0          99m    10.244.2.25   mesh-lab-worker2   <none>           <none>
+16:34:33 ambient-wp client -> NEW pod pod/server-d87c87d86-c5kkc (10.244.2.87) directly: {"-1":20}
+4m47s       Normal    Pulled                    pod/ztunnel-bq8jh                Container image "docker.io/istio/ztunnel:1.31.1-distroless" already present on machine and can be accessed by the pod
+4m47s       Normal    Created                   pod/ztunnel-bq8jh                Container created
+3m25s       Normal    SuccessfulDelete          replicaset/istiod-574cc458f      Deleted pod: istiod-574cc458f-6mp92
+3m25s       Normal    ScalingReplicaSet         deployment/istiod                Scaled down replica set istiod-574cc458f from 1 to 0
+3m25s       Normal    Killing                   pod/istiod-574cc458f-6mp92       Stopping container discovery
+NS        MSG
+sidecar   Error creating: Internal error occurred: failed calling webhook "namespace.sidecar-injector.istio.io": failed to call webhook: Post "https://istiod.istio-system.svc:443/inject?timeout=10s": dial tcp 10.96.186.77:443: connect: connection refused
+16:34:37 istiod restored
+16:35:37 sidecar pods 60s after istiod restored:
+NAME                      READY   STATUS    RESTARTS   AGE   IP            NODE               NOMINATED NODE   READINESS GATES
+server-7fdd9bcfdb-b7mgp   2/2     Running   0          18m   10.244.2.65   mesh-lab-worker2   <none>           <none>
+16:35:37 ambient pods 60s after istiod restored:
+NAME                     READY   STATUS    RESTARTS   AGE    IP            NODE               NOMINATED NODE   READINESS GATES
+server-d87c87d86-hbwnz   1/1     Running   0          101m   10.244.2.24   mesh-lab-worker2   <none>           <none>
+server-d87c87d86-xgpg8   1/1     Running   0          4m6s   10.244.2.86   mesh-lab-worker2   <none>           <none>
+16:35:37 ambient-wp pods 60s after istiod restored:
+NAME                     READY   STATUS    RESTARTS   AGE    IP            NODE               NOMINATED NODE   READINESS GATES
+server-d87c87d86-c5kkc   1/1     Running   0          4m6s   10.244.2.87   mesh-lab-worker2   <none>           <none>
+server-d87c87d86-nkh5x   1/1     Running   0          101m   10.244.2.25   mesh-lab-worker2   <none>           <none>

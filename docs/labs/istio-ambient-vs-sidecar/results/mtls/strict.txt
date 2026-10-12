@@ -1,0 +1,11 @@
+== baseline client -> server.sidecar (STRICT)
+{"ts":1791819586.901291,"level":"err","r":1,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.14:40620->10.96.100.1:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.100.1","Port":8080,"Zone":""},"url":"http://server.sidecar:8080/echo","thread":0,"run":0}
+{"ts":1791819586.901338,"level":"err","r":1,"file":"commonflags.go","line":160,"msg":"Error status -1"}
+== baseline client -> server.ambient (STRICT)
+{"ts":1791819586.987525,"level":"err","r":1,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.14:32982->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server.ambient:8080/echo","thread":0,"run":0}
+{"ts":1791819586.987550,"level":"err","r":1,"file":"commonflags.go","line":160,"msg":"Error status -1"}
+== baseline client -> server.ambient-wp (STRICT)
+{"ts":1791819587.074320,"level":"err","r":1,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.14:51584->10.96.1.142:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.1.142","Port":8080,"Zone":""},"url":"http://server.ambient-wp:8080/echo","thread":0,"run":0}
+{"ts":1791819587.074352,"level":"err","r":1,"file":"commonflags.go","line":160,"msg":"Error status -1"}
+== baseline client -> server.ambient (PERMISSIVE, after delete)
+HTTP/1.1 200 OK

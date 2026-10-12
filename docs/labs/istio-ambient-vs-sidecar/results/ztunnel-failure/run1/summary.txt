@@ -1,0 +1,6 @@
+graceful sidecar: requests=6000 sockets=4 codes={"200":6000} max_ms=6
+graceful ambient: requests=6000 sockets=8 codes={"200":6000} max_ms=12
+graceful ambient-wp: requests=6000 sockets=8 codes={"200":6000} max_ms=6
+crash sidecar: requests=6000 sockets=4 codes={"200":6000} max_ms=5
+crash ambient: requests=6000 sockets=8 codes={"-1":112,"200":5888} max_ms=8
+crash ambient-wp: requests=6000 sockets=8 codes={"-1":112,"200":5888} max_ms=10

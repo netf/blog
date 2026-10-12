@@ -1,0 +1,7 @@
+# Scheduling side effect observed during the first (concurrent) density attempt:
+# 10 sidecar servers (200m requested each: app 100m + istio-proxy 100m) and 10 ambient servers (100m each) on one 4-CPU worker.
+      2 Pending
+      8 Running
+0/3 nodes are available: 1 Insufficient cpu, 1 node(s) didn't match Pod's node affinity/selector, 1 node(s) had untolerated taint(s). no new claims to deallocate, preemption: 0/3 nodes are available: 1 No preemption victims found for incoming pod, 2 Preemption is not helpful for scheduling.
+  --------           --------      ------
+  cpu                4 (100%)      22 (550%)
