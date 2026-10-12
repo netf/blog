@@ -1,0 +1,6 @@
+== sidecar
+requests=30000 sockets=4 codes={"200":30000} max_ms=9 p99_ms=2.691287878787878
+== ambient
+requests=30000 sockets=8 codes={"200":30000} max_ms=8 p99_ms=1.6626506024096372
+== ambient-wp
+requests=30000 sockets=28 codes={"-1":16,"200":29984} max_ms=3002 p99_ms=2.8270270270270275

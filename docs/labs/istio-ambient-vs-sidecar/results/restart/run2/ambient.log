@@ -1,0 +1,96 @@
+{"ts":1791816761.035187,"level":"info","r":1,"file":"scli.go","line":124,"msg":"Starting","command":"Φορτίο","version":"1.76.0 h1:CSeuqtbKDwX34cTsjcV0VDYjCCJeQ/sYTPDtIakFmrs= go1.26.9 amd64 linux","go-max-procs":4}
+Fortio 1.76.0 running at 100 queries per second, 4->4 procs, for 1m0s: http://server:8080/echo
+{"ts":1791816761.035852,"level":"info","r":1,"file":"httprunner.go","line":121,"msg":"Starting http test","run":0,"url":"http://server:8080/echo","threads":4,"qps":"100.0","warmup":"parallel","conn-reuse":""}
+Starting at 100 qps with 4 thread(s) [gomax 4] for 1m0s : 1500 calls each (total 6000)
+{"ts":1791816771.945360,"level":"info","r":12,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":0,"run":0}
+{"ts":1791816771.945751,"level":"info","r":13,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":1,"run":0}
+{"ts":1791816771.946078,"level":"info","r":15,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":3,"run":0}
+{"ts":1791816771.945970,"level":"info","r":14,"file":"http_client.go","line":1111,"msg":"Closing dead socket (err at first read)","err":"EOF","thread":2,"run":0}
+{"ts":1791816771.949878,"level":"err","r":12,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52072->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":0,"run":0}
+{"ts":1791816771.950818,"level":"err","r":14,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52080->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":2,"run":0}
+{"ts":1791816771.951409,"level":"err","r":15,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52076->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":3,"run":0}
+{"ts":1791816771.951748,"level":"err","r":13,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52074->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":1,"run":0}
+{"ts":1791816771.987692,"level":"err","r":12,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52094->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":0,"run":0}
+{"ts":1791816771.989769,"level":"err","r":15,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52084->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":3,"run":0}
+{"ts":1791816771.992608,"level":"err","r":13,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52112->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":1,"run":0}
+{"ts":1791816771.993364,"level":"err","r":14,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52106->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":2,"run":0}
+{"ts":1791816772.026611,"level":"err","r":15,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52120->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":3,"run":0}
+{"ts":1791816772.027179,"level":"err","r":13,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52136->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":1,"run":0}
+{"ts":1791816772.028420,"level":"err","r":14,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52132->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":2,"run":0}
+{"ts":1791816772.028993,"level":"err","r":12,"file":"http_client.go","line":1130,"msg":"Read error","err":"read tcp 10.244.1.7:52152->10.96.250.241:8080: read: connection reset by peer","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":0,"run":0}
+{"ts":1791816775.067826,"level":"err","r":14,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.7:52210->10.96.250.241:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":2,"run":0}
+{"ts":1791816775.067855,"level":"err","r":12,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.7:52180->10.96.250.241:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":0,"run":0}
+{"ts":1791816775.067833,"level":"err","r":13,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.7:52196->10.96.250.241:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":1,"run":0}
+{"ts":1791816775.068827,"level":"err","r":15,"file":"http_client.go","line":1130,"msg":"Timeout error (incomplete/invalid response)","err":"read tcp 10.244.1.7:52166->10.96.250.241:8080: i/o timeout","size":0,"header_len":0,"dest":{"IP":"10.96.250.241","Port":8080,"Zone":""},"url":"http://server:8080/echo","thread":3,"run":0}
+{"ts":1791816821.059818,"level":"info","r":14,"file":"periodic.go","line":896,"msg":"T002 ended after 1m0.001970748s : 1500 calls. qps=24.99917888197028"}
+{"ts":1791816821.060757,"level":"info","r":12,"file":"periodic.go","line":896,"msg":"T000 ended after 1m0.002925619s : 1500 calls. qps=24.998781051519646"}
+{"ts":1791816821.060776,"level":"info","r":13,"file":"periodic.go","line":896,"msg":"T001 ended after 1m0.002948515s : 1500 calls. qps=24.998771512453565"}
+{"ts":1791816821.060792,"level":"info","r":15,"file":"periodic.go","line":896,"msg":"T003 ended after 1m0.00296469s : 1500 calls. qps=24.998764773534393"}
+Ended after 1m0.002987217s : 6000 calls. qps=99.995
+{"ts":1791816821.060880,"level":"info","r":1,"file":"periodic.go","line":598,"msg":"Run ended","run":0,"elapsed":60002987217,"calls":6000,"qps":99.9950215528617}
+Aggregated Sleep Time : count 5996 avg -0.037992848 +/- 0.3861 min -2.96371765 max 0.039703576 sum -227.805114
+# range, mid point, percentile, count
+>= -2.96372 <= -0.001 , -1.48236 , 5.00, 300
+> 0.013 <= 0.015 , 0.014 , 5.02, 1
+> 0.015 <= 0.017 , 0.016 , 5.07, 3
+> 0.024 <= 0.029 , 0.0265 , 5.14, 4
+> 0.029 <= 0.034 , 0.0315 , 5.34, 12
+> 0.034 <= 0.039 , 0.0365 , 65.58, 3612
+> 0.039 <= 0.0397036 , 0.0393518 , 100.00, 2064
+# target 50% 0.0377071
+WARNING 5.00% of sleep were falling behind
+Aggregated Function Time : count 6000 avg 0.002578667 +/- 0.07748 min 9.4972e-05 max 3.00290205 sum 15.4720022
+# range, mid point, percentile, count
+>= 9.4972e-05 <= 0.001 , 0.000547486 , 94.67, 5680
+> 0.001 <= 0.002 , 0.0015 , 99.05, 263
+> 0.002 <= 0.003 , 0.0025 , 99.37, 19
+> 0.003 <= 0.004 , 0.0035 , 99.50, 8
+> 0.004 <= 0.005 , 0.0045 , 99.63, 8
+> 0.005 <= 0.006 , 0.0055 , 99.73, 6
+> 0.006 <= 0.007 , 0.0065 , 99.87, 8
+> 0.012 <= 0.014 , 0.013 , 99.93, 4
+> 3 <= 3.0029 , 3.00145 , 100.00, 4
+# target 50% 0.000572905
+# target 75% 0.000811951
+# target 90% 0.000955378
+# target 99% 0.00198859
+# target 99.9% 0.013
+Error cases : count 16 avg 0.75362405 +/- 1.298 min 0.000690631 max 3.00290205 sum 12.0579847
+# range, mid point, percentile, count
+>= 0.000690631 <= 0.001 , 0.000845316 , 6.25, 1
+> 0.001 <= 0.002 , 0.0015 , 12.50, 1
+> 0.002 <= 0.003 , 0.0025 , 18.75, 1
+> 0.003 <= 0.004 , 0.0035 , 37.50, 3
+> 0.004 <= 0.005 , 0.0045 , 50.00, 2
+> 0.005 <= 0.006 , 0.0055 , 62.50, 2
+> 0.006 <= 0.007 , 0.0065 , 75.00, 2
+> 3 <= 3.0029 , 3.00145 , 100.00, 4
+# target 50% 0.005
+# target 75% 0.007
+# target 90% 3.00174
+# target 99% 3.00279
+# target 99.9% 3.00289
+# Socket and IP used for each connection:
+[0]   6 socket used, resolved to 10.96.250.241:8080, connection timing : count 6 avg 0.00015899983 +/- 0.0001868 min 2.8189e-05 max 0.000568192 sum 0.000953999
+[1]   6 socket used, resolved to 10.96.250.241:8080, connection timing : count 6 avg 0.000247555 +/- 0.0001732 min 3.6901e-05 max 0.000531838 sum 0.00148533
+[2]   6 socket used, resolved to 10.96.250.241:8080, connection timing : count 6 avg 0.00062898217 +/- 0.0005055 min 0.000104849 max 0.001561448 sum 0.003773893
+[3]   6 socket used, resolved to 10.96.250.241:8080, connection timing : count 6 avg 0.00019912617 +/- 0.0001876 min 2.7701e-05 max 0.000588127 sum 0.001194757
+Connection time histogram (s) : count 24 avg 0.00030866579 +/- 0.0003523 min 2.7701e-05 max 0.001561448 sum 0.007407979
+# range, mid point, percentile, count
+>= 2.7701e-05 <= 0.001 , 0.000513851 , 95.83, 23
+> 0.001 <= 0.00156145 , 0.00128072 , 100.00, 1
+# target 50% 0.000513851
+# target 75% 0.000779023
+# target 90% 0.000938126
+# target 99% 0.0014267
+# target 99.9% 0.00154797
+Sockets used: 24 (for perfect keepalive, would be 4)
+Uniform: false, Jitter: false, Catchup allowed: true
+IP addresses distribution:
+10.96.250.241:8080: 24
+Code  -1 : 16 (0.3 %)
+Code 200 : 5984 (99.7 %)
+Response Header Sizes : count 6000 avg 74.8 +/- 3.868 min 0 max 75 sum 448800
+Response Body/Total Sizes : count 6000 avg 74.8 +/- 3.868 min 0 max 75 sum 448800
+All done 6000 calls (plus 4 warmup) 2.579 ms avg, 100.0 qps
+Successfully wrote 6089 bytes of Json data to stdout

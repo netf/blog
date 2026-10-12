@@ -1,0 +1,20 @@
+# One control plane and two workers. Workloads are pinned to the workers with
+# nodeSelector so that client -> server traffic always crosses nodes.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: mesh-lab
+networking:
+  # The lab VM kernel lacks the iptables `statistic` match, so kube-proxy in
+  # iptables mode cannot program Services with more than one endpoint.
+  kubeProxyMode: nftables
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed
+  - role: worker
+    image: kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed
+    labels:
+      lab/role: client
+  - role: worker
+    image: kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed
+    labels:
+      lab/role: server

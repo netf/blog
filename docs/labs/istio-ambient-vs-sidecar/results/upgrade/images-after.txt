@@ -1,0 +1,15 @@
+NS                   POD                                              NODE                     IMAGES                                                        INIT
+ambient-wp           client-85d8795866-sqpzf                          mesh-lab-worker          fortio/fortio:1.76.0                                          <none>
+ambient-wp           server-74f4f4cff6-ckxlg                          mesh-lab-worker2         fortio/fortio:1.76.0                                          <none>
+ambient-wp           waypoint-f587fbfc4-4268n                         mesh-lab-worker2         docker.io/istio/proxyv2:1.31.1-distroless                     <none>
+ambient              client-85d8795866-vfvpl                          mesh-lab-worker          fortio/fortio:1.76.0                                          <none>
+ambient              server-74f4f4cff6-nrz4b                          mesh-lab-worker2         fortio/fortio:1.76.0                                          <none>
+istio-system         istio-cni-node-9fgk4                             mesh-lab-worker          docker.io/istio/install-cni:1.31.1-distroless                 <none>
+istio-system         istio-cni-node-9pwjn                             mesh-lab-worker2         docker.io/istio/install-cni:1.31.1-distroless                 <none>
+istio-system         istio-cni-node-s7p2d                             mesh-lab-control-plane   docker.io/istio/install-cni:1.31.1-distroless                 <none>
+istio-system         istiod-574cc458f-6mp92                           mesh-lab-worker2         docker.io/istio/pilot:1.31.1-distroless                       <none>
+istio-system         ztunnel-5jdzk                                    mesh-lab-control-plane   docker.io/istio/ztunnel:1.31.1-distroless                     <none>
+istio-system         ztunnel-956j8                                    mesh-lab-worker          docker.io/istio/ztunnel:1.31.1-distroless                     <none>
+istio-system         ztunnel-dmws4                                    mesh-lab-worker2         docker.io/istio/ztunnel:1.31.1-distroless                     <none>
+sidecar              client-85d8795866-r7jw5                          mesh-lab-worker          fortio/fortio:1.76.0                                          docker.io/istio/proxyv2:1.30.5-distroless,docker.io/istio/proxyv2:1.30.5-distroless
+sidecar              server-74f4f4cff6-kbwx2                          mesh-lab-worker2         fortio/fortio:1.76.0                                          docker.io/istio/proxyv2:1.30.5-distroless,docker.io/istio/proxyv2:1.30.5-distroless
