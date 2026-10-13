@@ -1,112 +1,160 @@
 ---
-import { PROMPT, url } from '../consts';
+import { url } from '../consts';
+import Icon from './Icon.astro';
 
 const links = [
-	{ href: '/posts', label: 'posts' },
-	{ href: '/tags', label: 'tags' },
-	{ href: '/about', label: 'about' },
+	{ href: '/posts', label: 'Archive' },
+	{ href: '/tags', label: 'Topics' },
+	{ href: '/about', label: 'About' },
 ];
 
 const current = Astro.url.pathname.replace(/\/$/, '');
 const isActive = (href: string) => current === url(href) || current.startsWith(`${url(href)}/`);
 ---
 
-<header class="site-header">
-	<nav class="container">
-		<a class="brand" href={url('/')} aria-label="Home">
-			<span class="prompt">{PROMPT}</span><span class="cursor" aria-hidden="true">_</span>
+<div class="sticky" data-header>
+	<header class="site-header container">
+		<a class="wordmark" href={url('/')} aria-label="netf, home">
+			netf<span class="cursor" aria-hidden="true"></span>
 		</a>
-		<ul>
+		<nav aria-label="Main">
 			{
 				links.map(({ href, label }) => (
-					<li>
-						<a href={url(href)} class:list={{ active: isActive(href) }}>
-							<span aria-hidden="true">./</span>
-							{label}
-						</a>
-					</li>
+					<a href={url(href)} aria-current={isActive(href) ? 'page' : undefined}>
+						{label}
+					</a>
 				))
 			}
-			<li>
-				<a href={url('/rss.xml')} aria-label="RSS feed" title="RSS feed">rss</a>
-			</li>
-		</ul>
-	</nav>
-</header>
+		</nav>
+		<button class="btn btn-ghost search" type="button" data-search-open aria-label="Search posts" aria-keyshortcuts="Meta+K Control+K /">
+			<Icon name="search" size={16} />
+			<span class="label">Search</span>
+			<kbd class="shortcut">⌘K</kbd>
+		</button>
+	</header>
+</div>
+
+<script>
+	// Show the shortcut the visitor's platform actually uses.
+	if (!/Mac|iPhone|iPad/.test(navigator.platform)) {
+		const kbd = document.querySelector('.site-header .shortcut');
+		if (kbd) kbd.textContent = 'Ctrl K';
+	}
+
+	// The header slides away while you scroll down, and comes back when you scroll up,
+	// stop scrolling, reach the top, or move keyboard focus into it.
+	const bar = document.querySelector<HTMLElement>('[data-header]');
+	if (bar) {
+		let lastY = scrollY;
+		let idle: number | undefined;
+		const show = () => bar.classList.remove('is-hidden');
+		addEventListener(
+			'scroll',
+			() => {
+				const y = scrollY;
+				if (y < bar.offsetHeight * 2 || y < lastY - 4) show();
+				else if (y > lastY + 4 && !bar.contains(document.activeElement)) bar.classList.add('is-hidden');
+				lastY = y;
+				clearTimeout(idle);
+				idle = window.setTimeout(show, 700);
+			},
+			{ passive: true },
+		);
+		bar.addEventListener('focusin', show);
+	}
+</script>
 
 <style>
-	.site-header {
+	.sticky {
 		position: sticky;
 		top: 0;
-		z-index: 10;
-		border-bottom: 1px solid var(--border);
-		background: color-mix(in srgb, var(--bg) 80%, transparent);
-		backdrop-filter: blur(12px);
+		z-index: 20;
+		background: var(--bg-raised);
+		border-bottom: var(--stroke) solid var(--line);
+		transition: transform 200ms ease-out;
+	}
+	.sticky:global(.is-hidden) {
+		transform: translateY(-100%);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.sticky {
+			transition: none;
+		}
+	}
+	.site-header {
+		display: flex;
+		align-items: center;
+		gap: var(--space-8);
+		height: var(--header-height);
+	}
+	/* The wordmark is type: Plex Mono 600 plus a solid ink block cursor. Not animated. */
+	.wordmark {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
+		font-family: var(--font-mono);
+		font-size: 16px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		color: var(--ink);
+		text-decoration: none;
+	}
+	.cursor {
+		display: inline-block;
+		width: 9px;
+		height: 18px;
+		margin-left: 2px;
+		background: var(--ink);
 	}
 	nav {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		height: 3.5rem;
+		flex: 1;
+		gap: var(--space-1);
+		min-width: 0;
+	}
+	nav a {
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-sm);
 		font-family: var(--font-mono);
-		font-size: 0.875rem;
-	}
-	.brand {
-		color: var(--fg);
-		text-decoration: none;
+		font-size: 12px;
+		line-height: 16px;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		white-space: nowrap;
-	}
-	.prompt {
-		color: var(--fg);
-	}
-	.cursor {
-		margin-left: 0.15em;
-		color: var(--muted);
-		animation: blink 1.1s steps(1) infinite;
-	}
-	ul {
-		display: flex;
-		gap: 1.25rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-	}
-	ul a {
-		color: var(--muted);
+		color: var(--ink-secondary);
 		text-decoration: none;
-		transition: color 0.15s ease;
+		transition:
+			color var(--ease),
+			background-color var(--ease);
 	}
-	ul a span {
-		color: var(--subtle);
+	nav a:hover {
+		color: var(--ink);
+		background: var(--bg-sunken);
 	}
-	ul a:hover,
-	ul a.active {
-		color: var(--fg);
+	nav a[aria-current='page'] {
+		color: var(--ink);
+		border-radius: 0;
+		box-shadow: inset 0 -1px 0 var(--ink);
 	}
-	@keyframes blink {
-		50% {
-			opacity: 0;
-		}
+	.search {
+		margin-right: calc(-1 * var(--space-2));
 	}
-	@media (prefers-reduced-motion: reduce) {
-		.cursor {
-			animation: none;
-		}
+	.shortcut {
+		margin-left: var(--space-1);
+		letter-spacing: 0;
+		text-transform: none;
 	}
-	@media (max-width: 560px) {
-		.prompt {
-			font-size: 0;
-		}
-		.prompt::before {
-			content: '~$';
-			font-size: 0.875rem;
-		}
-		ul {
-			gap: 0.9rem;
-		}
-		ul a span {
+	@media (max-width: 640px) {
+		.search .label,
+		.search .shortcut {
 			display: none;
+		}
+		.site-header {
+			gap: var(--space-3);
+		}
+		nav a {
+			padding-inline: var(--space-2);
 		}
 	}
 </style>

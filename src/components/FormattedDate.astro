@@ -3,7 +3,9 @@ interface Props {
 	date: Date;
 }
 
+// Dates are ISO 8601 everywhere: 2026-10-13.
 const { date } = Astro.props;
+const iso = date.toISOString().slice(0, 10);
 ---
 
-<time datetime={date.toISOString()}>{date.toISOString().slice(0, 10)}</time>
+<time datetime={iso}>{iso}</time>

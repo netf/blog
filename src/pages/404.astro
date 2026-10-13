@@ -1,13 +1,25 @@
 ---
+import PageHead from '../components/PageHead.astro';
 import { url } from '../consts';
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="404" description="Page not found.">
-	<section class="container page-head">
-		<p class="eyebrow">exit code 404</p>
-		<h1>Not found</h1>
-		<pre><code>Error from server (NotFound): pages "{Astro.url.pathname}" not found</code></pre>
-		<p><a href={url('/')}>&larr; back home</a></p>
-	</section>
+<Base title="Page not found" description="Page not found.">
+	<div class="container">
+		<PageHead eyebrow="404" title="Page not found" seed="not-found" inverse>
+			<p>Nothing lives at <code>{Astro.url.pathname}</code>. It may have moved, or the link has a typo.</p>
+		</PageHead>
+		<div class="actions">
+			<a class="btn btn-primary" href={url('/')}>Go home</a>
+			<a class="btn" href={url('/posts')}>Browse the archive</a>
+		</div>
+	</div>
 </Base>
+
+<style>
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+	}
+</style>

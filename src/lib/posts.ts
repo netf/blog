@@ -1,11 +1,29 @@
 import { type CollectionEntry, getCollection } from 'astro:content';
 
 export type Post = CollectionEntry<'blog'>;
+export type Pillar = Post['data']['pillar'];
+
+/** Pillars always carry their fixed index: 01 / PLATFORM, 02 / DATA, 03 / AI. */
+export const PILLARS: Record<Pillar, { index: string; label: string }> = {
+	platform: { index: '01', label: 'Platform' },
+	data: { index: '02', label: 'Data' },
+	ai: { index: '03', label: 'AI' },
+};
+
+export function pillarLabel(pillar: Pillar): string {
+	const { index, label } = PILLARS[pillar];
+	return `${index} / ${label}`;
+}
 
 /** Published posts, newest first. Drafts are visible in `astro dev` only. */
 export async function getPosts(): Promise<Post[]> {
 	const posts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
 	return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+}
+
+/** The lead post on the home page: the newest one marked `featured`, else the newest post. */
+export function getFeatured(posts: Post[]): Post | undefined {
+	return posts.find((p) => p.data.featured) ?? posts[0];
 }
 
 export function getTags(posts: Post[]): Map<string, number> {
@@ -16,7 +34,11 @@ export function getTags(posts: Post[]): Map<string, number> {
 	return new Map([...tags].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
 }
 
+export function wordCount(body = ''): number {
+	return body.trim().split(/\s+/).filter(Boolean).length;
+}
+
 export function readingTime(body = ''): string {
-	const words = body.trim().split(/\s+/).filter(Boolean).length;
+	const words = wordCount(body);
 	return `${Math.max(1, Math.round(words / 220))} min read`;
 }

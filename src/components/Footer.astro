@@ -1,44 +1,114 @@
 ---
 import { SITE_AUTHOR, SOCIALS, url } from '../consts';
+import Icon from './Icon.astro';
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
 	<div class="container">
-		<span>&copy; {year} {SITE_AUTHOR}</span>
-		<span class="links">
-			<a href={SOCIALS.github} rel="me noopener" target="_blank">github</a>
-			<a href={url('/rss.xml')}>rss</a>
-			<a href="https://astro.build" rel="noopener" target="_blank">built with astro</a>
-		</span>
+		<p class="meta">&copy; {year} {SITE_AUTHOR}. Notes on platform, data and AI.</p>
+		<div class="tools">
+			<a class="top" href="#main">
+				Back to top <Icon name="arrow-up" size={16} />
+			</a>
+			<span class="divider" aria-hidden="true"></span>
+			<a class="icon-btn" href={SOCIALS.github} rel="me noopener" aria-label="GitHub" title="GitHub">
+				<Icon name="github" />
+			</a>
+			<a class="icon-btn" href={SOCIALS.linkedin} rel="me noopener" aria-label="LinkedIn" title="LinkedIn">
+				<Icon name="linkedin" />
+			</a>
+			<a class="icon-btn" href={url('/rss.xml')} aria-label="RSS feed" title="RSS feed">
+				<Icon name="rss" />
+			</a>
+			<button class="icon-btn theme" type="button" aria-label="Switch to light theme" title="Switch theme" hidden>
+				<Icon name="sun" class="sun" />
+				<Icon name="moon" class="moon" />
+			</button>
+		</div>
 	</div>
 </footer>
 
+<script>
+	const root = document.documentElement;
+	const button = document.querySelector<HTMLButtonElement>('.site-footer .theme');
+	const label = () => {
+		const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+		if (button) button.ariaLabel = `Switch to ${next} theme`;
+	};
+	if (button) {
+		button.hidden = false;
+		label();
+		button.addEventListener('click', () => {
+			if (root.dataset.theme === 'light') delete root.dataset.theme;
+			else root.dataset.theme = 'light';
+			try {
+				localStorage.setItem('theme', root.dataset.theme ?? 'dark');
+			} catch {}
+			label();
+		});
+	}
+</script>
+
 <style>
 	.site-footer {
-		margin-top: 6rem;
-		border-top: 1px solid var(--border);
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		color: var(--subtle);
+		margin-top: var(--space-24);
+		border-top: var(--stroke) solid var(--line);
+		background: var(--bg-raised);
 	}
 	.container {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: center;
 		justify-content: space-between;
-		gap: 1rem;
-		padding-block: 2rem;
+		gap: var(--space-4) var(--space-8);
+		padding-block: var(--space-6);
 	}
-	.links {
+	p {
+		margin: 0;
+	}
+	.tools {
 		display: flex;
-		gap: 1.25rem;
+		align-items: center;
+		gap: var(--space-1);
+		margin-right: calc(-1 * var(--space-2));
 	}
-	a {
-		color: var(--muted);
+	.top {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: 12px;
+		line-height: 16px;
+		font-weight: 500;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--ink-secondary);
 		text-decoration: none;
+		transition: color var(--ease);
 	}
-	a:hover {
-		color: var(--fg);
+	.top:hover {
+		color: var(--ink);
+	}
+	.divider {
+		width: var(--stroke);
+		height: 20px;
+		margin-inline: var(--space-2);
+		background: var(--line);
+	}
+	/* The theme button shows the theme it switches to: sun in dark, moon in light. */
+	.theme[hidden] {
+		display: none;
+	}
+	.theme :global(.moon) {
+		display: none;
+	}
+	:global(:root[data-theme='light']) .theme :global(.sun) {
+		display: none;
+	}
+	:global(:root[data-theme='light']) .theme :global(.moon) {
+		display: block;
 	}
 </style>

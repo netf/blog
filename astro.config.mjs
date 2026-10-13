@@ -1,9 +1,13 @@
 // @ts-check
 
+import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
-import greyscale from './src/styles/greyscale.theme.json' with { type: 'json' };
+import { codeBlock } from './src/plugins/code-block.mjs';
+import { prosePlugins } from './src/plugins/prose.mjs';
+import dark from './src/styles/shiki-dark.theme.json' with { type: 'json' };
+import light from './src/styles/shiki-light.theme.json' with { type: 'json' };
 
 // The Pages workflow passes SITE_URL and BASE_PATH from `actions/configure-pages`.
 // BASE_PATH is empty when a custom domain is configured, so it must not fall back to '/blog'.
@@ -17,25 +21,34 @@ export default defineConfig({
 	trailingSlash: 'ignore',
 	integrations: [mdx(), sitemap()],
 	markdown: {
+		processor: satteri({ hastPlugins: prosePlugins }),
 		shikiConfig: {
-			theme: { ...greyscale, type: /** @type {const} */ ('dark') },
+			// Technica syntax: told apart by weight, style and grey level, never hue.
+			themes: {
+				light: { ...light, type: /** @type {const} */ ('light') },
+				dark: { ...dark, type: /** @type {const} */ ('dark') },
+			},
+			defaultColor: false,
 			wrap: false,
+			transformers: [codeBlock],
 		},
 	},
 	fonts: [
 		{
 			provider: fontProviders.google(),
-			name: 'Inter',
+			name: 'IBM Plex Sans',
 			cssVariable: '--font-sans',
-			weights: [400, 500, 600, 700],
-			fallbacks: ['system-ui', 'sans-serif'],
+			weights: [400, 500, 600],
+			styles: ['normal', 'italic'],
+			fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
 		},
 		{
 			provider: fontProviders.google(),
-			name: 'JetBrains Mono',
+			name: 'IBM Plex Mono',
 			cssVariable: '--font-mono',
-			weights: [400, 500, 700],
-			fallbacks: ['ui-monospace', 'monospace'],
+			weights: [400, 500, 600],
+			styles: ['normal', 'italic'],
+			fallbacks: ['ui-monospace', 'SF Mono', 'Menlo', 'monospace'],
 		},
 	],
 });

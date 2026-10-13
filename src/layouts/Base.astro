@@ -2,28 +2,32 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Search from '../components/Search.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 interface Props {
 	title?: string;
 	description?: string;
 	type?: 'website' | 'article';
+	image?: string;
 }
 
-const { title = SITE_TITLE, description = SITE_DESCRIPTION, type } = Astro.props;
+const { title = SITE_TITLE, description = SITE_DESCRIPTION, type, image } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={title} description={description} type={type} />
+		<BaseHead title={title} description={description} type={type} image={image} />
 		<slot name="head" />
 	</head>
 	<body>
+		<a class="skip-link" href="#main">Skip to content</a>
 		<Header />
-		<main>
+		<main id="main">
 			<slot />
 		</main>
 		<Footer />
+		<Search />
 	</body>
 </html>

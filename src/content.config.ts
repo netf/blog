@@ -9,8 +9,12 @@ const blog = defineCollection({
 		description: z.string(),
 		pubDate: z.coerce.date(),
 		updatedDate: z.coerce.date().optional(),
+		/** The pillar the post belongs to: platform, data or AI. */
+		pillar: z.enum(['platform', 'data', 'ai']).default('platform'),
 		tags: z.array(z.string()).default([]),
 		draft: z.boolean().default(false),
+		/** Lead the home page grid with this post instead of the newest one. */
+		featured: z.boolean().default(false),
 	}),
 });
 

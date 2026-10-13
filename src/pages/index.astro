@@ -1,194 +1,306 @@
 ---
-import PostList from '../components/PostList.astro';
-import Tag from '../components/Tag.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import IsoArt from '../components/IsoArt.astro';
+import PostTiles from '../components/PostTiles.astro';
+import TopicMenu from '../components/TopicMenu.astro';
 import { url } from '../consts';
 import Base from '../layouts/Base.astro';
-import { getPosts, getTags } from '../lib/posts';
+import { getFeatured, getPosts, getTags, PILLARS, readingTime, wordCount } from '../lib/posts';
 
 const posts = await getPosts();
-const recent = posts.slice(0, 5);
-const tags = [...getTags(posts)].slice(0, 10);
-
-const session: [string, string[]][] = [
-	['whoami', ['netf: platform engineer, YAML whisperer, recovering 3am hero']],
-	['uptime', ['up since the first pager went off, load average: coffee, coffee, more coffee']],
-	[
-		'cat ~/.plan',
-		[
-			'- make the right way the lazy way',
-			'- delete more config than I write',
-			'- never deploy on a Friday   # deploys on a Friday',
-		],
-	],
-];
+const featured = getFeatured(posts);
+const rest = posts.filter((p) => p !== featured).slice(0, 6);
+const tags = [...getTags(posts)];
+const words = posts.reduce((n, p) => n + wordCount(p.body), 0);
+const first = posts.at(-1)?.data.pubDate;
+const fmt = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n));
 ---
 
 <Base>
-	<section class="hero container">
-		<p class="eyebrow">hi, I'm netf</p>
-		<h1>
-			I make production <del>exciting</del>{' '}<span class="boring">boring.</span>
-		</h1>
-		<p class="intro">
-			Boring means green dashboards, quiet pagers and Friday deploys nobody notices. I build the platforms
-			that get teams there, and write down everything that broke on the way.
-		</p>
-		<div class="terminal" aria-hidden="true">
-			<div class="bar"><span></span><span></span><span></span><em>~/netf</em></div>
-			<pre>{
-				session.map(([cmd, out]) => (
-					<Fragment><span class="p">$</span> <span class="cmd">{cmd}</span>{'\n'}{out.join('\n')}{'\n'}</Fragment>
-				))
-			}<span class="p">$</span> <span class="blink">▍</span></pre>
-		</div>
-	</section>
+	<div class="container home">
+		<section class="panel intro">
+			<!-- One drawing spans both top panels; each panel shows its slice, colours flipped. -->
+			<div class="span-art"><IsoArt seed="netf-field-notes" cols={13} rows={9} height={5} instance="a" /></div>
+			<div class="intro-copy">
+				<p class="eyebrow kicker"><span>01 / Platform</span> <span>02 / Data</span> <span>03 / AI</span></p>
+				<h1>Notes from the blast radius</h1>
+				<p class="lead">
+					I spend my days making production boring and my nights finding out it wasn't. These are the
+					notes.
+				</p>
+				<dl class="stats">
+					<div>
+						<dt>Posts</dt>
+						<dd>{posts.length}</dd>
+					</div>
+					<div>
+						<dt>Topics</dt>
+						<dd>{tags.length}</dd>
+					</div>
+					<div>
+						<dt>Words</dt>
+						<dd>{fmt(words)}</dd>
+					</div>
+					{
+						first && (
+							<div>
+								<dt>Since</dt>
+								<dd>
+									<FormattedDate date={first} />
+								</dd>
+							</div>
+						)
+					}
+				</dl>
+				<a class="cta" href={url('/posts')}>Explore the archive</a>
+			</div>
+		</section>
 
-	<section class="container">
-		<div class="section-head">
-			<h2 class="eyebrow">latest posts</h2>
-			<a href={url('/posts')}>all posts &rarr;</a>
-		</div>
-		<PostList posts={recent} />
-	</section>
+		{
+			featured && (
+				<section class="panel inverse latest" aria-labelledby="latest-title">
+					<div class="span-art">
+						<IsoArt seed="netf-field-notes" cols={13} rows={9} height={5} instance="b" />
+					</div>
+					<div class="latest-copy">
+						<p class="eyebrow latest-kicker">
+							<span>Latest</span>
+							<span>
+								{PILLARS[featured.data.pillar].index} / {PILLARS[featured.data.pillar].label}
+							</span>
+						</p>
+						<h2 id="latest-title">
+							<a href={url(`/posts/${featured.id}/`)}>{featured.data.title}</a>
+						</h2>
+						<p class="latest-dek">{featured.data.description}</p>
+						<p class="meta">
+							<FormattedDate date={featured.data.pubDate} /> &nbsp; {readingTime(featured.body)} &nbsp;{' '}
+							{featured.data.tags.join(' · ')}
+						</p>
+						<a class="cta" href={url(`/posts/${featured.id}/`)}>
+							Read the post
+						</a>
+					</div>
+				</section>
+			)
+		}
 
-	{
-		tags.length > 0 && (
-			<section class="container topics">
-				<h2 class="eyebrow">topics</h2>
-				<div class="tags">
-					{tags.map(([tag, count]) => (
-						<Tag tag={tag} count={count} />
-					))}
-				</div>
-			</section>
-		)
-	}
+		{
+			rest.length > 0 && (
+				<section class="more" aria-labelledby="more">
+					<div class="section-head">
+						<h2 id="more" class="eyebrow">
+							More writing
+						</h2>
+						<a class="btn btn-ghost" href={url('/posts')}>
+							Archive &rarr;
+						</a>
+					</div>
+					<PostTiles posts={rest} />
+				</section>
+			)
+		}
+
+		{
+			tags.length > 0 && (
+				<section class="panel topics" aria-labelledby="topics">
+					<h2 id="topics" class="eyebrow topics-head">
+						Topics
+					</h2>
+					<TopicMenu tags={tags} />
+				</section>
+			)
+		}
+	</div>
 </Base>
 
 <style>
-	.hero {
-		padding-block: 5.5rem 4rem;
-	}
-	h1 {
-		margin: 0;
-		font-size: clamp(2.1rem, 6vw, 3.4rem);
-		line-height: 1.1;
-		letter-spacing: -0.035em;
-		font-weight: 700;
-	}
-	del {
-		color: var(--subtle);
-		font-weight: 500;
-		text-decoration-thickness: 0.08em;
-		text-decoration-color: var(--muted);
-	}
-	.boring {
-		display: inline-block;
-		font-family: var(--font-mono);
-		font-weight: 500;
-		letter-spacing: -0.04em;
-		background: linear-gradient(180deg, #ffffff 30%, #7a7a7a);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
+	/* Desktop bento: intro and latest side by side, tiles, then the topics menu.
+	   The grid is a size container so the shared drawing can be as wide as the row (100cqi). */
+	.home {
+		--art-h: 400px;
+		container-type: inline-size;
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: var(--space-6);
+		padding-top: var(--space-8);
 	}
 	.intro {
-		margin: 1.5rem 0 0;
-		max-width: 34rem;
-		font-size: 1.1rem;
-		color: var(--muted);
-	}
-	.terminal {
-		margin-top: 3rem;
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		background: var(--surface);
-		box-shadow:
-			0 0 0 1px rgba(255, 255, 255, 0.02),
-			0 30px 60px -30px rgba(0, 0, 0, 0.8);
-		overflow: hidden;
-	}
-	.bar {
+		grid-column: span 7;
 		display: flex;
-		gap: 6px;
-		padding: 0.7rem 0.9rem;
-		border-bottom: 1px solid var(--border);
+		flex-direction: column;
+		padding-top: var(--art-h);
 	}
-	.bar span {
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		background: var(--border-strong);
+	.latest {
+		grid-column: span 5;
+		display: flex;
+		flex-direction: column;
+		padding-top: var(--art-h);
 	}
-	.bar em {
-		margin-left: auto;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		font-style: normal;
-		line-height: 10px;
-		color: var(--subtle);
+	.more,
+	.topics {
+		grid-column: 1 / -1;
 	}
-	.cmd {
-		color: var(--fg);
+
+	/* The shared drawing: row-wide, pinned to the row's left edge in the intro and its right
+	   edge in latest, so the two slices line up across the gap. -1px offsets the panel border. */
+	.span-art {
+		position: absolute;
+		top: 0;
+		width: 100cqi;
+		height: var(--art-h);
 	}
-	.terminal pre {
+	.intro .span-art {
+		left: -1px;
+	}
+	.latest .span-art {
+		right: -1px;
+	}
+	.intro-copy {
+		padding: var(--space-6) var(--space-8) var(--space-8);
+	}
+	.kicker {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1) var(--space-6);
 		margin: 0;
-		border: 0;
-		border-radius: 0;
-		font-size: 0.8rem;
-		color: var(--muted);
+		color: var(--ink-muted);
 	}
-	@media (max-width: 640px) {
-		.terminal pre {
-			white-space: pre-wrap;
-		}
+	.kicker span {
+		white-space: nowrap;
 	}
-	.p {
-		color: var(--fg);
+	h1 {
+		max-width: 18ch;
+		margin-top: var(--space-4);
+		font-size: 56px;
+		line-height: 60px;
+		letter-spacing: -0.03em;
 	}
-	.c {
-		color: var(--subtle);
+	.lead {
+		max-width: 36rem;
+		margin: var(--space-4) 0 0;
+		font-size: 20px;
+		line-height: 32px;
+		color: var(--ink-secondary);
 	}
-	.blink {
-		color: var(--fg);
-		animation: blink 1.1s steps(1) infinite;
+	.stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-4) var(--space-12);
+		margin: var(--space-8) 0;
+		padding-top: var(--space-6);
+		border-top: var(--stroke) solid var(--line);
 	}
-	@keyframes blink {
-		50% {
-			opacity: 0;
-		}
+	.stats dt {
+		font-family: var(--font-mono);
+		font-size: 13px;
+		line-height: 20px;
+		color: var(--ink-muted);
 	}
-	@media (prefers-reduced-motion: reduce) {
-		.blink {
-			animation: none;
-		}
+	.stats dd {
+		margin: var(--space-1) 0 0;
+		font-size: 28px;
+		line-height: 36px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Latest: the solid panel; its copy sits at the bottom, level with the intro's. */
+	.latest-copy {
+		margin-top: auto;
+		padding: var(--space-6) var(--space-8) var(--space-8);
+	}
+	.latest-kicker {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--space-4);
+		margin: 0;
+		color: var(--ink-muted);
+	}
+	.latest h2 {
+		margin-top: var(--space-4);
+		font-size: 28px;
+		line-height: 36px;
+		letter-spacing: -0.02em;
+	}
+	.latest h2 a {
+		text-decoration: none;
+	}
+	.latest-dek {
+		margin: var(--space-3) 0 0;
+		font-size: 15px;
+		line-height: 24px;
+		color: var(--ink-secondary);
+	}
+	.latest .meta {
+		margin: var(--space-4) 0 var(--space-8);
+	}
+
+	/* More writing */
+	.more {
+		margin-top: var(--space-12);
 	}
 	.section-head {
 		display: flex;
-		align-items: baseline;
+		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 0.5rem;
+		gap: var(--space-4);
+		margin-bottom: var(--space-6);
+		padding-bottom: var(--space-3);
+		border-bottom: var(--stroke) solid var(--line);
 	}
-	.section-head a {
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		color: var(--muted);
-		text-decoration: none;
+	.section-head h2 {
+		color: var(--ink-muted);
 	}
-	.section-head a:hover {
-		color: var(--fg);
-	}
-	h2.eyebrow {
-		font-weight: 400;
-		letter-spacing: 0;
-		line-height: 1.7;
-	}
+
+	/* Topics as a big menu, two columns of large type. */
 	.topics {
-		margin-top: 4rem;
+		margin-top: var(--space-12);
+		padding: var(--space-8);
 	}
-	.tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+	.topics-head {
+		margin-bottom: var(--space-6);
+		color: var(--ink-muted);
+	}
+	/* Stacked: the intro keeps the whole drawing; latest turns typographic. */
+	@media (max-width: 1080px) {
+		.home {
+			--art-h: 300px;
+		}
+		.intro,
+		.latest {
+			grid-column: 1 / -1;
+		}
+		.latest {
+			padding-top: 0;
+		}
+		.latest .span-art {
+			display: none;
+		}
+	}
+	@media (max-width: 640px) {
+		.home {
+			--art-h: 220px;
+			gap: var(--space-4);
+			padding-top: var(--space-4);
+		}
+		.intro-copy {
+			padding: var(--space-6);
+		}
+		h1 {
+			font-size: 40px;
+			line-height: 46px;
+			letter-spacing: -0.025em;
+		}
+		.stats {
+			gap: var(--space-4) var(--space-8);
+		}
+		.latest-copy {
+			padding: var(--space-6);
+		}
+		.topics {
+			padding: var(--space-6);
+		}
 	}
 </style>

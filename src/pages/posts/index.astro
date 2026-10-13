@@ -1,5 +1,6 @@
 ---
-import PostList from '../../components/PostList.astro';
+import PageHead from '../../components/PageHead.astro';
+import PostTiles from '../../components/PostTiles.astro';
 import Base from '../../layouts/Base.astro';
 import { getPosts, type Post } from '../../lib/posts';
 
@@ -11,34 +12,32 @@ for (const post of posts) {
 }
 ---
 
-<Base title="Posts" description="Every post, newest first.">
-	<section class="container page-head">
-		<p class="eyebrow">ls -lt ./posts</p>
-		<h1>Posts</h1>
-		<p>{posts.length} {posts.length === 1 ? 'entry' : 'entries'} on DevOps and platform engineering.</p>
-	</section>
-	<section class="container">
+<Base title="Archive" description="Every post, newest first.">
+	<div class="container">
+		<PageHead eyebrow="Archive" title="Every post, newest first" seed="archive">
+			<p>{posts.length} {posts.length === 1 ? 'post' : 'posts'} on platform, data and AI.</p>
+		</PageHead>
 		{
 			[...byYear].map(([year, yearPosts]) => (
-				<div class="year">
-					<h2>{year}</h2>
-					<PostList posts={yearPosts} />
-				</div>
+				<section class="year" aria-labelledby={`y${year}`}>
+					<h2 id={`y${year}`} class="eyebrow">
+						{year}
+					</h2>
+					<PostTiles posts={yearPosts} />
+				</section>
 			))
 		}
-	</section>
+	</div>
 </Base>
 
 <style>
 	.year + .year {
-		margin-top: 3rem;
+		margin-top: var(--space-16);
 	}
 	h2 {
-		margin: 0 0 0.75rem;
-		font-family: var(--font-mono);
-		font-size: 0.85rem;
-		font-weight: 500;
-		color: var(--subtle);
-		letter-spacing: 0;
+		margin-bottom: var(--space-6);
+		padding-bottom: var(--space-3);
+		border-bottom: var(--stroke) solid var(--line);
+		color: var(--ink-muted);
 	}
 </style>

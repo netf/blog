@@ -1,38 +1,59 @@
 ---
-import PostList from '../../components/PostList.astro';
+import PageHead from '../../components/PageHead.astro';
+import PostTiles from '../../components/PostTiles.astro';
+import TopicMenu from '../../components/TopicMenu.astro';
 import { url } from '../../consts';
 import Base from '../../layouts/Base.astro';
 import { getPosts, getTags, type Post } from '../../lib/posts';
 
 export async function getStaticPaths() {
 	const posts = await getPosts();
-	return [...getTags(posts).keys()].map((tag) => ({
+	const tags = [...getTags(posts)];
+	return tags.map(([tag]) => ({
 		params: { tag },
-		props: { posts: posts.filter((p) => p.data.tags.includes(tag)) },
+		props: { posts: posts.filter((p) => p.data.tags.includes(tag)), tags },
 	}));
 }
 
 interface Props {
 	posts: Post[];
+	tags: [string, number][];
 }
 
 const { tag } = Astro.params;
-const { posts } = Astro.props;
+const { posts, tags } = Astro.props;
 ---
 
-<Base title={`#${tag}`} description={`Posts tagged #${tag}.`}>
-	<section class="container page-head">
-		<p class="eyebrow"><a href={url('/tags')}>tags</a> / {tag}</p>
-		<h1>#{tag}</h1>
-		<p>{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
-	</section>
-	<section class="container">
-		<PostList posts={posts} />
-	</section>
+<Base title={tag} description={`Posts about ${tag}.`}>
+	<div class="container">
+		<PageHead eyebrow="Topic" title={tag} seed={`topic-${tag}`}>
+			<p>
+				{posts.length} {posts.length === 1 ? 'post' : 'posts'} about {tag}.
+				<a href={url('/tags')}>All topics</a>
+			</p>
+		</PageHead>
+		<PostTiles posts={posts} level="h2" />
+		<section class="others" aria-labelledby="others">
+			<h2 id="others" class="eyebrow">Other topics</h2>
+			<TopicMenu tags={tags} current={tag} />
+		</section>
+	</div>
 </Base>
 
 <style>
-	.eyebrow a {
-		color: inherit;
+	.others {
+		margin-top: var(--space-16);
+	}
+	h2 {
+		margin-bottom: var(--space-6);
+		padding-bottom: var(--space-3);
+		border-bottom: var(--stroke) solid var(--line);
+		color: var(--ink-muted);
+	}
+	p a {
+		margin-left: var(--space-2);
+		color: var(--ink);
+		text-decoration-color: var(--line-strong);
+		text-underline-offset: 3px;
 	}
 </style>

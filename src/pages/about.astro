@@ -1,29 +1,36 @@
 ---
-import { SOCIALS } from '../consts';
+import PageHead from '../components/PageHead.astro';
+import { SOCIALS, url } from '../consts';
 import Base from '../layouts/Base.astro';
 ---
 
 <Base title="About" description="Who writes this blog and why.">
-	<section class="container page-head">
-		<p class="eyebrow">whoami</p>
-		<h1>About</h1>
-	</section>
-	<section class="container prose">
-		<p>
-			Hi, I'm <strong>netf</strong>. I work on DevOps and platform engineering: building the internal
-			platforms, pipelines and guardrails that let product teams ship safely and quickly.
-		</p>
-		<p>This blog is where I write down what I learn along the way, mostly about:</p>
-		<ul>
-			<li>Kubernetes, GitOps and cluster operations</li>
-			<li>Infrastructure as code with Terraform and friends</li>
-			<li>CI/CD, release engineering and developer experience</li>
-			<li>Observability, SLOs and incident response</li>
-			<li>Treating the platform as a product</li>
-		</ul>
-		<p>
-			You can find me on <a href={SOCIALS.github}>GitHub</a>. Opinions are my own and probably
-			eventually consistent.
-		</p>
-	</section>
+	<div class="container">
+		<PageHead eyebrow="About" title="Who writes this" seed="about-netf" inverse>
+			<p>I'm netf. I build platforms so that shipping software is the least interesting part of anyone's day.</p>
+		</PageHead>
+		<div class="prose">
+			<p>
+				I work on DevOps and platform engineering: the internal platforms, pipelines and guardrails that
+				let product teams ship safely and quickly. This blog is where I write down what I learn along the
+				way, mostly about:
+			</p>
+			<ul>
+				<li>Kubernetes, GitOps and cluster operations</li>
+				<li>Infrastructure as code with Terraform and friends</li>
+				<li>CI/CD, release engineering and developer experience</li>
+				<li>Observability, SLOs and incident response</li>
+				<li>Treating the platform as a product</li>
+			</ul>
+			<h2>How I write</h2>
+			<p>
+				If I didn't observe it, it isn't in the post, and if I couldn't test something, I say so. Lab posts
+				link to the scripts and raw output, so you can rerun them and tell me where I'm wrong.
+			</p>
+			<p>
+				You can find me on <a href={SOCIALS.github}>GitHub</a>, or follow new posts with the
+				<a href={url('/rss.xml')}>RSS feed</a>. Opinions are my own and probably eventually consistent.
+			</p>
+		</div>
+	</div>
 </Base>

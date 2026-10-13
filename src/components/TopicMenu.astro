@@ -1,0 +1,72 @@
+---
+import { url } from '../consts';
+
+interface Props {
+	tags: [string, number][];
+	/** Tag of the current page, marked in the menu. */
+	current?: string;
+}
+
+const { tags, current } = Astro.props;
+---
+
+<ol class="menu">
+	{
+		tags.map(([tag, count]) => (
+			<li>
+				<a href={url(`/tags/${tag}`)} aria-current={tag === current ? 'page' : undefined}>
+					<span class="name">{tag}</span>
+					<span class="meta">{String(count).padStart(2, '0')}</span>
+				</a>
+			</li>
+		))
+	}
+</ol>
+
+<style>
+	/* Topics as a big menu: two columns of large type with hairline rules. */
+	.menu {
+		columns: 2;
+		column-gap: var(--space-12);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		break-inside: avoid;
+		border-bottom: var(--stroke) solid var(--line);
+	}
+	a {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-4);
+		padding-block: var(--space-3);
+		text-decoration: none;
+	}
+	.name {
+		font-size: 28px;
+		line-height: 36px;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		overflow-wrap: anywhere;
+		transition: color var(--ease);
+	}
+	a:hover .name {
+		color: var(--ink-secondary);
+	}
+	a[aria-current='page'] .name {
+		text-decoration: underline;
+		text-decoration-thickness: 3px;
+		text-underline-offset: 6px;
+	}
+	@media (max-width: 640px) {
+		.menu {
+			columns: 1;
+		}
+		.name {
+			font-size: 22px;
+			line-height: 30px;
+		}
+	}
+</style>

@@ -1,0 +1,75 @@
+---
+// Renders a drawing from src/lib/iso.ts in `currentColor` on the panel's own ground
+// (`--art-bg`), so it works in both themes and on inverse panels. The drawing is laid out at a
+// fixed size and cropped by its frame, never scaled, so stripe pitch is identical everywhere.
+import { drawIso, type Face } from '../lib/iso';
+
+interface Props {
+	seed: string;
+	/** Footprint of the cluster in grid cells. */
+	cols?: number;
+	rows?: number;
+	/** Tallest block, in cells. */
+	height?: number;
+	/** Where the drawing sits in its frame when the frame crops it. */
+	focus?: 'center' | 'top-right' | 'bottom-left';
+	/** Distinguishes two copies of the same drawing on one page (their pattern ids must differ). */
+	instance?: string;
+	class?: string;
+}
+
+const { seed, cols, rows, height, focus = 'center', instance = '', class: className } = Astro.props;
+const art = drawIso({ seed, cols, rows, height });
+const pid = (i: number) => `iso-${art.key}${instance}-${i}`;
+const fillOf = (f: Face) =>
+	f === 'solid' ? 'currentColor' : f === 'blank' ? 'var(--art-bg)' : `url(#${pid(Number(f.slice(1)))})`;
+---
+
+<div class:list={['iso-frame', `focus-${focus}`, className]} aria-hidden="true">
+	<svg
+		class="iso"
+		viewBox={art.viewBox}
+		width={art.width}
+		height={art.height}
+		focusable="false"
+	>
+	<defs>
+		{
+			art.patterns.map(({ angle, gap }, i) => (
+				<pattern id={pid(i)} width={gap} height={gap} patternUnits="userSpaceOnUse" patternTransform={`rotate(${angle})`}>
+					<rect width={gap} height={gap} style="fill: var(--art-bg)" />
+					<rect width={gap} height={gap * 0.45} fill="currentColor" />
+				</pattern>
+			))
+		}
+	</defs>
+	<g stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+		{art.faces.map(({ fill, points }) => <polygon points={points} style={`fill: ${fillOf(fill)}`} />)}
+	</g>
+	</svg>
+</div>
+
+<style>
+	/* The frame crops the drawing; it is never scaled, so stripe pitch is identical everywhere. */
+	.iso-frame {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		color: var(--ink);
+	}
+	.focus-top-right {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	.focus-bottom-left {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	.iso {
+		display: block;
+		flex: none;
+	}
+</style>
