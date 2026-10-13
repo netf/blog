@@ -1,162 +1,460 @@
 ---
 import type { MarkdownHeading } from 'astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import Tag from '../components/Tag.astro';
-import { url } from '../consts';
-import type { Post } from '../lib/posts';
+import IsoArt from '../components/IsoArt.astro';
+import { SITE_AUTHOR, url } from '../consts';
+import { type Post, pillarLabel } from '../lib/posts';
 import Base from './Base.astro';
 
 interface Props {
+	/** Post id, which seeds the cover art. */
+	id: string;
 	data: Post['data'];
 	headings: MarkdownHeading[];
 	readingTime: string;
+	newer?: Post;
+	older?: Post;
 }
 
-const { data, headings, readingTime } = Astro.props;
-const { title, description, pubDate, updatedDate, tags } = data;
+const { id, data, headings, readingTime, newer, older } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, pillar } = data;
 const toc = headings.filter((h) => h.depth === 2);
+const showToc = toc.length > 2;
 ---
 
-<Base title={title} description={description} type="article">
-	<article class="container">
-		<header class="post-head">
-			<a class="back" href={url('/posts')}>&larr; cd ..</a>
+<Base title={title} description={description} type="article" image={`/og/${id}.png`}>
+	<div class="progress" aria-hidden="true"></div>
+	<div class="container">
+		<div class="panel inverse cover" aria-hidden="true">
+			<IsoArt seed={id} cols={13} rows={9} height={5} />
+		</div>
+	</div>
+	<article class="post container" class:list={{ 'has-toc': showToc }}>
+		<header class="article-head">
+			<p class="kicker eyebrow">
+				<span>{pillarLabel(pillar)}</span>
+				<span class="rule" aria-hidden="true"></span>
+				<a href={url('/posts')}>Archive</a>
+			</p>
 			<h1>{title}</h1>
-			<p class="lede">{description}</p>
-			<dl class="meta">
-				<div>
-					<dt>published</dt>
-					<dd><FormattedDate date={pubDate} /></dd>
-				</div>
+			<p class="lead">{description}</p>
+			<p class="meta article-meta">
+				<span>By <b>{SITE_AUTHOR}</b></span>
+				<span><FormattedDate date={pubDate} /></span>
 				{
 					updatedDate && (
-						<div>
-							<dt>updated</dt>
-							<dd>
-								<FormattedDate date={updatedDate} />
-							</dd>
-						</div>
+						<span>
+							Updated <FormattedDate date={updatedDate} />
+						</span>
 					)
 				}
-				<div>
-					<dt>read</dt>
-					<dd>{readingTime}</dd>
-				</div>
-			</dl>
-			{
-				tags.length > 0 && (
-					<div class="tags">
-						{tags.map((tag) => (
-							<Tag tag={tag} />
-						))}
-					</div>
-				)
-			}
+				<span>{readingTime}</span>
+				{tags.length > 0 && <span>{tags.join(' · ')}</span>}
+			</p>
 		</header>
 
 		{
-			toc.length > 2 && (
-				<nav class="toc" aria-label="Table of contents">
-					<p class="eyebrow">contents</p>
-					<ol>
-						{toc.map((h) => (
-							<li>
-								<a href={`#${h.slug}`}>{h.text}</a>
-							</li>
-						))}
-					</ol>
-				</nav>
+			showToc && (
+				<aside class="toc">
+					<details open>
+						<summary class="eyebrow">Contents</summary>
+						<p class="meta remaining" data-minutes={parseInt(readingTime, 10)} aria-live="off">
+							{readingTime}
+						</p>
+						<nav aria-label="Table of contents">
+							<ol>
+								{toc.map((h) => (
+									<li>
+										<a href={`#${h.slug}`}>{h.text}</a>
+									</li>
+								))}
+							</ol>
+						</nav>
+					</details>
+				</aside>
 			)
 		}
 
 		<div class="prose">
 			<slot />
 		</div>
+
+		<footer class="post-foot">
+			<div class="note">
+				<span class="status">[ NOTE ]</span>
+				<p>
+					Spotted a mistake or got a different result?{' '}
+					<a href="https://github.com/netf/blog/issues/new">Open an issue on GitHub</a>.
+				</p>
+			</div>
+			{
+				tags.length > 0 && (
+					<ul class="tags" aria-label="Topics">
+						{tags.map((tag) => (
+							<li>
+								<a class="tag" href={url(`/tags/${tag}`)}>
+									{tag}
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+			{
+				(newer || older) && (
+					<nav class="pager" aria-label="More posts">
+						{older && (
+							<a class="older" href={url(`/posts/${older.id}/`)}>
+								<span class="eyebrow">&larr; Previous</span>
+								{older.data.title}
+							</a>
+						)}
+						{newer && (
+							<a class="newer" href={url(`/posts/${newer.id}/`)}>
+								<span class="eyebrow">Next &rarr;</span>
+								{newer.data.title}
+							</a>
+						)}
+					</nav>
+				)
+			}
+		</footer>
 	</article>
 </Base>
 
+<script>
+	// CodeBlock copy buttons (the bar itself is built at build time).
+	if (navigator.clipboard) {
+		for (const button of document.querySelectorAll<HTMLButtonElement>('.code-copy')) {
+			const pre = button.closest('.code')?.querySelector('pre');
+			if (!pre) continue;
+			button.hidden = false;
+			button.addEventListener('click', async () => {
+				await navigator.clipboard.writeText(pre.innerText);
+				button.textContent = 'Copied';
+				setTimeout(() => (button.textContent = 'Copy'), 1600);
+			});
+		}
+	}
+
+	// Contents: mark the section being read. Collapse the list by default on narrow screens.
+	const details = document.querySelector<HTMLDetailsElement>('.toc details');
+	if (details && matchMedia('(max-width: 1199px)').matches) details.open = false;
+
+	const links = new Map(
+		[...document.querySelectorAll<HTMLAnchorElement>('.toc a')].map((a) => [
+			decodeURIComponent(a.hash.slice(1)),
+			a,
+		]),
+	);
+	const sections = [...document.querySelectorAll<HTMLElement>('.prose h2[id]')].filter((h) =>
+		links.has(h.id),
+	);
+	// Reading time left: the share of the article body still below the reading line.
+	const prose = document.querySelector<HTMLElement>('.prose');
+	const remaining = document.querySelector<HTMLElement>('.remaining');
+	const total = Number(remaining?.dataset.minutes) || 0;
+	const updateRemaining = () => {
+		if (!prose || !remaining || !total) return;
+		const r = prose.getBoundingClientRect();
+		const read = Math.min(1, Math.max(0, (innerHeight * 0.3 - r.top) / r.height));
+		const left = Math.ceil(total * (1 - read));
+		remaining.textContent = read >= 0.98 ? 'Finished' : read <= 0 ? `${total} min read` : `${left} min left`;
+	};
+
+	let current: HTMLAnchorElement | undefined;
+	let queued = false;
+	const update = () => {
+		queued = false;
+		updateRemaining();
+		const line = innerHeight * 0.3;
+		let active: HTMLElement | undefined;
+		for (const h of sections) if (h.getBoundingClientRect().top <= line) active = h;
+		const link = active && links.get(active.id);
+		if (link === current) return;
+		current?.removeAttribute('aria-current');
+		link?.setAttribute('aria-current', 'location');
+		current = link;
+	};
+	if (sections.length) {
+		addEventListener(
+			'scroll',
+			() => {
+				if (!queued) {
+					queued = true;
+					requestAnimationFrame(update);
+				}
+			},
+			{ passive: true },
+		);
+		update();
+	}
+</script>
+
 <style>
-	.post-head {
-		padding-block: 3.5rem 2.5rem;
-		margin-bottom: 2.5rem;
-		border-bottom: 1px solid var(--border);
+	/* Reading progress: a 2px ink line across the top of the viewport, driven by scroll in CSS.
+	   Browsers without scroll-driven animations simply don't show it. */
+	.progress {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 30;
+		height: 2px;
+		background: var(--ink);
+		transform: scaleX(0);
+		transform-origin: 0 50%;
 	}
-	.back {
-		display: inline-block;
-		margin-bottom: 2rem;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		color: var(--subtle);
+	/* The timeline sits in its own, more specific rule: the CSS minifier would otherwise fold it
+	   into the animation shorthand, which browsers reject. */
+	@supports (animation-timeline: scroll()) {
+		.progress {
+			animation: progress linear both;
+		}
+		:root .progress {
+			animation-timeline: scroll(root);
+		}
+	}
+	@keyframes progress {
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	.post {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* Cover: the post's own art on the solid panel, cropped to a wide band. */
+	.cover {
+		height: 320px;
+		margin-top: var(--space-8);
+	}
+
+	/* ArticleHeader: pillar kicker, display title, lead dek and a mono meta row. */
+	.article-head {
+		max-width: var(--width-prose);
+		padding-block: var(--space-12);
+	}
+	.kicker {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		margin: 0;
+		color: var(--ink-muted);
+	}
+	.kicker .rule {
+		flex: 0 0 32px;
+		height: var(--stroke);
+		background: var(--line-strong);
+	}
+	.kicker a {
+		color: var(--ink-muted);
 		text-decoration: none;
+		transition: color var(--ease);
 	}
-	.back:hover {
-		color: var(--fg);
+	.kicker a:hover {
+		color: var(--ink);
 	}
 	h1 {
-		margin: 0;
-		font-size: clamp(2rem, 5vw, 2.6rem);
+		margin-top: var(--space-4);
+		font-size: 56px;
+		line-height: 60px;
 		letter-spacing: -0.03em;
 	}
-	.lede {
-		margin: 1rem 0 0;
-		font-size: 1.125rem;
-		color: var(--muted);
+	.lead {
+		margin: var(--space-4) 0 0;
+		font-size: 20px;
+		line-height: 32px;
+		color: var(--ink-secondary);
 	}
-	.meta {
+	.article-meta {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem 2rem;
-		margin: 2rem 0 0;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
+		gap: var(--space-2) var(--space-6);
+		margin: var(--space-6) 0 0;
+		padding-top: var(--space-4);
+		border-top: var(--stroke) solid var(--line);
 	}
-	.meta div {
-		display: flex;
-		gap: 0.5rem;
+	.article-meta b {
+		font-weight: 500;
+		color: var(--ink);
 	}
-	dt {
-		color: var(--subtle);
+
+	/* Contents */
+	.toc {
+		max-width: var(--width-prose);
+		margin-bottom: var(--space-8);
 	}
-	dt::after {
-		content: ':';
+	.toc details {
+		border: var(--stroke) solid var(--line);
+		background: var(--bg-raised);
 	}
-	dd {
+	summary {
+		padding: var(--space-3) var(--space-4);
+		color: var(--ink-muted);
+		cursor: pointer;
+	}
+	.remaining {
 		margin: 0;
-		color: var(--muted);
+		padding: 0 var(--space-4) var(--space-3);
+	}
+	.toc ol {
+		margin: 0;
+		padding: 0 0 var(--space-3);
+		list-style: none;
+	}
+	.toc a {
+		display: block;
+		padding: var(--space-1) var(--space-4);
+		border-left: var(--stroke) solid var(--line);
+		margin-left: var(--space-4);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		line-height: 20px;
+		color: var(--ink-muted);
+		text-decoration: none;
+		transition:
+			color var(--ease),
+			border-color var(--ease);
+	}
+	.toc a:hover {
+		color: var(--ink);
+	}
+	.toc a[aria-current] {
+		border-left-color: var(--ink);
+		color: var(--ink);
+	}
+
+	/* Wide screens: contents sit in a sticky rail; the body column leaves room for wide code. */
+	@media (min-width: 1200px) {
+		.post.has-toc {
+			grid-template-columns: 200px minmax(0, var(--width-wide));
+			column-gap: var(--space-12);
+			justify-content: start;
+		}
+		.has-toc .article-head,
+		.has-toc .prose,
+		.has-toc .post-foot {
+			grid-column: 2;
+		}
+		.has-toc .prose {
+			grid-row: 2;
+		}
+		.has-toc .post-foot {
+			grid-row: 3;
+		}
+		.has-toc .toc {
+			grid-column: 1;
+			grid-row: 2 / 4;
+			margin: 0;
+		}
+		.has-toc .toc details {
+			position: sticky;
+			top: calc(var(--header-height) + var(--space-6));
+			max-height: calc(100vh - var(--header-height) - var(--space-12));
+			overflow-y: auto;
+			border: 0;
+			background: none;
+		}
+		.has-toc summary {
+			padding: 0 0 var(--space-3);
+			pointer-events: none;
+			list-style: none;
+		}
+		.has-toc summary::-webkit-details-marker {
+			display: none;
+		}
+		.has-toc .toc a {
+			margin-left: 0;
+		}
+		.has-toc .remaining {
+			padding: 0 0 var(--space-4);
+		}
+	}
+
+	/* After the post */
+	.post-foot {
+		max-width: var(--width-prose);
+		margin-top: var(--space-16);
+	}
+	.note {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--space-4);
+		padding: var(--space-4) var(--space-6);
+		border: var(--stroke) solid var(--line-strong);
+		background: var(--bg-raised);
+		font-size: 15px;
+		line-height: 24px;
+	}
+	.note p {
+		margin: 0;
+	}
+	.note a {
+		color: var(--ink);
+		text-decoration-color: var(--line-strong);
+		text-underline-offset: 3px;
+	}
+	.note a:hover {
+		text-decoration-color: var(--ink);
 	}
 	.tags {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-top: 1.25rem;
-	}
-	.toc {
-		margin-bottom: 2.5rem;
-		padding: 1.25rem 1.5rem;
-		border: 1px solid var(--border);
-		border-radius: 8px;
-		background: var(--surface);
-	}
-	.toc .eyebrow {
-		margin-bottom: 0.5rem;
-	}
-	.toc ol {
-		margin: 0;
+		gap: var(--space-2);
+		margin: var(--space-6) 0 0;
 		padding: 0;
 		list-style: none;
-		font-size: 0.925rem;
 	}
-	.toc li::before {
-		content: '›';
-		margin-right: 0.6rem;
-		font-family: var(--font-mono);
-		color: var(--subtle);
+	.pager {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--space-4);
+		margin-top: var(--space-8);
 	}
-	.toc a {
-		color: var(--muted);
+	.pager a {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-4) var(--space-6);
+		border: var(--stroke) solid var(--line);
+		background: var(--bg-raised);
+		font-size: 17px;
+		line-height: 24px;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: var(--ink);
 		text-decoration: none;
+		transition: border-color var(--ease);
 	}
-	.toc a:hover {
-		color: var(--fg);
+	.pager a:hover {
+		border-color: var(--line-strong);
+	}
+	.pager .eyebrow {
+		color: var(--ink-muted);
+	}
+	.newer {
+		grid-column: 2;
+		text-align: right;
+	}
+
+	@media (max-width: 640px) {
+		.cover {
+			height: 180px;
+			margin-top: var(--space-4);
+		}
+		h1 {
+			font-size: 40px;
+			line-height: 46px;
+			letter-spacing: -0.025em;
+		}
+		.pager {
+			grid-template-columns: 1fr;
+		}
+		.newer {
+			grid-column: 1;
+			grid-row: 1;
+			text-align: left;
+		}
 	}
 </style>

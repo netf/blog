@@ -1,0 +1,32 @@
+---
+import type { Post } from '../lib/posts';
+import PostTile from './PostTile.astro';
+
+interface Props {
+	posts: Post[];
+	level?: 'h2' | 'h3';
+}
+
+const { posts, level } = Astro.props;
+---
+
+<div class="tiles">{posts.map((post) => <PostTile post={post} level={level} />)}</div>
+
+<style>
+	.tiles {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--space-6);
+	}
+	@media (max-width: 1080px) {
+		.tiles {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+	@media (max-width: 640px) {
+		.tiles {
+			grid-template-columns: 1fr;
+			gap: var(--space-4);
+		}
+	}
+</style>

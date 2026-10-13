@@ -3,6 +3,7 @@ title: 'Istio ambient vs sidecar: what I measured, and what quietly broke'
 description: 'Sidecars tax every pod. Ambient promises to move that cost to the node. I ran both on the same Kind cluster to see what you actually save, and what your existing YAML quietly stops doing.'
 pubDate: 2026-10-12
 tags: ['kubernetes', 'istio', 'service-mesh', 'benchmarks']
+featured: true
 ---
 
 If you run Istio the classic way, every pod carries its own proxy. That proxy is why the mesh

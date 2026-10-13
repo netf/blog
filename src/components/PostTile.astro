@@ -1,0 +1,78 @@
+---
+import { url } from '../consts';
+import { type Post, PILLARS, readingTime } from '../lib/posts';
+import FormattedDate from './FormattedDate.astro';
+import IsoArt from './IsoArt.astro';
+
+interface Props {
+	post: Post;
+	/** Heading level, so tiles nest correctly under their section heading. */
+	level?: 'h2' | 'h3';
+}
+
+const { post, level: Title = 'h3' } = Astro.props;
+const { title, description, pubDate, pillar, draft } = post.data;
+---
+
+<a class="panel tile" href={url(`/posts/${post.id}/`)}>
+	<span class="art"><IsoArt seed={post.id} cols={4} rows={4} height={3} /></span>
+	<span class="body">
+		<span class="eyebrow pillar">{PILLARS[pillar].index} / {PILLARS[pillar].label}</span>
+		<Title class="title">{title}</Title>
+		<span class="excerpt">{description}</span>
+		<span class="meta foot">
+			<FormattedDate date={pubDate} />
+			<span>{readingTime(post.body)}{draft && ' · draft'}</span>
+		</span>
+	</span>
+</a>
+
+<style>
+	/* A post: art strip, pillar, title, excerpt, meta. The edge goes line-strong on hover. */
+	.tile {
+		display: flex;
+		flex-direction: column;
+		text-decoration: none;
+		transition: border-color var(--ease);
+	}
+	.tile:hover {
+		border-color: var(--line-strong);
+	}
+	.art {
+		display: block;
+		height: 180px;
+		border-bottom: var(--stroke) solid var(--line);
+	}
+	.body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: var(--space-2);
+		padding: var(--space-6);
+	}
+	.pillar {
+		color: var(--ink-muted);
+	}
+	.title {
+		margin-top: var(--space-1);
+		font-size: 20px;
+		line-height: 28px;
+		letter-spacing: -0.01em;
+	}
+	.excerpt {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		font-size: 15px;
+		line-height: 24px;
+		color: var(--ink-secondary);
+	}
+	.foot {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--space-4);
+		margin-top: auto;
+		padding-top: var(--space-4);
+	}
+</style>

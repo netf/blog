@@ -1,0 +1,250 @@
+---
+// The search palette: a dialog over every post's title, summary, topics and section headings.
+// Opens from the header's Search button, ⌘K / Ctrl+K, or "/". The index (search.json) loads on
+// first open, so pages carry no search weight until someone searches.
+import { url } from '../consts';
+---
+
+<dialog class="palette" aria-label="Search posts" data-index={url('/search.json')}>
+	<form method="dialog" class="bar" role="search">
+		<label class="sr-only" for="search-input">Search posts</label>
+		<input
+			id="search-input"
+			type="search"
+			placeholder="Search posts, topics and sections"
+			autocomplete="off"
+			spellcheck="false"
+			aria-controls="search-results"
+		/>
+		<kbd>Esc</kbd>
+	</form>
+	<ol id="search-results" class="results" role="listbox" aria-label="Results"></ol>
+	<p class="status meta" aria-live="polite"></p>
+</dialog>
+
+<script>
+	interface Section {
+		text: string;
+		slug: string;
+	}
+	interface Entry {
+		title: string;
+		description: string;
+		url: string;
+		date: string;
+		pillar: string;
+		readingTime: string;
+		tags: string[];
+		sections: Section[];
+	}
+	interface Hit {
+		entry: Entry;
+		section?: Section;
+		score: number;
+	}
+
+	const dialog = document.querySelector<HTMLDialogElement>('dialog.palette');
+	const input = dialog?.querySelector<HTMLInputElement>('input');
+	const list = dialog?.querySelector<HTMLOListElement>('.results');
+	const status = dialog?.querySelector<HTMLParagraphElement>('.status');
+
+	if (dialog && input && list && status) {
+		let index: Promise<Entry[]> | undefined;
+		let hits: Hit[] = [];
+		let active = 0;
+
+		const load = () =>
+			(index ??= fetch(dialog.dataset.index!)
+				.then((r) => r.json() as Promise<Entry[]>)
+				.catch(() => {
+					index = undefined;
+					return [];
+				}));
+
+		// Every word must match somewhere; title matches count most, then topics, then the rest.
+		// A word that only matches a section heading links straight to that section.
+		const search = (entries: Entry[], query: string): Hit[] => {
+			const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+			if (!words.length) return entries.slice(0, 6).map((entry) => ({ entry, score: 0 }));
+			const out: Hit[] = [];
+			for (const entry of entries) {
+				const title = entry.title.toLowerCase();
+				const tags = entry.tags.join(' ').toLowerCase();
+				const body = `${entry.description} ${entry.pillar}`.toLowerCase();
+				let score = 0;
+				let section: Section | undefined;
+				let matched = true;
+				for (const w of words) {
+					if (title.includes(w)) score += 10;
+					else if (tags.includes(w)) score += 6;
+					else if (body.includes(w)) score += 3;
+					else {
+						const s = entry.sections.find((s) => s.text.toLowerCase().includes(w));
+						if (!s) {
+							matched = false;
+							break;
+						}
+						section ??= s;
+						score += 2;
+					}
+				}
+				if (matched) out.push({ entry, section, score });
+			}
+			return out.sort((a, b) => b.score - a.score).slice(0, 8);
+		};
+
+		const href = (h: Hit) => (h.section ? `${h.entry.url}#${h.section.slug}` : h.entry.url);
+
+		const paint = () => {
+			list.replaceChildren(
+				...hits.map((h, i) => {
+					const li = document.createElement('li');
+					li.setAttribute('role', 'option');
+					li.id = `search-hit-${i}`;
+					li.ariaSelected = String(i === active);
+					const a = document.createElement('a');
+					a.href = href(h);
+					const title = document.createElement('span');
+					title.className = 'title';
+					title.textContent = h.entry.title;
+					const meta = document.createElement('span');
+					meta.className = 'meta';
+					meta.textContent = h.section
+						? `§ ${h.section.text}`
+						: `${h.entry.pillar}  ${h.entry.date}  ${h.entry.readingTime}`;
+					a.append(title, meta);
+					li.append(a);
+					return li;
+				}),
+			);
+			input.setAttribute('aria-activedescendant', hits.length ? `search-hit-${active}` : '');
+			const q = input.value.trim();
+			status.textContent = !q
+				? 'Latest posts'
+				: hits.length
+					? `${hits.length} ${hits.length === 1 ? 'result' : 'results'}`
+					: `No posts match “${q}”. Try a topic, like kubernetes.`;
+		};
+
+		const run = async () => {
+			hits = search(await load(), input.value);
+			active = 0;
+			paint();
+		};
+
+		const open = () => {
+			if (dialog.open) return;
+			dialog.showModal();
+			input.select();
+			void run();
+		};
+
+		input.addEventListener('input', run);
+		input.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				e.preventDefault();
+				if (!hits.length) return;
+				active = (active + (e.key === 'ArrowDown' ? 1 : hits.length - 1)) % hits.length;
+				paint();
+				list.children[active]?.scrollIntoView({ block: 'nearest' });
+			} else if (e.key === 'Enter') {
+				e.preventDefault();
+				if (hits[active]) location.href = href(hits[active]);
+			}
+		});
+		// Clicking the backdrop closes the palette.
+		dialog.addEventListener('click', (e) => {
+			if (e.target === dialog) dialog.close();
+		});
+
+		document.addEventListener('keydown', (e) => {
+			const typing = e.target instanceof HTMLElement && e.target.closest('input, textarea, [contenteditable]');
+			if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) {
+				e.preventDefault();
+				open();
+			}
+		});
+		for (const trigger of document.querySelectorAll('[data-search-open]')) {
+			trigger.addEventListener('click', open);
+		}
+	}
+</script>
+
+<style>
+	/* Something that floats, so it gets the system's one shadow: shadow-pop. */
+	.palette {
+		width: min(640px, calc(100vw - 2 * var(--space-4)));
+		max-height: min(560px, 70vh);
+		margin: 12vh auto auto;
+		padding: 0;
+		border: var(--stroke) solid var(--line-strong);
+		background: var(--bg-raised);
+		color: var(--ink);
+		box-shadow: var(--shadow-pop);
+	}
+	.palette[open] {
+		display: flex;
+		flex-direction: column;
+	}
+	.palette::backdrop {
+		background: rgba(0, 0, 0, 0.55);
+	}
+	.bar {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: 0 var(--space-4);
+		border-bottom: var(--stroke) solid var(--line);
+	}
+	input {
+		flex: 1;
+		min-width: 0;
+		height: 56px;
+		border: 0;
+		background: transparent;
+		color: var(--ink);
+		font: inherit;
+		font-size: 17px;
+		outline: none;
+	}
+	input::placeholder {
+		color: var(--ink-muted);
+	}
+	input::-webkit-search-cancel-button {
+		display: none;
+	}
+	.results {
+		flex: 1;
+		margin: 0;
+		padding: var(--space-2) 0;
+		overflow-y: auto;
+		list-style: none;
+	}
+	.results:empty {
+		display: none;
+	}
+	.results :global(a) {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: var(--space-2) var(--space-4);
+		border-left: 2px solid transparent;
+		text-decoration: none;
+		color: var(--ink);
+	}
+	.results :global([aria-selected='true'] a),
+	.results :global(a:hover) {
+		border-left-color: var(--ink);
+		background: var(--bg-sunken);
+	}
+	.results :global(.title) {
+		font-weight: 600;
+		font-size: 15px;
+		line-height: 24px;
+	}
+	.status {
+		margin: 0;
+		padding: var(--space-2) var(--space-4);
+		border-top: var(--stroke) solid var(--line);
+	}
+</style>

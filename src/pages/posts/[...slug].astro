@@ -5,17 +5,30 @@ import { getPosts, type Post, readingTime } from '../../lib/posts';
 
 export async function getStaticPaths() {
 	const posts = await getPosts();
-	return posts.map((post) => ({
+	// Posts are sorted newest first.
+	return posts.map((post, i) => ({
 		params: { slug: post.id },
-		props: post,
+		props: { post, newer: posts[i - 1], older: posts[i + 1] },
 	}));
 }
-type Props = Post;
 
-const post = Astro.props;
+interface Props {
+	post: Post;
+	newer?: Post;
+	older?: Post;
+}
+
+const { post, newer, older } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<BlogPost data={post.data} headings={headings} readingTime={readingTime(post.body)}>
+<BlogPost
+	id={post.id}
+	data={post.data}
+	headings={headings}
+	readingTime={readingTime(post.body)}
+	newer={newer}
+	older={older}
+>
 	<Content />
 </BlogPost>
