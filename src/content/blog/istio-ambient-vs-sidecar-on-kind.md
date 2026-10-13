@@ -1,26 +1,31 @@
 ---
-title: 'Istio ambient vs sidecar: what I measured, and what quietly broke'
-description: 'Sidecars tax every pod. Ambient promises to move that cost to the node. I ran both on the same Kind cluster to see what you actually save, and what your existing YAML quietly stops doing.'
+title: 'Istio ambient is cheaper than sidecars. It also quietly ignored my YAML'
+description: "I ran Istio's ambient mode and classic sidecars side by side on one cluster. Ambient really did cut latency and CPU. It also silently skipped my retries, a deny policy and my egress lockdown."
 pubDate: 2026-10-12
 tags: ['kubernetes', 'istio', 'service-mesh', 'benchmarks']
 featured: true
 ---
 
-If you run Istio the classic way, every pod carries its own proxy. That proxy is why the mesh
-works: it terminates mTLS, retries failed calls, and enforces authorization before traffic ever
-reaches the application. It is also a tax you pay on every replica. Each pod gets an extra
-container, extra CPU and memory reservations, and an init container that needs `NET_ADMIN`. When
-you upgrade Istio, none of those proxies move until you roll the application itself.
+My idea of a good time: one Kubernetes cluster, Istio's two data planes running side by side, and a
+list of ways to break them both.
 
-Ambient mode is Istio's answer to that tax. Instead of a proxy inside every pod, a single
-node-level proxy (ztunnel) handles encryption and identity for everything on the node, and you add
-a shared Envoy (a waypoint) only for the namespaces that actually need layer 7. Fewer proxies,
-less reserved capacity, and proxy upgrades that don't restart your apps. That's the pitch. I
-wanted to know how much of it survives contact with a running cluster.
+If you run Istio the classic way, every pod carries its own proxy, the sidecar. That proxy is the
+reason the mesh works at all: it terminates mTLS, retries failed calls, and enforces authorization
+before traffic ever reaches your app.
 
-## What I set out to answer
+**It's also a tax on every replica.** Each pod gets an extra container, extra CPU and memory
+reservations, and an init container that needs `NET_ADMIN`. And when you upgrade Istio, none of
+those proxies move until you roll the application itself. If you've ever had to restart a few
+hundred Deployments just to pick up a mesh patch, you know the feeling.
 
-I had three questions, and I didn't trust a vendor benchmark to answer them:
+**Ambient mode is Istio's answer to that tax.** Instead of a proxy in every pod, one node-level
+proxy (ztunnel) handles encryption and identity for everything on the node. You add a shared Envoy,
+called a waypoint, only for the namespaces that actually need layer 7. Fewer proxies, less reserved
+capacity, and proxy upgrades that don't restart your apps.
+
+That's the pitch, and it's a good one. I wanted to know how much of it survives contact with a
+running cluster, so I wrote down three questions. I didn't trust a vendor benchmark to answer any of
+them:
 
 1. **How much do you actually save?** Latency, CPU and memory, measured against an identical
    workload with no mesh at all, so the cost of the mesh is visible on its own.
@@ -29,21 +34,26 @@ I had three questions, and I didn't trust a vendor benchmark to answer them:
 3. **What fails differently?** Upgrades, a dead proxy, a dead control plane. The cost model is
    irrelevant if the failure mode is worse.
 
-To keep the comparison honest, both modes had to run at the same time, on the same cluster, under
-the same istiod, with the same application. A Kind cluster, four namespaces, one client/server
-pair each: no mesh, sidecar, ambient, and ambient with a waypoint. Clients and servers pinned to
-different nodes, so every request crossed the network.
+To make it a fair fight, both modes ran at the same time, on the same cluster, under the same
+istiod, with the same application: a Kind cluster, four namespaces, one client/server pair each (no
+mesh, sidecar, ambient, and ambient with a waypoint). Clients and servers were pinned to different
+nodes, so every request crossed the network.
 
-One rule for the write-up: if I didn't observe it, it isn't in this post, and if I couldn't test
-something, I say so. The scripts and raw output are in
-[`docs/labs/istio-ambient-vs-sidecar/`](https://github.com/netf/blog/tree/main/docs/labs/istio-ambient-vs-sidecar).
+**One rule for this write-up: if I didn't observe it, it isn't here, and if I couldn't test
+something, I say so.** The scripts and raw output are in
+[`docs/labs/istio-ambient-vs-sidecar/`](https://github.com/netf/blog/tree/main/docs/labs/istio-ambient-vs-sidecar),
+so you can check my work.
 
-I got answers to all three questions. The cost numbers came out the way the pitch suggests, more
-or less. Then I applied a three-line `AuthorizationPolicy` denying `GET /debug`, and the cluster
-told me it would enforce that policy **more restrictively** than I'd asked. `/debug` returned
-`200 OK`. So did everything else, for ninety polls. The YAML had stopped meaning what it said, and
-nothing had errored. That turned out to be the more important finding, and it shows up again with
-retries and with egress.
+**Most of what I found was the good news you'd hope for.** Ambient really is cheaper, more or less
+the way the pitch suggests.
+
+Then I applied a three-line `AuthorizationPolicy` denying `GET /debug`. The cluster warned me it
+would enforce that policy *more restrictively* than I'd asked. Instead, `/debug` returned `200 OK`.
+So did everything else, for ninety polls in a row.
+
+**The YAML had stopped meaning what it said, and nothing had errored.** That turned out to be the
+real story of this lab, and it wasn't a one-off: the same thing happened with retries and with
+egress.
 
 ## The short version
 
@@ -61,7 +71,17 @@ retries and with egress.
 - **The blast radius moves to the node.** Killing one ztunnel broke traffic, DNS included, for every
   ambient pod on that node.
 
-## The lab, briefly
+In this article, we cover:
+
+1. **The lab.** What ran where, and why the absolute numbers come with a caveat.
+2. **The bill.** Latency, CPU and memory, measured against no mesh at all.
+3. **Is it actually encrypted?** Checked on the wire with tcpdump.
+4. **The YAML that quietly stopped working.** Retries, deny policies and egress.
+5. **Bad days.** An upgrade under load, a dead ztunnel and a missing istiod.
+6. **So which one would I pick?** Plus what I'd check before migrating.
+7. **What this lab can't tell you.**
+
+## 1. The lab: one cluster, four namespaces
 
 One istiod, installed with Helm using `profile=ambient`, served all four namespaces, so the only
 thing that differed between them was the data plane. Kubernetes was 1.36.4.
@@ -73,34 +93,40 @@ thing that differed between them was the data plane. Kubernetes was 1.36.4.
 | `ambient`    | ztunnel on each node (L4 only)                |
 | `ambient-wp` | ambient plus a namespace waypoint (Envoy, L7) |
 
-The cluster actually started on Istio 1.30.5 so I could do a real in-place upgrade under load
-later, and every measurement below is from 1.31.1 unless a section says otherwise. Kubernetes 1.36
-was the newest version that
+The cluster actually started on Istio 1.30.5, so I could do a real in-place upgrade under load
+later. Every measurement below is from 1.31.1 unless a section says otherwise. Kubernetes 1.36 was
+the newest version that
 [both Istio releases support](https://istio.io/latest/docs/releases/supported-releases/).
 
-You can already see the difference before measuring anything. A sidecar pod gets two extra
-containers: an `istio-init` that runs as root with `NET_ADMIN` and `NET_RAW`, and an `istio-proxy`
-that requests 100m CPU and 128Mi. An ambient pod gets nothing except an annotation. Its traffic is
+**You can see the difference before measuring anything.** A sidecar pod gets two extra containers:
+an `istio-init` that runs as root with `NET_ADMIN` and `NET_RAW`, and an `istio-proxy` that
+requests 100m CPU and 128Mi. An ambient pod gets nothing except an annotation. Its traffic is
 handled by a per-node ztunnel that requests 200m and 512Mi.
 
-The responses tell the same story. Sidecar responses come back with `server: envoy` and an
-`X-Forwarded-Client-Cert` header containing both workload identities. Ambient responses come back
-untouched. Waypoint responses say `server: istio-envoy`.
+Even the responses look different:
 
-A word on honesty: Kind fought me before Istio did. My lab VM's kernel had no ipset support and no
-iptables `statistic` match, so both kube-proxy and Istio run on their **nftables** backends here,
+- **Sidecar** responses come back with `server: envoy` and an `X-Forwarded-Client-Cert` header
+  containing both workload identities.
+- **Ambient** responses come back untouched.
+- **Waypoint** responses say `server: istio-envoy`.
+
+**A word on honesty: Kind fought me before Istio did.** My lab VM's kernel had no ipset support and
+no iptables `statistic` match, so both kube-proxy and Istio run on their **nftables** backends here,
 which is not the default. The full list of workarounds is in
-[Appendix B](#appendix-b-environment-workarounds). It matters for how far you should trust the
-absolute numbers. Everything ran on one 4 vCPU VM, so compare the modes with each other, and treat
-the milliseconds as specific to this machine.
+[Appendix B](#appendix-b-environment-workarounds).
 
-## Part 1: The bill
+This matters for how far you should trust the absolute numbers. Everything ran on one 4 vCPU VM, so
+compare the modes with each other, and treat the milliseconds as specific to this machine.
+
+## 2. The bill: what the mesh actually costs
 
 ### Latency: ambient L4 is close to free, waypoints are not
 
 The main test was steady traffic: 1,000 requests per second over 16 keep-alive connections for 60
 seconds. I ran three rounds, rotating the order of the modes each round. None of the 12 runs
-returned a single non-200 response. Medians, in milliseconds:
+returned a single non-200 response.
+
+Here are the medians, in milliseconds:
 
 | mode               | p50  | p90  | p99  | p99.9 |
 | ------------------ | ---- | ---- | ---- | ----- |
@@ -109,11 +135,12 @@ returned a single non-200 response. Medians, in milliseconds:
 | ambient            | 0.62 | 0.89 | 1.38 | 2.34  |
 | ambient + waypoint | 1.90 | 2.41 | 2.92 | 5.07  |
 
-Subtract the baseline, and the cost of the mesh at the median is **+0.39 ms for ambient, +1.40 ms
-for sidecars, and +1.67 ms for ambient with a waypoint**. That last number surprised me. I had
-half-assumed that a single waypoint would beat two sidecars, because it's one Envoy hop instead of
-two. It didn't. The traffic still crosses two ztunnels as well, and in this lab the waypoint
-happened to sit on the server's node.
+**Subtract the baseline, and the mesh costs +0.39 ms at the median for ambient, +1.40 ms for
+sidecars, and +1.67 ms for ambient with a waypoint.**
+
+That last number surprised me. I'd half-assumed that a single waypoint would beat two sidecars,
+because it's one Envoy hop instead of two. It didn't. The traffic still crosses two ztunnels as
+well, and in this lab the waypoint happened to sit on the server's node.
 
 Two more tests sharpened the picture:
 
@@ -127,8 +154,8 @@ Two more tests sharpened the picture:
 
 ### CPU: you pay roughly a third
 
-At the same 1,000 req/s, here is what the proxies themselves consumed, measured from container
-CPU counters immediately before and after each run:
+At the same 1,000 req/s, this is what the proxies themselves consumed, measured from container CPU
+counters immediately before and after each run:
 
 | mode               | proxy CPU (cores) | where it went                    |
 | ------------------ | ----------------- | -------------------------------- |
@@ -136,18 +163,19 @@ CPU counters immediately before and after each run:
 | ambient            | 0.077             | two ztunnels, about 0.04 each    |
 | ambient + waypoint | 0.156             | waypoint 0.088 + ztunnels 0.067  |
 
-ztunnel also got *cheaper* per request as load went up. It used 77 millicores per 1,000 req/s at
-the steady rate, and 40 when flat out. The sidecars barely moved (206 down to 186). The one place the
-advantage vanished was the new-connection-per-request test, where sidecar and ztunnel cost almost
-exactly the same: 557 and 566 millicores per 1,000 req/s.
+**ztunnel even got *cheaper* per request as load went up.** It used 77 millicores per 1,000 req/s
+at the steady rate, and 40 when flat out. The sidecars barely moved (206 down to 186).
+
+The one place the advantage vanished was the new-connection-per-request test. There, sidecar and
+ztunnel cost almost exactly the same: 557 and 566 millicores per 1,000 req/s.
 
 ### Memory: the cost that grows when nobody is looking
 
-This is the result I'd show a finance team.
+**This is the result I'd show a finance team.**
 
 A fresh sidecar sat at about 28 MiB, a ztunnel at about 4 MiB, and a waypoint at about 25 MiB. Then
-I added 200 Services to an unrelated namespace. These were Services that none of my test workloads
-would ever call:
+I added 200 Services to an unrelated namespace: Services that none of my test workloads would ever
+call.
 
 | proxy                   | before   | after 200 Services | what it learned           |
 | ----------------------- | -------- | ------------------ | ------------------------- |
@@ -155,29 +183,33 @@ would ever call:
 | each ztunnel (per node) | ~4.2 MiB | ~5.0 MiB           | 8 → 208 services          |
 | waypoint                | 25.3 MiB | 25.9 MiB           | unchanged (own namespace) |
 
-By default, every sidecar receives configuration for every Service in the mesh. Here that meant
-about 40 MiB extra for each pod, for nothing. In a cluster with thousands of pods, that is real
-money. You can scope it down with the `Sidecar` resource. I didn't test that, so I can't tell you
-how much it would win back.
+Read the first row again. **Every sidecar more than doubled its memory for Services it will never
+talk to.** By default, every sidecar receives configuration for every Service in the mesh. Here,
+that meant about 40 MiB extra for each pod, for nothing. In a cluster with thousands of pods, that's
+real money.
 
-Envoy didn't give the memory back either. After I deleted the 200 Services, the sidecars stayed
+You can scope it down with the `Sidecar` resource, but I didn't test that, so I can't tell you how
+much it would win back.
+
+Envoy didn't give the memory back, either. After I deleted the 200 Services, the sidecars stayed
 high, at 90 and 66 MiB, until their pods restarted. The waypoint did the same: it climbed to 93 MiB
 during the flat-out benchmark and stayed there.
 
 Pod density told the same story from the other side. Scaling a server to 10 replicas added about
 257 MiB of sidecars. Doing the same in ambient grew that node's ztunnel by 1.3 MiB.
 
-There's a quieter cost too: **resource requests**. With default settings, each sidecar pod reserves
+**There's a quieter cost too: resource requests.** With default settings, each sidecar pod reserves
 an extra 100m CPU and 128Mi. When I first scaled both namespaces to 10 replicas on one 4-CPU node,
 the node ran out of requestable CPU, and two of the *ambient* pods sat in `Pending` with
-`Insufficient cpu`. The sidecars had reserved the room. A ztunnel's reservation equals four sidecars
-for memory and two for CPU, so it pays for itself quickly on a busy node.
+`Insufficient cpu`. The sidecars had already called dibs on the room.
 
-## Part 2: Is it actually encrypted?
+A ztunnel's reservation equals four sidecars for memory and two for CPU, so it pays for itself
+quickly on a busy node.
 
-Yes, in both modes, and I checked on the wire rather than trusting a dashboard. I ran tcpdump on the
-server's node while each client sent requests carrying the header
-`X-Lab-Marker: PLAINTEXT-CANARY-42`:
+## 3. Is it actually encrypted? (Yes.)
+
+I didn't want to take a dashboard's word for it, so I checked on the wire: tcpdump on the server's
+node, while each client sent requests carrying the header `X-Lab-Marker: PLAINTEXT-CANARY-42`.
 
 | mode               | canary visible? | port  | TLS handshake                           |
 | ------------------ | --------------- | ----- | --------------------------------------- |
@@ -186,9 +218,11 @@ server's node while each client sent requests carrying the header
 | ambient            | no              | 15008 | TLS 1.3, ALPN `h2` (HBONE)              |
 | ambient + waypoint | no              | 15008 | TLS 1.3, ALPN `h2` (HBONE)              |
 
-Sidecars keep classic Istio mTLS on the app's own port. Ambient moves everything onto a single
-HBONE port, 15008. Identity survives in both modes: the sidecar passed the caller's SPIFFE ID in a
-header, and ztunnel logged both sides of every connection:
+**The canary only showed up where it should: with no mesh at all.** Sidecars keep classic Istio
+mTLS on the app's own port. Ambient moves everything onto a single HBONE port, 15008.
+
+Identity survives in both modes. The sidecar passed the caller's SPIFFE ID in a header, and ztunnel
+logged both sides of every connection:
 
 ```text
 info access connection complete src.identity="spiffe://cluster.local/ns/ambient/sa/client"
@@ -197,12 +231,13 @@ info access connection complete src.identity="spiffe://cluster.local/ns/ambient/
 ```
 
 With `PeerAuthentication` set to `STRICT`, all three meshed servers rejected a plaintext client from
-outside the mesh with a connection reset. On the security fundamentals, the two modes are
-equivalent.
+outside the mesh with a connection reset. **On the security fundamentals, the two modes are
+equivalent.**
 
-## Part 3: Your YAML might stop meaning anything
+## 4. The YAML that quietly stopped working
 
-This is the section I'd want someone to read before they migrate.
+**If you read one section before migrating, make it this one.** Everything below applied cleanly
+and raised no errors. That's the problem.
 
 ### Retries that don't retry
 
@@ -214,22 +249,22 @@ requests:
 | no VirtualService           | 49.7% failed | 46.9% failed  | 50.0% failed       |
 | VirtualService, 5 retries   | **1.55%**    | **50.5%**     | **1.7%**           |
 
-My first surprise was the top row. I'd assumed Istio retries 503s by default. It doesn't. The
+**My first surprise was the top row.** I'd assumed Istio retries 503s by default. It doesn't: the
 default policy retries on connection failures, but its list of retriable status codes is empty.
 
-The second surprise was the ambient column. Sidecar and waypoint matched the math almost exactly:
-with six attempts, 0.5<sup>6</sup> ≈ 1.56% of requests should still fail. Without a waypoint, the
-VirtualService applied cleanly, produced no warning, and did nothing. Half the requests kept
-failing.
+**The second surprise was the ambient column.** Sidecar and waypoint matched the math almost
+exactly: with six attempts, 0.5<sup>6</sup> ≈ 1.56% of requests should still fail. Without a
+waypoint, the VirtualService applied cleanly, produced no warning, and did absolutely nothing. Half
+the requests kept failing.
 
-One more thing the retries cost: p99 jumped from about 3 ms to about 360 ms, which I attribute to
-Envoy's backoff between attempts. Retries hide errors, and they show up in your tail latency
-instead.
+Even where retries worked, they weren't free: p99 jumped from about 3 ms to about 360 ms, which I
+attribute to Envoy's backoff between attempts. Retries hide errors, and the errors show up in your
+tail latency instead.
 
 ### The deny policy that denies nothing
 
-Back to the opening story. The policy was `action: DENY` with one rule matching path `/debug`. I
-applied it in each mode and polled once a second:
+Back to the story from the start. The policy was `action: DENY` with one rule matching path
+`/debug`. I applied it in each mode and polled once a second:
 
 | mode               | `/debug` started returning 403 after | other paths   |
 | ------------------ | ------------------------------------ | ------------- |
@@ -249,10 +284,10 @@ is enforced without the HTTP rules. This will be more restrictive than requested
 ```
 
 `kubectl apply` added its own warning: `will deny all traffic to TCP ports under its scope`. Both
-messages promise that everything will be denied. In reality nothing was, including requests from a
-brand-new pod with no pooled connections.
+messages promise that everything will be denied. **In reality, nothing was.** Not even requests
+from a brand-new pod with no pooled connections.
 
-So I went digging. The policy that actually reached ztunnel was this:
+So I went digging. This is the policy that actually reached ztunnel:
 
 ```json
 {"name":"deny-debug","namespace":"ambient","action":"Deny","rules":[[[{}]]]}
@@ -261,18 +296,21 @@ So I went digging. The policy that actually reached ztunnel was this:
 That's a rule whose only condition is empty. In ztunnel 1.31.1's
 [`src/rbac.rs`](https://github.com/istio/ztunnel/blob/1.31.1/src/rbac.rs), the matching code skips
 empty conditions (`if mg.is_empty() { continue; }`). A rule made only of an empty condition
-therefore never matches, so the DENY never fires. To rule out a general enforcement problem, I
-applied an L4 DENY on the client's identity. ztunnel enforced it immediately. Only the HTTP rule
-fails, and it fails *open*, the opposite of what the status says.
+therefore never matches, so the DENY never fires. A policy that promises to deny everything ends up
+denying nothing.
 
-If you run ambient without waypoints, never put HTTP attributes in policies that ztunnel enforces.
-Better still, make `UnsupportedValue` on `ZtunnelAccepted` fail your CI.
+To rule out a general enforcement problem, I applied an L4 DENY on the client's identity, and
+ztunnel enforced it immediately. **Only the HTTP rule fails, and it fails *open*: the opposite of
+what the status says.**
+
+My take: if you run ambient without waypoints, never put HTTP attributes in policies that ztunnel
+enforces. Better still, make `UnsupportedValue` on `ZtunnelAccepted` fail your CI.
 
 ### Egress lockdown that isn't
 
-I put a plain HTTP server outside the cluster and had each client call it. Then I switched the
-mesh to `outboundTrafficPolicy: REGISTRY_ONLY`, which is meant to block anything not in Istio's
-service registry:
+I put a plain HTTP server outside the cluster and had each client call it. Then I switched the mesh
+to `outboundTrafficPolicy: REGISTRY_ONLY`, which is meant to block anything not in Istio's service
+registry:
 
 | policy                         | no mesh | sidecar     | ambient | ambient + waypoint |
 | ------------------------------ | ------- | ----------- | ------- | ------------------ |
@@ -280,22 +318,26 @@ service registry:
 | `REGISTRY_ONLY`                | 200     | **502**     | **200** | **200**            |
 | `REGISTRY_ONLY` + ServiceEntry | 200     | 200         | 200     | 200                |
 
-Only the sidecar enforced it. Ambient pods walked straight out, with or without a waypoint.
+**Only the sidecar enforced it.** Ambient pods walked straight out, with or without a waypoint.
 
-Then I tried the documented way to send egress through a waypoint. Istio's
+Next, I tried the documented way to send egress through a waypoint. Istio's
 [ambient egress docs](https://istio.io/latest/docs/ambient/usage/egress-gateway/) say a ServiceEntry
 in a waypoint-enrolled namespace is routed through the waypoint automatically. My first attempt
-didn't route through it: no Envoy headers, and ztunnel logged a direct connection. That held even
-though the ServiceEntry reported `WaypointBound=True`. The difference turned out to be one field.
-I had set `addresses:` to the external server's real IP. When I left `addresses` out, Istio
-assigned a virtual IP, and calls by hostname went through the waypoint as documented.
+didn't route through it: there were no Envoy headers, and ztunnel logged a direct connection. That
+held even though the ServiceEntry reported `WaypointBound=True`.
 
-The catch is that a pod calling the external **IP** directly bypassed the waypoint either way, and
-`REGISTRY_ONLY` didn't stop it. In ambient, the waypoint only governs egress that is addressed to
+The difference turned out to be one field. I'd set `addresses:` to the external server's real IP.
+When I left `addresses` out, Istio assigned a virtual IP, and calls by hostname went through the
+waypoint as documented.
+
+**The catch: a pod calling the external IP directly bypassed the waypoint either way, and
+`REGISTRY_ONLY` didn't stop it.** In ambient, the waypoint only governs egress that is addressed to
 the ServiceEntry. I didn't test NetworkPolicy or a dedicated egress namespace as ways to close that
 gap.
 
-## Part 4: Bad days
+## 5. Bad days: upgrades, crashes and a missing control plane
+
+Cheap is nice. What I really wanted to know is what happens when things go wrong.
 
 ### Upgrading under load
 
@@ -308,24 +350,30 @@ handled 100 req/s for five minutes. That's 30,000 requests per namespace:
 | ambient            | 0      | The ztunnel upgrade closed all 4 connections; the client reconnected.      |
 | ambient + waypoint | **16** | The istiod upgrade rolled the waypoint, and 4 requests hung for 3 s.       |
 
-Each row tells a different story. The sidecar result looks perfect only because nothing was
-upgraded: `istioctl proxy-status` showed the sidecars still on 1.30.5, waiting for someone to
-restart every pod. Ambient's ztunnels really were upgraded, without touching a single app, and the
-only cost was a reconnect. The waypoint was the casualty. It's a Deployment that istiod manages, so
-upgrading istiod silently rolled it, and with the default single replica, requests dropped. I'd run
-waypoints with at least two replicas and a PodDisruptionBudget. I didn't test that setup, though.
+Each row tells a different story:
 
-What about the sidecar restarts that upgrade postponed? I rolled the server Deployment under load
-three times in each mode. Every mode lost a handful of requests out of 6,000, including the no-mesh
-baseline, because my test server has one replica and no graceful shutdown. The counts were too noisy
-to rank. The *shape* was consistent, though. The sidecar always failed fast, with a 503 in under 75
-ms. Every other mode hit the client's 3-second timeout in at least one run.
+- **Sidecar: perfect, but only because nothing was upgraded.** `istioctl proxy-status` showed the
+  sidecars still on 1.30.5, waiting for someone to restart every pod.
+- **Ambient: really upgraded, without touching a single app.** The only cost was a reconnect.
+- **Ambient + waypoint: the casualty.** The waypoint is a Deployment that istiod manages, so
+  upgrading istiod silently rolled it, and with the default single replica, requests dropped.
 
-### When ztunnel goes away
+My take: I'd run waypoints with at least two replicas and a PodDisruptionBudget. I didn't test that
+setup, though.
+
+What about the sidecar restarts that the upgrade postponed? I rolled the server Deployment under
+load three times in each mode. Every mode lost a handful of requests out of 6,000, including the
+no-mesh baseline, because my test server has one replica and no graceful shutdown. The counts were
+too noisy to rank.
+
+**The *shape* was consistent, though.** The sidecar always failed fast, with a 503 in under 75 ms.
+Every other mode hit the client's 3-second timeout in at least one run.
+
+### When ztunnel dies
 
 All three meshed clients shared one node. I removed that node's ztunnel two ways, three times each.
 
-**Gracefully** (`kubectl delete pod`), nothing failed. But every ambient connection was closed
+**Gracefully (`kubectl delete pod`), nothing failed.** But every ambient connection was closed
 exactly 25 seconds later, and the old ztunnel's log says why:
 
 ```text
@@ -335,21 +383,22 @@ exactly 25 seconds later, and the old ztunnel's log says why:
 
 New connections went to the replacement ztunnel immediately. Existing ones got 25 seconds, which
 comes from the chart's 30-second termination grace period, and were then cut. fortio shrugged and
-reconnected. A gRPC stream or a database pool will see a disconnect on every ztunnel upgrade.
+reconnected. **Your gRPC streams and database pools won't be so relaxed: they'll see a disconnect on
+every ztunnel upgrade.**
 
-**Crashed** (SIGKILL), the sidecar namespace didn't notice. Both ambient namespaces failed together:
-112, 20 to 24, and 40 failed requests across the three runs, over windows of 0.16 to 1.1 seconds.
-And every single failure was DNS:
+**Crashed (SIGKILL), the sidecar namespace didn't notice, and both ambient namespaces failed
+together:** 112, 20 to 24, and 40 failed requests across the three runs, over windows of 0.16 to 1.1
+seconds. And every single failure was DNS. (It's always DNS.)
 
 ```text
 lookup server on 10.96.0.10:53: read udp ...: read: connection refused
 ```
 
 In this install, ztunnel also answers DNS for ambient pods. When it dies, those pods can't even
-resolve a Service name until it comes back. One ztunnel is a shared dependency for every ambient
-pod on its node. I didn't kill an individual sidecar for comparison.
+resolve a Service name until it comes back. **One ztunnel is a shared dependency for every ambient
+pod on its node.** I didn't kill an individual sidecar for comparison.
 
-### When istiod goes away
+### When istiod disappears
 
 I scaled istiod to zero and kept going:
 
@@ -366,17 +415,22 @@ warn access connection failed dst.addr=10.244.2.88:8080 direction="inbound"
 
 When istiod came back, the new ambient pods became reachable within 30 seconds.
 
-I find the sidecar behavior easier to live with. A deploy that fails loudly is better than a pod
-that reports healthy and drops traffic. Requests through the Service were fine in my test, because
-the meshed clients still had the old endpoint list. I didn't test a client outside the mesh, which
-would get the full endpoint list from kube-proxy. I suspect it would hit the broken pod, but that's
-a hypothesis.
+**My take: the sidecar behavior is easier to live with.** A deploy that fails loudly beats a pod
+that says it's healthy and quietly drops traffic.
 
-## So which one would I pick?
+Requests through the Service were fine in my test, because the meshed clients still had the old
+endpoint list. I didn't test a client outside the mesh, which would get the full endpoint list from
+kube-proxy. I suspect it would hit the broken pod, but that's a hypothesis.
 
-The cost models are fundamentally different. Sidecar cost grows with **pods × mesh size**. Ambient
-L4 cost grows with **nodes**, and barely notices mesh size. Waypoint cost grows with the traffic
-and config of the namespace it serves. That alone answers the question for a lot of clusters.
+## 6. So which one would I pick?
+
+**The cost models are fundamentally different:**
+
+- **Sidecar** cost grows with **pods × mesh size**.
+- **Ambient L4** cost grows with **nodes**, and barely notices mesh size.
+- **Waypoint** cost grows with the traffic and config of the namespace it serves.
+
+That alone answers the question for a lot of clusters. Here's how I'd decide:
 
 **I'd pick ambient (L4 only)** when what I need is mTLS, workload identity and L4 policy across a
 large, dense, or fast-growing mesh. I'd also want my apps to tolerate a reconnect on every node
@@ -403,7 +457,7 @@ Both modes ran happily side by side under one istiod in this lab, so a gradual m
 least plausible. I didn't test traffic *between* sidecar and ambient workloads, though, so verify
 that path yourself.
 
-## What this lab can't tell you
+## 7. What this lab can't tell you
 
 - **It's one small VM.** Four vCPUs were shared by the load generator, three Kind nodes and Docker.
   Trust the ratios more than the milliseconds.
@@ -418,8 +472,8 @@ that path yourself.
   dedicated egress namespaces, NetworkPolicy for egress, Gateway API retries, multi-cluster, and
   traffic between sidecar and ambient workloads.
 
-If you run this on real hardware and get different numbers, I'd genuinely like to see them. That's
-why the scripts are public.
+**If you run this on real hardware and get different numbers, I'd genuinely like to see them.**
+That's why the scripts are public. I'd rather be corrected than quoted.
 
 ---
 
