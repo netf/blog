@@ -1,7 +1,7 @@
 # netf / blog
 
-Personal DevOps and platform engineering blog. Built with [Astro](https://astro.build), deployed to
-GitHub Pages at **https://netf.github.io/blog/**.
+Personal site and blog. Built with [Astro](https://astro.build), served from Cloudflare Workers at
+**https://netf.io**.
 
 - Built on the **Technica** design system: greys only,
   IBM Plex Sans + IBM Plex Mono, square edges, 1px hairlines, dark by default with a light theme toggle
@@ -67,31 +67,39 @@ src/
   layouts/           base page shell and post layout
   pages/             routes: home, posts, tags, about, 404, rss.xml
   styles/            global CSS and the Shiki theme
-.github/workflows/   GitHub Pages deploy workflow
+.github/workflows/   CI: type-check, build and validate the Cloudflare config
+wrangler.jsonc       Cloudflare Workers config (static assets, netf.io custom domain)
 ```
 
 ## Deploy
 
-Deploys run from `.github/workflows/deploy.yml`. Every push to `main` builds the site and publishes it
-to GitHub Pages. Pull requests build the site as a check but do not deploy.
+The site is a static Astro build served as [Cloudflare Workers static assets](https://developers.cloudflare.com/workers/static-assets/).
+**Workers Builds** (Cloudflare's Git integration) deploys it: every push to `main` runs
+`npm run build` then `npx wrangler deploy`, and other branches get preview URLs. GitHub Actions only
+runs a build check (`.github/workflows/ci.yml`).
 
-One-time setup:
+- `wrangler.jsonc` serves `./dist`, uses `dist/404.html` for unknown paths, and attaches the apex
+  domain `netf.io` as a custom domain. Other hostnames on the zone (for example `fire.netf.io`) are
+  not touched.
+- `public/_headers` sets long-lived caching for fingerprinted `/_astro/*` files and basic security
+  headers.
+- `.node-version` pins Node 22 for both Cloudflare and CI.
 
-1. In the repository go to **Settings > Pages**.
-2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-3. Merge to `main` (or run the workflow manually from the **Actions** tab).
+One-time setup in the Cloudflare dashboard:
 
-The workflow reads the site URL and base path from `actions/configure-pages`, so the site works at
-`https://netf.github.io/blog/` without any config changes.
+1. **Workers & Pages > Create application > Import a repository**, and pick `netf/blog`.
+2. Build command `npm run build`, deploy command `npx wrangler deploy`, production branch `main`.
+3. If `netf.io` already has an `A`, `AAAA` or `CNAME` record at the apex, remove it first: the custom
+   domain creates its own record, and the deploy fails if one exists.
 
-### Custom domain
-
-1. Add the domain under **Settings > Pages > Custom domain** and create the DNS record GitHub asks for
-   (a `CNAME` to `netf.github.io` for a subdomain).
-2. Re-run the deploy workflow. The base path switches from `/blog` to `/` automatically.
-
-To build locally for a custom domain, set the same variables the workflow uses:
+Preview locally on the Workers runtime:
 
 ```bash
-SITE_URL=https://blog.example.com BASE_PATH= npm run build
+npm run build && npx wrangler dev
+```
+
+To build for another domain, set `SITE_URL` (the site always lives at the root path):
+
+```bash
+SITE_URL=https://staging.example.com npm run build
 ```

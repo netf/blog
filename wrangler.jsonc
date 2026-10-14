@@ -1,0 +1,19 @@
+// Cloudflare Workers config: the blog is a static site served as Worker assets.
+// Workers Builds runs `npm run build` and then `npx wrangler deploy` on every push.
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "blog",
+	"compatibility_date": "2026-09-29",
+	"assets": {
+		"directory": "./dist",
+		// Unknown paths get dist/404.html with a 404 status.
+		"not_found_handling": "404-page",
+		// /posts/x and /posts/x/ both serve /posts/x/index.html, redirecting to the trailing-slash form.
+		"html_handling": "auto-trailing-slash"
+	},
+	// Serve on the apex domain only. Other hostnames on the zone (like fire.netf.io) are untouched.
+	"routes": [{ "pattern": "netf.io", "custom_domain": true }],
+	// No per-branch workers.dev URL for production; previews come from Workers Builds.
+	"workers_dev": false,
+	"preview_urls": true
+}

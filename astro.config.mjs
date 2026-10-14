@@ -9,15 +9,13 @@ import { prosePlugins } from './src/plugins/prose.mjs';
 import dark from './src/styles/shiki-dark.theme.json' with { type: 'json' };
 import light from './src/styles/shiki-light.theme.json' with { type: 'json' };
 
-// The Pages workflow passes SITE_URL and BASE_PATH from `actions/configure-pages`.
-// BASE_PATH is empty when a custom domain is configured, so it must not fall back to '/blog'.
-const site = process.env.SITE_URL || 'https://netf.github.io';
-const base = process.env.SITE_URL ? process.env.BASE_PATH || '/' : '/blog';
+// The site lives at the root of netf.io (Cloudflare Workers, see wrangler.jsonc).
+// SITE_URL overrides it, e.g. to build for another domain.
+const site = process.env.SITE_URL || 'https://netf.io';
 
 // https://astro.build/config
 export default defineConfig({
 	site,
-	base,
 	trailingSlash: 'ignore',
 	integrations: [mdx(), sitemap()],
 	markdown: {
