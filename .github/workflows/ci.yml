@@ -1,0 +1,36 @@
+name: CI
+
+# Cloudflare Workers Builds deploys the site (see wrangler.jsonc). This workflow only checks that
+# every push and pull request type-checks and builds, so a broken build is caught before merge.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check and build
+        run: npm run build
+
+      - name: Validate the Cloudflare config
+        run: npx wrangler deploy --dry-run

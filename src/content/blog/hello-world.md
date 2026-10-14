@@ -27,7 +27,7 @@ Five areas, roughly in order of how often they've kept me up at night:
 ## How this site is built
 
 Nothing fancy, which is the point. It's a static [Astro](https://astro.build) site written in
-Markdown, built by GitHub Actions and served from GitHub Pages.
+Markdown, built and served by Cloudflare Workers.
 
 The source is at [github.com/netf/blog](https://github.com/netf/blog), so you can run it locally in
 three commands:
