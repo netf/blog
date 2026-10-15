@@ -608,6 +608,26 @@ kbd {
 	border-color: var(--line-strong);
 	color: var(--ink);
 }
+/* Diagram: mermaid source until the post script swaps in the rendered SVG. */
+.diagram {
+	margin: var(--space-6) 0;
+	padding: var(--space-6) var(--space-4);
+	border: var(--stroke) solid var(--line);
+	background: var(--bg-raised);
+	overflow-x: auto;
+}
+.diagram pre {
+	margin: 0;
+	font-size: 13px;
+	line-height: 20px;
+	color: var(--ink-secondary);
+}
+.diagram svg {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	margin: 0 auto;
+}
 pre.astro-code {
 	margin: 0;
 	padding: var(--space-4) 0;

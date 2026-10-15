@@ -137,6 +137,43 @@ const showToc = toc.length > 2;
 		}
 	}
 
+	// Diagrams: load mermaid only on posts that have one, draw it in the site's greys, redraw on theme switch.
+	const diagrams = [...document.querySelectorAll<HTMLElement>('.diagram')];
+	if (diagrams.length) {
+		const sources = diagrams.map((d) => d.querySelector('pre')?.textContent ?? '');
+		const draw = async () => {
+			const { default: mermaid } = await import('mermaid');
+			const css = getComputedStyle(document.documentElement);
+			const v = (name: string) => css.getPropertyValue(name).trim();
+			mermaid.initialize({
+				startOnLoad: false,
+				theme: 'base',
+				fontFamily: v('--font-sans') || 'sans-serif',
+				themeVariables: {
+					background: v('--bg-raised'),
+					primaryColor: v('--bg-sunken'),
+					primaryBorderColor: v('--line-strong'),
+					primaryTextColor: v('--ink'),
+					secondaryColor: v('--bg-raised'),
+					tertiaryColor: v('--bg-raised'),
+					lineColor: v('--ink-muted'),
+					textColor: v('--ink'),
+					edgeLabelBackground: v('--bg-raised'),
+					clusterBkg: v('--bg-raised'),
+					clusterBorder: v('--line'),
+					fontSize: '14px',
+				},
+			});
+			for (const [i, figure] of diagrams.entries()) {
+				const { svg } = await mermaid.render(`diagram-${i}-${Date.now()}`, sources[i]);
+				figure.innerHTML = svg;
+				figure.setAttribute('role', 'img');
+			}
+		};
+		draw();
+		new MutationObserver(draw).observe(document.documentElement, { attributeFilter: ['data-theme'] });
+	}
+
 	// Contents: mark the section being read. Collapse the list by default on narrow screens.
 	const details = document.querySelector<HTMLDetailsElement>('.toc details');
 	if (details && matchMedia('(max-width: 1199px)').matches) details.open = false;

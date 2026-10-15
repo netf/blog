@@ -2,6 +2,8 @@
 // Shiki transformer that turns every highlighted listing into a Technica CodeBlock:
 // a 40px file bar (language, or `~ $` for a shell session) with a Copy button, then the listing.
 // One-line listings drop their line numbers. The Copy button starts hidden; the post script wires it.
+// `mermaid` listings are not highlighted: they become a figure holding the raw source, which the post
+// script renders to SVG in the browser (without JavaScript the source stays readable).
 
 const SHELLS = new Set(['bash', 'sh', 'shell', 'zsh', 'console', 'shellsession']);
 const PLAIN = new Set(['text', 'txt', 'plaintext', '']);
@@ -16,6 +18,24 @@ export const codeBlock = {
 		const pre = root.children.find((c) => c.type === 'element');
 		if (!pre) return;
 		const lang = this.options.lang ?? '';
+		if (lang === 'mermaid') {
+			root.children = [
+				{
+					type: 'element',
+					tagName: 'figure',
+					properties: { class: 'diagram' },
+					children: [
+						{
+							type: 'element',
+							tagName: 'pre',
+							properties: { class: 'mermaid-src' },
+							children: [{ type: 'text', value: this.source.trimEnd() }],
+						},
+					],
+				},
+			];
+			return;
+		}
 		const label = SHELLS.has(lang) ? '~ $' : PLAIN.has(lang) ? 'output' : lang;
 		root.children = [
 			{
