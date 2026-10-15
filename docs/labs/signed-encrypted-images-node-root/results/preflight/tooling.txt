@@ -1,0 +1,34 @@
+
+## docker
+client 29.9.1 server 29.9.1
+ Storage Driver: overlayfs
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 2
+ Runtimes: runc io.containerd.runc.v2
+ Docker Root Dir: /var/lib/docker
+
+## iptables
+iptables v1.8.10 (nf_tables)
+-P FORWARD DROP
+-A FORWARD -j DOCKER-USER
+-A FORWARD -j DOCKER-FORWARD
+table ip nat
+table ip filter
+table ip6 nat
+table ip6 filter
+
+## tools
+kind v0.33.0 go1.26.7 linux/amd64
+Client Version: v1.37.1
+v3.22.0+g144ca65
+GitVersion:    v3.1.3
+Version:       1.54.1
+skopeo version 1.13.3
+go version go1.26.9 linux/amd64
+GNU gdb (Ubuntu 15.1-1ubuntu1~24.04.1) 15.1
+jq-1.7
+
+## egress
+https://registry-1.docker.io/v2/ 401
+https://ghcr.io/v2/ 401
+https://github.com 200

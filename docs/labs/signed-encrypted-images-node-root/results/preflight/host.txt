@@ -1,0 +1,27 @@
+
+## compute
+4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi        10Gi       2.4Gi        17Mi       2.7Gi       4.8Gi
+Swap:             0B          0B          0B
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdb        254G  8.0G  246G   4% /
+kvm
+MemTotal:       16387332 kB
+MemAvailable:    5019620 kB
+
+## kernel
+6.12.94+
+cgroup2fs
+cpuset cpu io memory hugetlb pids
+
+## modules
+ls: cannot access '/lib/modules': No such file or directory
+0
+nf_conntrack
+overlay
+
+## limits
+524288
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
