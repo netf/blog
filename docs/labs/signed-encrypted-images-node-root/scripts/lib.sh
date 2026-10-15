@@ -34,14 +34,16 @@ PY
 
 # kyverno_mode default|ttl2m|off: set the verify-cache flags and restart cold.
 kyverno_mode() {
-  local MODE=$1 ARGS
+  local MODE=$1 ARGS SARGS=
   case $MODE in
     default) ARGS='features.registryClient.allowInsecure=true' ;;
     ttl2m)   ARGS='features.registryClient.allowInsecure=true,admissionController.container.extraArgs.imageVerifyCacheTTLDuration=2m' ;;
-    off)     ARGS='features.registryClient.allowInsecure=true,admissionController.container.extraArgs.imageVerifyCacheEnabled=false' ;;
+    off)     ARGS='features.registryClient.allowInsecure=true'
+             # the chart drops boolean false (`if $value`), so pass it as a string
+             SARGS='admissionController.container.extraArgs.imageVerifyCacheEnabled=false' ;;
   esac
   helm upgrade kyverno kyverno/kyverno --version 3.9.1 -n kyverno \
-    --set "$ARGS" --wait --timeout 5m >/dev/null
+    --set "$ARGS" ${SARGS:+--set-string "$SARGS"} --wait --timeout 5m >/dev/null
   kubectl -n kyverno rollout restart deploy/kyverno-admission-controller >/dev/null
   kubectl -n kyverno rollout status deploy/kyverno-admission-controller --timeout=180s >/dev/null
   sleep 10

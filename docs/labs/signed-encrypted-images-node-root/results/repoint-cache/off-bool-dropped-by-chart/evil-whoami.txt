@@ -1,0 +1,7 @@
+EVIL secret-len=16
+All commands and output from this session will be recorded in container logs, including credentials and sensitive information passed through the command prompt.
+If you don't see a command prompt, try pressing enter.
+warning: couldn't attach to pod/probe-off, falling back to streaming logs: unable to upgrade connection: container probe-off not found in pod probe-off_default
+EVIL secret-len=16
+pod "probe-off" deleted from default namespace
+kind-registry:5000/demo/app@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
