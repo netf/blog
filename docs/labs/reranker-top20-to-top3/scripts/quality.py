@@ -27,6 +27,7 @@ from lab.common import (  # noqa: E402
     CACHE,
     DATASETS,
     EMBEDDERS,
+    EMBEDDERS_FOR,
     RERANKERS,
     RESULTS,
     load_dataset,
@@ -52,7 +53,8 @@ def read_jsonl_gz(path: Path) -> list[dict]:
 
 def retrieve(ds_name: str) -> None:
     ds = load_dataset(ds_name)
-    for key, e in EMBEDDERS.items():
+    for key in EMBEDDERS_FOR[ds_name]:
+        e = EMBEDDERS[key]
         out = QDIR / "candidates" / f"{ds_name}.{key}.jsonl.gz"
         if out.exists():
             print(f"skip {out.name}", flush=True)
@@ -107,7 +109,7 @@ def rerank(ds_name: str, emb_key: str, rr_key: str) -> None:
         "queries": len(rows),
         "pairs": len(rows) * RERANK_DEPTH,
         "seconds": round(dt, 1),
-        "max_length": model.max_length,
+        "max_length": model.max_seq_length,
     }
     with open(QDIR / "rerank_runs.jsonl", "a") as f:
         f.write(json.dumps(meta) + "\n")

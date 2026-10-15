@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Full run in the order I used. Run it on an otherwise idle machine: index time and latency are measured.
-# Every step skips work whose output already exists, except latency, which appends.
+# Every step skips work whose output already exists.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY="${PYTHON:-python3}"
@@ -11,7 +11,7 @@ log() { printf '\n=== %s %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 log preflight
 ./scripts/00-preflight.sh
 
-log "embed (everything except FiQA with bge-large)"
+log "embed (SciFact with all three, FiQA with bge-small and bge-base)"
 $PY scripts/embed.py scifact
 $PY scripts/embed.py fiqa --models bge-small,bge-base
 
@@ -32,26 +32,17 @@ log "verify that slicing the top-50 scores equals reranking top-k directly"
   $PY scripts/verify_subset.py fiqa bge-small minilm-l6 40
 }
 
-LAT_FAST="bge-small,bge-base,bge-large"
-for r in minilm-l6 minilm-l12; do for k in 10 20 50; do LAT_FAST+=",bge-small+$r@$k"; done; done
+rerankers="bge-small"
+for r in minilm-l6 minilm-l12; do for k in 10 20 50; do rerankers+=",bge-small+$r@$k"; done; done
 log "latency: retrievers + MiniLM rerankers, $LAT_RUNS runs x $LAT_QUERIES queries"
 for ds in fiqa scifact; do
+  if [ -f "results/latency/$ds.jsonl" ]; then echo "skip latency $ds (results exist)"; continue; fi
+  cfgs="$rerankers,bge-base"
+  [ "$ds" = scifact ] && cfgs+=",bge-large"
   for run in $(seq 1 "$LAT_RUNS"); do
-    $PY scripts/latency.py $ds "$run" --queries "$LAT_QUERIES" --configs "$LAT_FAST"
+    $PY scripts/latency.py $ds "$run" --queries "$LAT_QUERIES" --configs "$cfgs"
   done
 done
-log "latency: bge-reranker-base on FiQA, 3 runs"
-for run in 1 2 3; do
-  $PY scripts/latency.py fiqa "$run" --queries "$LAT_QUERIES" --configs "bge-small+bge-reranker-base@10,bge-small+bge-reranker-base@20,bge-small+bge-reranker-base@50"
-done
-
-log "rerank: bge-reranker-base over bge-small"
-for ds in scifact fiqa; do rerank $ds bge-small bge-reranker-base; done
-
-log "embed + retrieve + rerank FiQA with bge-large (the slow one)"
-$PY scripts/embed.py fiqa --models bge-large
-$PY scripts/quality.py retrieve fiqa
-rerank fiqa bge-large minilm-l6
 
 log analyze
 $PY scripts/analyze.py

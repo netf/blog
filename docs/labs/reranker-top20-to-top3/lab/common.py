@@ -55,11 +55,13 @@ RERANKERS = {
     for r in [
         Reranker("minilm-l6", "cross-encoder/ms-marco-MiniLM-L6-v2", "233902d25c440f23af6f7d6e94d2946bac0bee0a", 23),
         Reranker("minilm-l12", "cross-encoder/ms-marco-MiniLM-L12-v2", "7b0235231ca2674cb8ca8f022859a6eba2b1c968", 33),
-        Reranker("bge-reranker-base", "BAAI/bge-reranker-base", "2cfc18c9415c912f9d8155881c133215df768a70", 278),
     ]
 }
 
 KS = (10, 20, 50)
+
+# FiQA is not encoded with bge-large: about 4 CPU-hours here, cut from the run (see the post's limits).
+EMBEDDERS_FOR = {"scifact": ("bge-small", "bge-base", "bge-large"), "fiqa": ("bge-small", "bge-base")}
 
 
 def _read_jsonl(path: str) -> list[dict]:

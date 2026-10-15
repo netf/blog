@@ -1,6 +1,6 @@
 """Encode each corpus with each embedding model and cache the vectors.
 
-Usage: python scripts/embed.py [dataset ...] [--models bge-small,bge-base,bge-large]
+Usage: python scripts/embed.py [dataset ...] [--models bge-small,bge-base]
 Writes .cache/emb/<dataset>.<model>.docs.npy and appends wall time to results/index_time.jsonl.
 """
 
@@ -16,21 +16,21 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from lab.common import CACHE, DATASETS, EMBEDDERS, RESULTS, load_dataset  # noqa: E402
+from lab.common import CACHE, DATASETS, EMBEDDERS, EMBEDDERS_FOR, RESULTS, load_dataset  # noqa: E402
 from sentence_transformers import SentenceTransformer  # noqa: E402
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("datasets", nargs="*", default=list(DATASETS))
-    ap.add_argument("--models", default=",".join(EMBEDDERS))
+    ap.add_argument("--models", help="comma list; default: EMBEDDERS_FOR[dataset]")
     args = ap.parse_args()
     out_dir = CACHE / "emb"
     out_dir.mkdir(parents=True, exist_ok=True)
     RESULTS.mkdir(exist_ok=True)
     for ds_name in args.datasets:
         ds = load_dataset(ds_name)
-        for key in args.models.split(","):
+        for key in args.models.split(",") if args.models else EMBEDDERS_FOR[ds_name]:
             path = out_dir / f"{ds_name}.{key}.docs.npy"
             if path.exists():
                 print(f"skip {path.name} (cached)", flush=True)
