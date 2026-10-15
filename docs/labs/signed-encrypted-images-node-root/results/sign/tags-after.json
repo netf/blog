@@ -1,7 +1,8 @@
 {
     "Repository": "kind-registry:5000/demo/app",
     "Tags": [
-        "sha256-a5beece27f56056ef9cd95cf71ff716f496d64c35d99146641db0be81126224f",
+        "evil",
+        "sha256-2380692cb7c2ef4383838f7a274c3778b2a64a7d17015a6a871312af99ffe791",
         "v1"
     ]
 }

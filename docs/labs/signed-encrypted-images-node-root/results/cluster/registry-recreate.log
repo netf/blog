@@ -1,0 +1,5 @@
+bfe1b5cbb22eb135bb8eea0d0f003ce62a67ea7ee2e280cc344abb0d6cee3ce7
+NAME                   STATUS   ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION     CONTAINER-RUNTIME
+supply-control-plane   Ready    control-plane   12m   v1.37.0   172.18.0.3    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+supply-worker          Ready    <none>          12m   v1.37.0   172.18.0.4    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+supply-worker2         Ready    <none>          12m   v1.37.0   172.18.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4

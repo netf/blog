@@ -10,7 +10,7 @@ REG_PORT=5000
 REG_IMAGE=registry:2.8.3
 
 docker inspect -f '{{.State.Running}}' "$REG" 2>/dev/null | grep -q true || \
-  docker run -d --restart=always -p "127.0.0.1:${REG_PORT}:5000" --name "$REG" "$REG_IMAGE"
+  docker run -d --restart=always -e REGISTRY_STORAGE_DELETE_ENABLED=true -p "127.0.0.1:${REG_PORT}:5000" --name "$REG" "$REG_IMAGE"
 
 kind get clusters | grep -qx supply || kind create cluster --config "$HERE/kind-config.yaml" --wait 120s
 
