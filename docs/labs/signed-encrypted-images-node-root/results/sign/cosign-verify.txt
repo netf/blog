@@ -1,0 +1,21 @@
+
+Verification for kind-registry:5000/demo/app@sha256:a5beece27f56056ef9cd95cf71ff716f496d64c35d99146641db0be81126224f --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+verify sig: OK
+
+Verification for kind-registry:5000/demo/app@sha256:a5beece27f56056ef9cd95cf71ff716f496d64c35d99146641db0be81126224f --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+verify sbom: OK
+
+Verification for kind-registry:5000/demo/app@sha256:a5beece27f56056ef9cd95cf71ff716f496d64c35d99146641db0be81126224f --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+verify prov: OK
