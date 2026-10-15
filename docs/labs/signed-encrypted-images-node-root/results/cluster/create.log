@@ -1,0 +1,51 @@
+Unable to find image 'registry:2.8.3' locally
+2.8.3: Pulling from library/registry
+6d464ea18732: Pulling fs layer
+bbbdd6c6894b: Pulling fs layer
+44cf07d57ee4: Pulling fs layer
+8e82f80af0de: Pulling fs layer
+3493bf46cdec: Pulling fs layer
+6d464ea18732: Download complete
+bbbdd6c6894b: Download complete
+8e82f80af0de: Download complete
+44cf07d57ee4: Download complete
+3493bf46cdec: Download complete
+44cf07d57ee4: Pull complete
+32a76c78501f: Download complete
+b537bf6d1146: Download complete
+6d464ea18732: Pull complete
+bbbdd6c6894b: Pull complete
+8e82f80af0de: Pull complete
+3493bf46cdec: Pull complete
+Digest: sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373
+Status: Downloaded newer image for registry:2.8.3
+9f5b379948586037e6f29004b52cc5d619b423b32ddcacfedd5ef28dd9a4fdc0
+No kind clusters found.
+Creating cluster "supply" ...
+ • Ensuring node image (kindest/node:v1.37.0) 🖼️  ...
+ ✓ Ensuring node image (kindest/node:v1.37.0) 🖼️
+ • Preparing nodes 📦 📦 📦   ...
+ ✓ Preparing nodes 📦 📦 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Joining worker nodes 🚜  ...
+ ✓ Joining worker nodes 🚜
+ • Waiting ≤ 2m0s for control-plane = Ready ⏳  ...
+ ✓ Waiting ≤ 2m0s for control-plane = Ready ⏳
+ • Ready after 6s 💚
+Set kubectl context to "kind-supply"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-supply
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+NAME                   STATUS     ROLES           AGE   VERSION   INTERNAL-IP   EXTERNAL-IP   OS-IMAGE                       KERNEL-VERSION     CONTAINER-RUNTIME
+supply-control-plane   Ready      control-plane   21s   v1.37.0   172.18.0.3    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+supply-worker          NotReady   <none>          6s    v1.37.0   172.18.0.4    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
+supply-worker2         NotReady   <none>          6s    v1.37.0   172.18.0.2    <none>        Debian GNU/Linux 13 (trixie)   6.12.94+ (amd64)   containerd://2.3.4
