@@ -17,7 +17,7 @@ reg stop;  try_pod regdown-cold "$R:v1"; reg start
 try_pod warmup "$R:v1"
 reg stop;  try_pod regdown-warm-cache "$R:v1"; reg start
 
-sed 's/failureAction: Enforce/failureAction: Audit/' "$P" > /tmp/policy-audit.yaml
+sed -e 's/failureAction: Enforce/failureAction: Audit/' -e 's/mutateDigest: true/mutateDigest: false/' "$P" > /tmp/policy-audit.yaml
 kyverno_mode default; apply_policy /tmp/policy-audit.yaml type=SigstoreBundle 2>/dev/null
 reg stop;  try_pod regdown-audit "$R:v1"; reg start
 try_pod unsigned-audit "$R:evil"

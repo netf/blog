@@ -29,6 +29,8 @@ for kv in extras:
     out = out.replace("    - imageReferences:", f"    - {k}: {v}\n      imageReferences:", 1)
 print(out)
 PY
+  local rc=${PIPESTATUS[1]}
+  [ "$rc" -eq 0 ] || { echo "FATAL apply_policy: kubectl apply failed for $file"; exit 1; }
   kubectl wait --for=condition=Ready clusterpolicy --all --timeout=60s >/dev/null
 }
 

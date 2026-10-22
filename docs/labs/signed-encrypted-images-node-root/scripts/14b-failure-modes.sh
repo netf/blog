@@ -28,7 +28,7 @@ try_pod warm-digest "$R@$GOOD"
 reg stop; try_pod regdown-warm-digest "$R@$GOOD"; reg start
 } | tee "$OUT/regdown-digest.tsv"
 
-sed 's/failureAction: Enforce/failureAction: Audit/' "$P" > /tmp/policy-audit.yaml
+sed -e 's/failureAction: Enforce/failureAction: Audit/' -e 's/mutateDigest: true/mutateDigest: false/' "$P" > /tmp/policy-audit.yaml
 kyverno_mode default; apply_policy /tmp/policy-audit.yaml type=SigstoreBundle 2>/dev/null
 kubectl get clusterpolicy verify-lab-images -o jsonpath='{.spec.rules[0].verifyImages[0].failureAction}{"\n"}' > "$OUT/audit-live-failureAction.txt"
 try_pod unsigned-audit "$R:evil" | tee "$OUT/audit.tsv"
