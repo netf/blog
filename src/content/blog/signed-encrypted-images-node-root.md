@@ -224,3 +224,23 @@ The contents are protected as advertised. What's around them isn't:
   a layer (a public base image, last quarter's model), they can confirm the guess without the key.
 - **Sizes are exact.** Ciphertext layers are byte-for-byte the same length as the plaintext ones
   (8,391,419 bytes for the model layer in the final run).
+
+## Appendix A: Methodology
+
+- **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
+  flow without Fulcio or Rekor, Kyverno's `ClusterPolicy` API (deprecated in 1.19 in favour of
+  `ImageValidatingPolicy`, which I didn't test), and node-model key distribution for ocicrypt.
+  "Root on the node" means `docker exec` into the Kind node container, which gives the same
+  filesystem, process and kubelet view a root shell on a real node would.
+- **Why there's no TEE here.** The VM is a Firecracker microVM. `/proc/cpuinfo` shows `vmx` and
+  `hypervisor` but none of `sev`, `sev_snp`, `tdx_guest` or `sgx`, there is no
+  `/sys/hypervisor` and no `/dev/vhost-vsock`, and an earlier run found that `KVM_CREATE_VCPU`
+  hits `kernel BUG at arch/x86/kvm/x86.c:702` (`kvm_spurious_fault`). Confidential Containers
+  needs a working nested hypervisor at minimum, so it's part 2, on different hardware. This lab
+  ran no KVM, QEMU or Kata probes.
+- **Runs.** Parts 1 and the stolen-copy test ran on two blank VMs (2026-10-15 and 2026-10-22),
+  with different keys and digests and the same outcomes. The node-side encryption tests and the
+  node-root attack ran on the second VM. Tables show the second run unless marked.
+- **Timing.** Admission latency is client wall time of `kubectl create --dry-run=server`, so it
+  includes about 66 ms of client and API-server overhead that's present in every case.
+  Node-root steps are timed around each `docker exec`, which adds its own startup cost.
