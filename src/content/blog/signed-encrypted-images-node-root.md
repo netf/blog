@@ -35,6 +35,29 @@ and `./reproduce.sh` rebuilds everything from a blank VM.
 Part 2 is about the obvious answer to question 3, confidential containers and TEEs. I meant to
 test them here and couldn't; the methodology section says why in two lines.
 
+## The short version
+
+- **The signature checks themselves are solid.** Unsigned images, by tag or digest, and a valid
+  signature transplanted onto another image were all denied. Full verification of a signature and
+  two attestations cost 43 ms per pod at the median against a local registry.
+- **cosign v3 and Kyverno's default settings don't agree on where signatures live.** A correctly
+  signed image was denied with `no signatures found` until I set `type: SigstoreBundle`.
+- **A repointed tag rides the verification cache.** Kyverno caches "verified" against the tag
+  string for up to 60 minutes, then pins whatever digest the tag points to now. With a 2-minute
+  TTL the unsigned image was admitted for 104 to 106 seconds. Digest references and a disabled
+  cache both closed it. The Helm chart silently drops `imageVerifyCacheEnabled=false` unless you
+  pass it as a string.
+- **Kyverno fails closed when it crashes and open when it's stopped politely.** After a
+  graceful scale-down its webhooks were gone within 2 seconds and an unsigned pod was admitted.
+- **Encrypted layers stop registry theft and little else.** A stolen copy didn't contain the
+  model, but its config, build history, `diff_ids` and exact layer sizes were plaintext. A node
+  without the key couldn't pull the image, unless it had already run the plain version. Then it
+  ran it in 10 ms.
+- **Root on the node got everything on that node in 8.3 seconds:** the env secret, the mounted
+  Secret, the decrypted model from disk (still there after the pod was deleted), the decryption
+  key, a decrypted copy of the registry image, and a memory dump. The kubelet's own credentials
+  couldn't read a Secret that no pod on that node mounts.
+
 ## How the pieces fit
 
 Signing and encryption protect different hops, and neither one protects the node itself:
@@ -324,8 +347,8 @@ it, and with it every copy of the image anywhere, including the "stolen registry
 The process has its secrets in its environment and memory because that's how it uses them.
 
 The one boundary that held is the Kubernetes API. The kubelet's credentials are confined by the
-Node authorizer to Secrets that pods on that node mount: `db-creds` yes, `unrelated-secret` and
-`list` no. So root on one node gets that node's workloads, its decryption keys and its pods'
+Node authorizer to Secrets that pods on that node mount: `db-creds` yes, `unrelated-secret` and `list` no
+(`node: no relationship found between node 'supply-worker' and this object`). So root on one node gets that node's workloads, its decryption keys and its pods'
 Secrets, not the cluster's.
 
 Signing didn't help here at all, and wasn't meant to. It answers "is this the image I built?",
