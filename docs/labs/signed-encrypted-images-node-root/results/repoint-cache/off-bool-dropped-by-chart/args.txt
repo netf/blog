@@ -1,0 +1,1 @@
+"--allowInsecureRegistry=true" (only arg rendered; imageVerifyCacheEnabled=false dropped by chart if $value)

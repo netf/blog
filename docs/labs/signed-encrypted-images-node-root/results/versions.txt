@@ -1,0 +1,19 @@
+host: 6.12.94+, 4 vCPU, MemTotal:       16387280 kB
+docker 29.9.2
+kind v0.33.0 go1.26.7 linux/amd64
+Client Version: v1.37.1
+Kustomize Version: v5.8.1
+containerd github.com/containerd/containerd/v2 v2.3.4 db8809540e1a7a9da5d518876894933ff55692ab
+v3.22.0+g144ca65
+kyverno chart kyverno-3.9.1 app v1.19.1
+GitVersion:    v3.1.3
+Version:       1.54.1
+skopeo version 1.13.3
+v2.0.3
+go version go1.26.9 linux/amd64
+registry image registry:2.8.3
+GNU gdb (Ubuntu 15.1-1ubuntu1~24.04.1) 15.1
+supply-control-plane   v1.37.0   containerd://2.3.4
+supply-worker          v1.37.0   containerd://2.3.4
+supply-worker2         v1.37.0   containerd://2.3.4
+note: first run (2026-10-15) used docker 29.9.1; this run 29.9.2 (get.docker.com is unpinned)

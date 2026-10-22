@@ -1,0 +1,2 @@
+$ tr '\0' '\n' < /proc/$(crictl inspect --output go-template --template '{{.info.pid}}' $(crictl ps -q --label io.kubernetes.pod.name=victim --name app))/environ | grep APP_SECRET
+APP_SECRET=env-secret-value-77aa

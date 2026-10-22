@@ -1,0 +1,2 @@
+$ sudo gcore -o /tmp/tmp.xATDfzf3uQ/core 64188 >/dev/null 2>&1; sudo strings -a /tmp/tmp.xATDfzf3uQ/core.64188 | grep -c env-secret-value-77aa
+2

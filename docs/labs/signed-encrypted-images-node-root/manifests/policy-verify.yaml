@@ -1,0 +1,49 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-lab-images
+spec:
+  webhookTimeoutSeconds: 15
+  failurePolicy: Fail
+  rules:
+  - name: signed-with-sbom-and-provenance
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaces: [prod]
+    verifyImages:
+    - imageReferences: ["kind-registry:5000/*"]
+      failureAction: Enforce
+      mutateDigest: true
+      verifyDigest: true
+      required: true
+      attestors:
+      - entries:
+        - keys:
+            publicKeys: |-
+              __COSIGN_PUB__
+            rekor: {ignoreTlog: true}
+            ctlog: {ignoreSCT: true}
+      attestations:
+      - type: https://cyclonedx.org/bom
+        attestors:
+        - entries:
+          - keys:
+              publicKeys: |-
+                __COSIGN_PUB__
+              rekor: {ignoreTlog: true}
+              ctlog: {ignoreSCT: true}
+      - type: https://slsa.dev/provenance/v1
+        attestors:
+        - entries:
+          - keys:
+              publicKeys: |-
+                __COSIGN_PUB__
+              rekor: {ignoreTlog: true}
+              ctlog: {ignoreSCT: true}
+        conditions:
+        - all:
+          - key: "{{ runDetails.builder.id }}"
+            operator: Equals
+            value: https://netf.io/lab/builder/laptop

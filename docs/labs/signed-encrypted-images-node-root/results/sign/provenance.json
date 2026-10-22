@@ -1,0 +1,4 @@
+{"buildDefinition":{"buildType":"https://netf.io/lab/docker-build@v1",
+  "externalParameters":{"source":"docs/labs/signed-encrypted-images-node-root/app"}},
+ "runDetails":{"builder":{"id":"https://netf.io/lab/builder/laptop"},
+  "metadata":{"invocationId":"lab-20261022T163144Z"}}}

@@ -1,0 +1,6 @@
+#	worker2 model.bin copies on disk after clean	0
+keyless-clean	Pending/ErrImagePull	Failed: Failed to pull image "kind-registry:5000/demo/app-enc:v1": failed to pull and unpack image "kind-registry:5000/demo/app-enc:v1": failed to extract layer (application/vnd.oci.image.layer.v1.tar+gzip+encrypted sha256:616308651d8d6d37f4d559756cc36d35a8128bbd4637b36f4175a95e3b8c0ebc) to overlayfs as "extract-355277014--YwT sha256:f69d9684af2bbcc233647652b0bba26665d1db5534f2b559b196f7732a3fd4cb
+plain-first	Running/2026-10-22T17:09:00Z	Pulled: Successfully pulled image "kind-registry:5000/demo/app-plain:v1" in 68ms (68ms including waiting). Image size: 10858016 bytes.
+keyless-after-plain	Running/2026-10-22T17:09:01Z	Pulled: Successfully pulled image "kind-registry:5000/demo/app-enc:v1" in 10ms (10ms including waiting). Image size: 10858016 bytes.
+#	worker model.bin copies on disk after clean	0
+keyed-clean	Running/2026-10-22T17:09:05Z	Pulled: Successfully pulled image "kind-registry:5000/demo/app-enc:v1" in 118ms (118ms including waiting). Image size: 10861345 bytes.

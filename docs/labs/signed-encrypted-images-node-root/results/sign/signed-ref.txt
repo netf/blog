@@ -1,0 +1,1 @@
+kind-registry:5000/demo/app@sha256:af1092bfe894df61d8e3882364b10d3062d5363f6e3ce06ad7a2c17079bfd61c

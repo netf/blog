@@ -1,0 +1,21 @@
+== tar listing of each encrypted blob (no key)
+-- app-enc.616308651d8d.blob
+
+gzip: stdin: not in gzip format
+-- app-enc.a9d9cb3b2e34.blob
+
+gzip: stdin: not in gzip format
+== tar listing of plain blobs
+-- app-plain.44c3f63b5b59.blob
+demoapp
+-- app-plain.d6353246ba9c.blob
+opt/
+opt/model/
+opt/model/model.bin
+== encrypted image config is plaintext JSON:
+{"Entrypoint":["/demoapp"],"User":"65532:65532","Env":["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"],"history":["COPY demoapp /demoapp # buildkit","COPY model.bin /opt/model/model.bin # buildkit","USER 65532:65532","ENTRYPOINT [\"/demoapp\"]"],"diff_ids":["sha256:f69d9684af2bbcc233647652b0bba26665d1db5534f2b559b196f7732a3fd4cb","sha256:f93d780df969cb17b1d3d817a9e256fbb2a89a093f8d45a43b51120883fc4ad3"]}
+== ocicrypt layer annotations (keys wrapped per recipient):
+org.opencontainers.image.enc.keys.jwe (1460 chars)
+org.opencontainers.image.enc.pubopts (148 chars)
+== pubopts (base64 JSON):
+{"cipher":"AES_256_CTR_HMAC_SHA256","hmac":"4Io5lFC/u46P3lgEC/updNH8CQJmVnfAO5rmif35F+0=","cipheroptions":{}}

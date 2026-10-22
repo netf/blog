@@ -1,0 +1,4 @@
+#	resource-webhooks-before-kill	2
+#	resource-webhooks-right-after-kill	2
+crash-unsigned	DENIED	47	Error from server (InternalError): Internal error occurred: failed calling webhook "mutate.kyverno.svc-fail": failed to call webhook: Post "https://kyverno-svc.kyverno.svc:443/mutate/fail?timeout=15s": dial tcp 10.96.171.31:443: connect: connection refused 
+#	resource-webhooks-after-try	2

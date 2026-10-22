@@ -1,0 +1,2 @@
+$ echo pid=$(crictl inspect --output go-template --template '{{.info.pid}}' $(crictl ps -q --label io.kubernetes.pod.name=victim --name app))
+pid=22163

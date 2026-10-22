@@ -1,0 +1,21 @@
+image	run	left_on_disk	pull	ready_ms
+app-plain	1	0	in 79ms	586
+app-enc	1	0	in 108ms	614
+app-plain	2	0	in 82ms	584
+app-enc	2	0	in 119ms	645
+app-plain	3	0	in 77ms	585
+app-enc	3	0	in 107ms	635
+app-plain	4	0	in 82ms	575
+app-enc	4	0	in 104ms	602
+app-plain	5	0	in 66ms	565
+app-enc	5	0	in 117ms	620
+app-plain	6	0	in 76ms	588
+app-enc	6	0	in 111ms	619
+app-plain	7	0	in 83ms	577
+app-enc	7	0	in 129ms	636
+app-plain	8	0	in 76ms	577
+app-enc	8	0	in 116ms	626
+app-plain	9	0	in 64ms	863
+app-enc	9	0	in 125ms	637
+app-plain	10	0	in 81ms	595
+app-enc	10	0	in 120ms	629

@@ -1,0 +1,10 @@
+control-signed-tag	ALLOWED	123	pod/control-signed-tag created 
+control-signed-digest	ALLOWED	109	pod/control-signed-digest created 
+unsigned-tag	DENIED	114	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/unsigned-tag was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 
+unsigned-digest	DENIED	52	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/unsigned-digest was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a: .attestors[0].entries[0].keys: sigstore bundle verificatio
+#	transplant PUT	201
+transplanted-signature	DENIED	76	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/transplanted-signature was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app@sha256:b3cdb84e15f04465732479a70ec2072a799dde2452295f7a5cd8fb30b974e097: .attestors[0].entries[0].keys: sigstore bundle veri
+#	v1 now resolves to	sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+repointed-tag	ALLOWED	53	pod/repointed-tag created 
+repoint-pinned-digest	ALLOWED	50	pod/repoint-pinned-digest created 
+restored-tag	ALLOWED	57	pod/restored-tag created 

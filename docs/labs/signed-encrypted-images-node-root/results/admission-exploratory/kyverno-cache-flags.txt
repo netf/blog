@@ -1,0 +1,6 @@
+  -imageVerifyCacheEnabled
+    	Enable a TTL cache for verified images. (default true)
+  -imageVerifyCacheMaxSize int
+    	Maximum number of keys that can be stored in the TTL cache. Keys are a combination of policy elements along with the image reference. Default is 1000. 0 sets the value to default. (default 1000)
+  -imageVerifyCacheTTLDuration duration
+    	Maximum TTL value for a cache expressed as duration. Default is 60m. 0 sets the value to default. (default 1h0m0s)

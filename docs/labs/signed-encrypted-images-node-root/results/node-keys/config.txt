@@ -1,0 +1,13 @@
+== supply-worker
+    [plugins.'io.containerd.cri.v1.images'.image_decryption]
+      key_model = 'node'
+--
+  [stream_processors.'io.containerd.ocicrypt.decoder.v1.tar.gzip']
+total 4
+-rw------- 1 1000 1000 3272 Oct 22 16:32 enc-priv.pem
+== supply-worker2
+    [plugins.'io.containerd.cri.v1.images'.image_decryption]
+      key_model = 'node'
+--
+  [stream_processors.'io.containerd.ocicrypt.decoder.v1.tar.gzip']
+total 0

@@ -1,0 +1,10 @@
+#	resource-webhooks-before-scale-down	2
+#	resource-webhooks-after-2s-more	0
+#	resource-webhooks-after-5s-more	0
+#	resource-webhooks-after-10s-more	0
+#	resource-webhooks-after-20s-more	0
+kyverno-down-unsigned	ALLOWED	39	pod/kyverno-down-unsigned created 
+#	resource-webhooks-after-start+0s	0
+#	resource-webhooks-after-start+5s	0
+#	resource-webhooks-after-start+10s	2
+#	resource-webhooks-after-start+20s	2

@@ -16,6 +16,18 @@ export const codeBlock = {
 		const pre = root.children.find((c) => c.type === 'element');
 		if (!pre) return;
 		const lang = this.options.lang ?? '';
+		if (lang === 'mermaid') {
+			// Rendered client-side by the post script; keep the raw source.
+			root.children = [
+				{
+					type: 'element',
+					tagName: 'pre',
+					properties: { class: 'mermaid' },
+					children: [{ type: 'text', value: this.source }],
+				},
+			];
+			return;
+		}
 		const label = SHELLS.has(lang) ? '~ $' : PLAIN.has(lang) ? 'output' : lang;
 		root.children = [
 			{

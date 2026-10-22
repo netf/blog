@@ -1,0 +1,1 @@
+guard ok: dry-run denies unsigned image

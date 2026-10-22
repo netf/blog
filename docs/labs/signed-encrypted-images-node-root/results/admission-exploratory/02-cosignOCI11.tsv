@@ -1,0 +1,1 @@
+oci11-signed-tag	DENIED	54	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/oci11-signed-tag was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:v1: .attestors[0].entries[0].keys: no signatures found' 
