@@ -11,12 +11,12 @@ That string is mine. I put it in a deliberately bad build of a tiny Go service, 
 my registry unsigned, and pointed the `:v1` tag at it. The policy in front of the cluster
 requires a cosign signature, a CycloneDX SBOM and a SLSA provenance attestation from my key
 before any image runs in `prod`. It had denied that exact image, by digest, a few seconds
-earlier. Then it let it in under the tag, pinned it to the evil digest, and the kubelet started
-it with the production secret in its environment.
+earlier. Then it let it in under the tag and pinned it to the evil digest. When I let that pod
+start, it answered with the string above, with the pod's `APP_SECRET` in its environment.
 
 Nothing errored. The policy reported Ready the whole time.
 
-This is the first of two posts about a question I keep getting from teams hardening their
+This is the first of two posts about the question that comes up once a team has hardened its
 Kubernetes supply chain: once you sign everything and encrypt the layers, what is actually left
 to protect? I built the whole stack on a Kind cluster and asked three things:
 
