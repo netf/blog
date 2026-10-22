@@ -421,6 +421,37 @@ cache window didn't matter, and with a warm cache the pod was admitted through a
 Turning the cache off gives that last part up: every admission then needs the registry. I'd still
 turn it off if tags are allowed anywhere; if every reference is a digest, the cache is harmless.
 
+## What this lab tells you
+
+1. **Sign, but enforce by digest.** Signature checks caught every forged or unsigned image I
+   tried. The one thing that got past them was a tag, and digest references made the attack moot.
+2. **Test your policy against your current cosign.** A version bump in CI silently changed the
+   signature format, and the default `verifyImages` config couldn't see it. One pod with a fresh
+   signature in staging catches this before production does.
+3. **Run two Kyverno admission replicas.** With one, a graceful shutdown deregistered the
+   webhooks and `failurePolicy: Fail` protected nothing. With two, a graceful shutdown of one
+   didn't open a gap. Audit mode is not a fail-open safety valve for outages: it admits unsigned
+   images, forbids digest pinning, and still denies on registry timeouts.
+4. **Treat layer encryption as protection for the registry, not the node.** It kept the model out
+   of a stolen registry copy, at about 40 ms per pull. It did not hide build history, `diff_ids`
+   or sizes, and it didn't stop a keyless node that already had the plaintext layers.
+5. **Assume node root is "everything scheduled there".** In 8.3 seconds it got the key, the
+   plaintext image (on disk after the pod was gone), env and mounted secrets, and process memory.
+   What it didn't get was a Secret that no pod on that node mounted. So the levers that work
+   today are about *placement*:
+   - **Keep the decryption key off nodes that don't need it.** The keyless node couldn't pull a
+     clean encrypted image.
+   - **Keep sensitive pods and their Secrets on dedicated nodes**, because the kubelet identity
+     reads exactly the Secrets of the pods it runs.
+   - **Remove images you no longer run.** `crictl rmi` is what took the plaintext `model.bin` off
+     disk; deleting the pod didn't.
+
+What none of this fixes is the root user on a node reading the memory and disk of a running
+workload. That needs the workload to be opaque to the node it runs on: a confidential VM or
+Confidential Containers, where the decryption key is released only after the guest proves what
+it is. That's part 2. It needs hardware this Firecracker VM doesn't have, so I'll be running it
+somewhere that does, and I'll redo the twelve steps above against it.
+
 ## Appendix A: Methodology
 
 - **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
