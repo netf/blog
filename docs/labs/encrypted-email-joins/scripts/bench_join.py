@@ -45,16 +45,21 @@ def sources(mode, kind):
 
 def main():
     rounds, reps = int(sys.argv[1]), int(sys.argv[2])
-    cons = {m: db(m) for m in MODES}
     # The point lookup uses the same customer in every variant: the one with the most orders.
-    heavy_id = cons["plain"].execute("""select c.customer_id from orders o join customers c on o.customer_email = c.email
-                                        group by 1 order by count(*) desc, 1 limit 1""").fetchone()[0]
-    keys = {m: cons[m].execute("select email from customers where customer_id = ?", [heavy_id]).fetchone()[0] for m in MODES}
+    con = db("plain")
+    heavy_id = con.execute("""select c.customer_id from orders o join customers c on o.customer_email = c.email
+                              group by 1 order by count(*) desc, 1 limit 1""").fetchone()[0]
+    con.close()
+    keys = {}
+    for m in MODES:
+        con = db(m)
+        keys[m] = con.execute("select email from customers where customer_id = ?", [heavy_id]).fetchone()[0]
+        con.close()
     answers = {}
     for r in range(rounds):
         order = MODES[r % 3:] + MODES[:r % 3]
         for mode in order:
-            con = cons[mode]
+            con = db(mode)
             for kind in ("table", "parquet"):
                 for q, sql in QUERIES.items():
                     text = sql.format(**sources(mode, kind))
@@ -68,6 +73,7 @@ def main():
                         times.append(time.perf_counter() - t)
                     print(json.dumps({"round": r, "mode": mode, "source": kind, "query": q,
                                       "ms": [round(x * 1000, 2) for x in times]}), flush=True)
+            con.close()
     same = all(len({json.dumps(v, default=str) for v in d.values()}) == 1 for d in answers.values())
     print(json.dumps({"check": "identical_results_across_modes", "ok": same, "heavy_customer_id": heavy_id,
                       "sample": {f"{k[0]}/{k[1]}": d["plain"][:3] for k, d in answers.items()}}, default=str), flush=True)
