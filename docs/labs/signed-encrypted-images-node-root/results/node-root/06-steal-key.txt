@@ -1,0 +1,4 @@
+$ ls -l /etc/containerd/ocicrypt/keys; head -1 /etc/containerd/ocicrypt/keys/enc-priv.pem
+total 4
+-rw------- 1 1000 1000 3272 Oct 22 16:32 enc-priv.pem
+-----BEGIN PRIVATE KEY-----

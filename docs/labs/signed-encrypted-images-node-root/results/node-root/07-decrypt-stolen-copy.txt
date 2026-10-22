@@ -1,0 +1,2 @@
+$ skopeo copy -q --src-tls-verify=false --decryption-key /tmp/tmp.xATDfzf3uQ/stolen.pem docker://kind-registry:5000/demo/app-enc:v1 dir:/tmp/tmp.xATDfzf3uQ/dec && for b in /tmp/tmp.xATDfzf3uQ/dec/*; do gzip -dc $b 2>/dev/null; done | grep -a -c PROPRIETARY-MODEL-MARKER
+1

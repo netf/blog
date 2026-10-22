@@ -1,0 +1,13 @@
+step	ms	last-line-of-output
+01-find-process	83	pid=22163
+02-env	82	APP_SECRET=env-secret-value-77aa
+03-secret-volume	77	tmpfs            16G  4.0K   16G   1% /var/lib/kubelet/pods/9e8d91c1-17b1-4394-b0f7-2fff3f7daa72/volumes/kubernetes.io~s
+04-decrypted-rootfs	73	PROPRIETARY-MODEL-MARKER-7f3a9c
+05-snapshot-on-disk	53	PROPRIETARY-MODEL-MARKER-7f3a9c
+06-steal-key	29	-----BEGIN PRIVATE KEY-----
+07-decrypt-stolen-copy	155	1
+08-gcore	7406	2
+09-kubelet-secret-mounted	121	s3cr3t-db-password-4b1d
+10-kubelet-secret-unmounted	87	Error from server (Forbidden): secrets "unrelated-secret" is forbidden: User "system:node:supply-worker" cannot get reso
+11-kubelet-list-secrets	126	Error from server (Forbidden): secrets is forbidden: User "system:node:supply-worker" cannot list resource "secrets" in 
+12-after-pod-delete	54	PROPRIETARY-MODEL-MARKER-7f3a9c
