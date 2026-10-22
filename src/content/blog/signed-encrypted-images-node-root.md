@@ -128,3 +128,57 @@ Six of seven rows behave the way the brochure says. The bundle binds the digest 
 copied signature is useless, and anything referenced by digest can't be swapped underneath you.
 
 The repointed tag is the row from the opening.
+
+### The tag that stayed verified
+
+My first guess was that `85d20…`, the digest in that run, had somehow picked up a valid
+signature. `cosign verify` said `no signatures found`. Then I restarted the Kyverno admission
+controller and retried the same tag. Denied.
+
+So it was state, and the binary documents it:
+
+```text
+-imageVerifyCacheEnabled     Enable a TTL cache for verified images. (default true)
+-imageVerifyCacheMaxSize     ... Keys are a combination of policy elements along with
+                             the image reference. Default is 1000.
+-imageVerifyCacheTTLDuration ... Default is 60m.
+```
+
+The cache key is the image reference as written in the pod spec, `kind-registry:5000/demo/app:v1`,
+and not the digest it resolved to. When the signed `:v1` is admitted, "verified" is cached against
+the string `…/app:v1`. When the tag moves, the next pod with that string hits the cache, skips
+verification, and then `mutateDigest` resolves the tag again and pins whatever it points to
+*now*. Verification and digest resolution are two separate lookups, and the cache sits between
+them.
+
+`scripts/13-repoint-cache.sh` reproduces it: admit `:v1`, repoint `:v1`, keep admitting:
+
+| Kyverno setting | Repointed tag admitted until | First denial |
+|---|---|---|
+| `imageVerifyCacheTTLDuration=2m` (run 1) | t=104 s | t=124 s |
+| `imageVerifyCacheTTLDuration=2m` (run 2) | t=106 s | t=126 s |
+| default (60m TTL), polled every 2 min | still admitted at t=483 s, the last poll before the VM went away | not reached |
+| `imageVerifyCacheEnabled=false` | never | t=0 s |
+
+The first admitted pod in each run really was the evil build: a probe pod's `wget` of
+`/whoami` returned `EVIL secret-len=16`, and the kubelet reported the unsigned digest as its
+`imageID`. In the 2-minute runs, a cache hit every 20 seconds did not extend the window; it
+closed one TTL after the legitimate `:v1` was verified. So anyone who can push a tag gets up to
+an hour (the default TTL) of unverified deploys of that tag after it was last verified.
+
+The fix is one flag, and the chart ate it the first time. Kyverno's chart renders extra args
+like this:
+
+```yaml
+{{- range $key, $value := .Values.admissionController.container.extraArgs }}
+{{- if $value }}
+- --{{ $key }}={{ $value }}
+{{- end }}
+{{- end }}
+```
+
+`--set admissionController.container.extraArgs.imageVerifyCacheEnabled=false` makes `$value`
+the boolean `false`, the `if` drops it, and the cache stays on. No warning; the repointed tag was
+still admitted in that run (`results/repoint-cache/off-bool-dropped-by-chart/`). Pass it as a
+string with `--set-string`, then check that `--imageVerifyCacheEnabled=false` is actually in the
+container args.
