@@ -1,0 +1,4 @@
+case         n    p50    p90    p99    max  (ms, kubectl create --dry-run=server wall time)
+baseline    30     66     70     84     87
+warm        30     71     76     96    103
+uncached    30    109    117    127    130
