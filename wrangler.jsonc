@@ -15,5 +15,6 @@
 	"routes": [{ "pattern": "netf.io", "custom_domain": true }],
 	// No per-branch workers.dev URL for production; previews come from Workers Builds.
 	"workers_dev": false,
-	"preview_urls": true
+	"preview_urls": true,
+	"previews": {}
 }
