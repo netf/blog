@@ -10,14 +10,15 @@
 5. destroy the old key
 """
 import json
-import os
 import pathlib
 import random
 import resource
 import sys
 import time
 
+import duckdb
 import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
 import keys
@@ -41,22 +42,17 @@ def key_id(token):
 
 
 def sample_plain_emails(n=100_000, seed=7):
-    import adbc_driver_postgresql.dbapi as pg
-    with pg.connect(os.environ.get("LAB_PG_URI", "postgresql://lab:lab@localhost/shop")) as conn:
-        cur = conn.cursor()
-        cur.execute("select count(*) from customers")
-        total = cur.fetchone()[0]
-        ids = random.Random(seed).sample(range(1, total + 1), n)
-        cur.execute("select email from customers where customer_id = any($1)", parameters=(ids,))
-        return [r[0] for r in cur.fetchall()]
+    """Existing customers' emails as they arrive in new source rows (plaintext copy of the source)."""
+    col = pq.read_table(ROOT / "data" / "warehouse" / "plain" / "customers.parquet", columns=["email"]).column("email")
+    idx = random.Random(seed).sample(range(len(col)), n)
+    return col.take(pa.array(idx)).to_pylist()
 
 
 def lazy_match(column, plain):
     p = keys.primitive(column)
     new = {p.encrypt_deterministically(v.encode(), column.encode()) for v in plain}
     existing = pq.read_table(WH / "customers.parquet", columns=[column]).column(column)
-    hits = pa.compute.sum(pa.compute.is_in(existing, value_set=pa.array(list(new), pa.binary()))).as_py()
-    return hits
+    return pc.sum(pc.is_in(existing, value_set=pa.array(list(new), pa.binary()))).as_py() or 0
 
 
 def rewrite(path, name, prim, ad, old_id):
@@ -88,6 +84,15 @@ def rewrite(path, name, prim, ad, old_id):
             "write_s": round(t_write, 2), "bytes_before": before, "bytes_after": after, "old_key_tokens_left": leftover}
 
 
+def join_rows(d):
+    con = duckdb.connect()
+    con.execute("set threads = 4; set memory_limit = '3GB'")
+    n = con.execute(f"""select count(*) from read_parquet('{d / "orders.parquet"}') o
+                        join read_parquet('{d / "customers.parquet"}') c on o.customer_email = c.email""").fetchone()[0]
+    con.close()
+    return n
+
+
 def main():
     column, run = sys.argv[1], sys.argv[2]
     plain = sample_plain_emails() if column == "email" else None
@@ -106,6 +111,8 @@ def main():
         out["after_rewrite_matches"] = lazy_match(column, plain)
     keys.retire(column, old_id)
     out["keyset_after"] = keys.info(column)
+    out["join_rows_after"] = join_rows(WH)
+    out["join_rows_plaintext"] = join_rows(ROOT / "data" / "warehouse" / "plain")
     out["peak_rss_mb"] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024)
     print(json.dumps(out))
 

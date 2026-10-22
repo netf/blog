@@ -6,7 +6,6 @@ import base64
 import http.client
 import json
 import pathlib
-import statistics
 import subprocess
 import sys
 import time
