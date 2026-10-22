@@ -1,9 +1,3 @@
-t=0s	warm	ALLOWED	kind-registry:5000/demo/app:v1@sha256:2380692cb7c2ef4383838f7a274c3778b2a64a7d17015a6a871312af99ffe791
-t=0s	repointed-to	sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=0s	after-repoint	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=23s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=43s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=63s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=84s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=104s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-t=124s	poll	DENIED	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/evil-6 was blocked due to the following policies   verify
+t=0s	warm	ALLOWED	kind-registry:5000/demo/app:v1@sha256:af1092bfe894df61d8e3882364b10d3062d5363f6e3ce06ad7a2c17079bfd61c
+t=0s	repointed-to	sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+t=0s	after-repoint	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
