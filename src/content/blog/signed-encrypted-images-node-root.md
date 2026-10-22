@@ -208,3 +208,19 @@ The contents are protected as advertised. What's around them isn't:
   a layer (a public base image, last quarter's model), they can confirm the guess without the key.
 - **Sizes are exact.** Ciphertext layers are byte-for-byte the same length as the plaintext ones
   (8,391,419 bytes for the model layer in the final run).
+
+### What verification costs per pod
+
+`scripts/15-latency.sh` times `kubectl create --dry-run=server` for a pod. Dry-run runs the
+whole admission chain, verification and digest mutation included; the script aborts if a dry-run
+of the unsigned image is *not* denied. 30 samples per case, wall time in ms, local registry:
+
+| Case | p50 | p90 | p99 | max |
+|---|---|---|---|---|
+| No policy (namespace `default`) | 66 | 70 | 84 | 87 |
+| Policy, verify-cache hit | 71 | 76 | 96 | 103 |
+| Policy, cache disabled (full signature + 2 attestation checks) | 109 | 117 | 127 | 130 |
+
+So full verification adds about 43 ms at the median against a registry on the same Docker
+network. Turning the cache off costs 38 ms per pod over a warm cache. A registry across a WAN
+will add its round trips on top, and I didn't test that.
