@@ -17,7 +17,7 @@ following report.md section 6. The preflight never opens `/dev/kvm` or starts a 
 - Kernel 6.12.94+, cgroup v2 (`cgroup2fs`; controllers cpuset cpu io memory hugetlb pids).
 - Monolithic kernel: no `/lib/modules`, `/proc/modules` empty. `overlay` and `nf_conntrack`
   are built in. Nothing this lab needs is a loadable module.
-- Docker 29.9.1 (overlayfs storage driver, cgroupfs, cgroup v2), rootful.
+- Docker 29.9.1 on the first VM, 29.9.2 on the second (get.docker.com is not pinned); overlayfs storage driver, cgroupfs, cgroup v2, rootful.
 - iptables 1.8.10 with the nf_tables backend, but a legacy `filter` table also exists with
   `FORWARD DROP`. That is the dual-backend problem the Istio lab documented, fixed by the same
   `scripts/02b-host-iptables-fix.sh`.
@@ -43,3 +43,9 @@ following report.md section 6. The preflight never opens `/dev/kvm` or starts a 
 2. `/var/run/docker.sock` is made world-writable on this throwaway VM so Kind runs without sudo.
 3. `scripts/02b-host-iptables-fix.sh` (copied from the Istio lab) accepts Kind bridge traffic in
    the legacy `FORWARD` chain.
+
+## Second run (2026-10-22)
+
+The first VM was recycled mid-lab. The second VM had the same shape (4 vCPU, 16 GB, kernel
+6.12.94+, same CPU flags, no `/sys/hypervisor`); `results/preflight/` holds its preflight. The
+whole lab was rebuilt from `reproduce.sh`'s steps; keys and digests differ from the first run.
