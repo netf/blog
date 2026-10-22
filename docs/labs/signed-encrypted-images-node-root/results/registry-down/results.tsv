@@ -1,0 +1,7 @@
+regdown-cold	DENIED	15043	Error from server (InternalError): Internal error occurred: failed calling webhook "mutate.kyverno.svc-fail": failed to call webhook: Post "https://kyverno-svc.kyverno.svc:443/mutate/fail?timeout=15s": context deadline exceeded 
+warmup	ALLOWED	107	pod/warmup created 
+regdown-warm-cache	DENIED	15039	Error from server (InternalError): Internal error occurred: failed calling webhook "mutate.kyverno.svc-fail": failed to call webhook: Post "https://kyverno-svc.kyverno.svc:443/mutate/fail?timeout=15s": context deadline exceeded 
+regdown-audit	DENIED	15042	Error from server (InternalError): Internal error occurred: failed calling webhook "mutate.kyverno.svc-fail": failed to call webhook: Post "https://kyverno-svc.kyverno.svc:443/mutate/fail?timeout=15s": context deadline exceeded 
+unsigned-audit	ALLOWED	57	Warning: policy verify-lab-images.signed-with-sbom-and-provenance: failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found Warning: policy verify-lab-images.signed-with-sbom-and-provenance: missing digest for kind-registry:5000/demo/app:evil pod/unsigned-audit created 
+kyverno-down-fail-unsigned	ALLOWED	44	pod/kyverno-down-fail-unsigned created 
+kyverno-down-ignore-unsigned	ALLOWED	46	pod/kyverno-down-ignore-unsigned created 

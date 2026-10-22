@@ -199,6 +199,43 @@ So full verification adds about 43 ms at the median against a registry on the sa
 network. Turning the cache off costs 38 ms per pod over a warm cache. A registry across a WAN
 will add its round trips on top, and I didn't test that.
 
+### When things are down: fail-closed, mostly
+
+The registry tests pause the registry container (`docker pause`), so connections hang rather
+than get refused. The Kyverno tests take the admission controller away two ways: a normal
+scale-down to zero, and a `kill -9` of its process (`scripts/14*.sh`).
+
+| Situation | Unsigned or signed? | Result | Time |
+|---|---|---|---|
+| Registry hung, cold cache, by tag | signed | denied: webhook `context deadline exceeded` | 15,043 ms |
+| Registry hung, warm cache, by tag | signed | denied, same timeout | 15,039 ms |
+| Registry hung, warm cache, **by digest** | signed | allowed | 54 ms |
+| `failureAction: Audit` | unsigned | **allowed**, client gets a `Warning:` line | 57 ms |
+| `failureAction: Audit`, registry hung | signed | denied, same timeout | 15,042 ms |
+| Kyverno `kill -9`'d, `failurePolicy: Fail` | unsigned | denied: `connection refused` | 47 ms |
+| Kyverno **scaled to 0**, `failurePolicy: Fail` | unsigned | **allowed** | 44 ms |
+| Kyverno scaled to 0, `failurePolicy: Ignore` | unsigned | allowed | 46 ms |
+
+Three of these surprised me.
+
+**A warm cache doesn't save a tag from a registry outage.** It covers verification, but
+`mutateDigest` still has to ask the registry what the tag points to, and that call hangs until
+the 15-second webhook timeout. The same signed image by digest went straight through. So
+digest references make you both safer (no repointing) and more available.
+
+**Audit mode can't pin digests, and it isn't fail-open either.** Kyverno's own policy validation
+refused my Audit policy with `mutateDigest must be set to false for 'Audit' failure action`. So
+Audit means unsigned images run *and* tags stay mutable. Yet with the registry hung, Audit still
+denied a signed pod after 15 seconds, because a webhook timeout is governed by `failurePolicy`,
+not by `failureAction`.
+
+**A graceful Kyverno shutdown removes the enforcement, not just the enforcer.** Before the
+scale-down there were two `kyverno-resource-*` webhook configurations. Two seconds after it, zero,
+so `failurePolicy: Fail` had nothing to apply to and the unsigned pod was admitted. They came back
+5 to 10 seconds after the new pod was ready. A crash leaves the webhooks in place, and those fail
+closed. So the dangerous outage is the polite one. I only tested `kubectl scale`; I'd expect anything
+else that stops a single replica gracefully, such as draining its node, to behave the same.
+
 ## 2. Encrypted layers: what a stolen registry gets you
 
 `skopeo copy --encryption-key jwe:enc-pub.pem` re-wrote both layers as
