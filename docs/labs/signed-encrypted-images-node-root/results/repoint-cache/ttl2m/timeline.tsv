@@ -4,3 +4,4 @@ t=0s	after-repoint	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c9634715
 t=25s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
 t=45s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
 t=65s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+t=85s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a

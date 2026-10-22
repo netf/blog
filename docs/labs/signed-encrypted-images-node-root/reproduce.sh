@@ -7,7 +7,7 @@ export PATH="$HOME/bin:/usr/local/go/bin:$PATH"
 s() { echo; echo "### $*"; bash "scripts/$@"; }
 s 00-tools.sh; s 00b-start-dockerd.sh; s 01-preflight.sh
 s 03-cluster.sh; s 09-images.sh; s 10-sign.sh; s 11-kyverno.sh
-s 12-attacks.sh
+s 11b-format-compat.sh; s 12-attacks.sh
 s 13-repoint-cache.sh ttl2m
 LIMIT=25 STEP=10 s 13-repoint-cache.sh off
 [ "${DEFAULT_TTL:-0}" = 1 ] && LIMIT=660 STEP=120 s 13-repoint-cache.sh default
