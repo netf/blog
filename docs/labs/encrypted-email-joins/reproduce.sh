@@ -7,8 +7,8 @@ N_CUSTOMERS=${N_CUSTOMERS:-10000000}
 N_ORDERS=${N_ORDERS:-50000000}
 PY=../.venv/bin/python
 
-./scripts/01-setup.sh
 ./scripts/00-preflight.sh
+./scripts/01-setup.sh
 mkdir -p results/{generate,ingest,sizes,join,rotation,attack,frequency,reid}
 
 cd scripts
