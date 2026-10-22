@@ -63,26 +63,32 @@ test them here and couldn't; the methodology section says why in two lines.
 Signing and encryption protect different hops, and neither one protects the node itself:
 
 ```mermaid
-flowchart LR
-  B[Build: docker build] -->|push index digest| REG[(Registry)]
-  S[cosign sign + attest<br/>SBOM, SLSA provenance] -->|referrer: sigstore bundle| REG
-  ENC[skopeo --encryption-key jwe:pub] -->|layers +encrypted| REG
-  API[kube-apiserver] -->|AdmissionReview| K[Kyverno verifyImages]
-  K -->|1. cache lookup by policy + image ref| C{{verify cache, TTL 60m}}
-  K -->|2. on miss: fetch bundle, verify| REG
-  K -->|3. mutateDigest: resolve tag now| REG
-  API --> KL[kubelet on node]
-  KL --> CT[containerd + ctd-decoder]
-  CT -->|pull ciphertext| REG
-  KEY[/node key: /etc/containerd/ocicrypt/keys/] --> CT
-  CT --> SNAP[(overlayfs snapshots: plaintext)]
-  SNAP --> P[container process: env, memory, mounted secrets]
+flowchart TB
+  subgraph build [Build and publish]
+    B[docker build: OCI index] --> S[cosign sign + attest: SBOM, SLSA provenance]
+    S --> ENC[skopeo --encryption-key: layers +encrypted]
+  end
+  build --> REG[(Registry: image, sigstore bundle referrer, encrypted copy)]
+  subgraph admit [Admission, per pod]
+    K[Kyverno verifyImages] --> C{verify cache hit? key = policy + image ref, TTL 60m}
+    C -- miss --> V[fetch bundle from registry, verify]
+    C -- hit --> M
+    V --> M[mutateDigest: resolve the tag now, pin digest]
+  end
+  REG --> admit
+  subgraph node [Node]
+    KL[kubelet] --> CT[containerd + ctd-decoder, key on local disk]
+    CT --> SNAP[(snapshots: decrypted layers)]
+    SNAP --> P[process: env, memory, mounted Secrets]
+  end
+  admit --> node
 ```
 
 Admission decides *whether* a pod may run, using signatures fetched from the registry.
 Encryption decides *who* can read the layers on the way to the node. Once containerd has
 decrypted them, the plaintext lives on the node's disk and in the process, next to the key that
-decrypted it. Steps 1 and 3 in the diagram are where the surprise below comes from.
+decrypted it. The cache-hit path that skips straight to `mutateDigest` is where the first surprise
+comes from.
 
 ## The lab
 

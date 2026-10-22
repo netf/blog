@@ -126,7 +126,8 @@ const showToc = toc.length > 2;
 	// Mermaid diagrams: load the renderer only on posts that have one.
 	if (document.querySelector('pre.mermaid')) {
 		const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-		import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs').then(
+		const mermaidUrl: string = 'https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs';
+		import(/* @vite-ignore */ mermaidUrl).then(
 			({ default: mermaid }) => {
 				mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral' });
 				mermaid.run({ querySelector: 'pre.mermaid' });
