@@ -81,3 +81,50 @@ matters because Kyverno fetches signatures from inside a pod.
   `ctd-decoder` as containerd's stream processor, with the private key on `supply-worker` only.
 - **The attacker** in part 3 is `docker exec supply-worker`, which on Kind is the same thing as a
   root shell on the node.
+
+## 1. Admission: what the policy actually blocks
+
+### First, my correctly signed image was rejected
+
+cosign v3 changed where signatures go. `cosign sign` now writes a Sigstore bundle
+(`application/vnd.dev.sigstore.bundle.v0.3+json`) as an OCI 1.1 *referrer* of the image. My
+`registry:2.8.3` has no referrers API, so cosign fell back to a tag named after the digest,
+`sha256-<digest>`, with no `.sig` suffix. cosign itself verified the signature and both
+attestations without complaint.
+
+Kyverno, with the policy's `type` left at its default (`Cosign`), denied the image:
+
+```text
+failed to verify image kind-registry:5000/demo/app:v1:
+.attestors[0].entries[0].keys: no signatures found
+```
+
+Setting `cosignOCI11: true` (described in the CRD as "the experimental OCI 1.1 behaviour")
+produced the same error. What worked was `type: SigstoreBundle` on the `verifyImages` entry.
+To make sure that wasn't a policy accepting anything, I changed the expected builder ID in the
+provenance condition and the same image was denied with
+`image attestations verification failed, verifiedCount: 0, requiredCount: 1`.
+
+This failure is the safe kind: a format mismatch fails closed. But if you upgrade cosign in CI
+and not your policies, every newly signed image is denied, and the error message points at your
+signatures rather than at the policy.
+
+### The attack matrix
+
+With `type: SigstoreBundle`, I threw the obvious attacks at it. Each row is one `kubectl run` in
+`prod` (`results/admission/attacks.tsv`):
+
+| Attempt | What the attacker did | Result |
+|---|---|---|
+| Signed image by tag | nothing (control) | allowed |
+| Signed image by digest | nothing (control) | allowed |
+| Unsigned image by tag | pushed `:evil`, never signed | **denied** |
+| Unsigned image by digest | same image, `@sha256:` | **denied** |
+| Transplanted signature | copied v1's valid bundle onto an unsigned image's referrer tag (raw manifest `GET` + `PUT`, HTTP 201) | **denied**: `sigstore bundle verification failed: no matching signatures found` |
+| Repointed tag | overwrote `:v1` so it resolves to the unsigned image | **allowed**, pinned to the unsigned digest |
+| Signed digest after repoint | `@sha256:` of the real v1 | allowed |
+
+Six of seven rows behave the way the brochure says. The bundle binds the digest it signed, so a
+copied signature is useless, and anything referenced by digest can't be swapped underneath you.
+
+The repointed tag is the row from the opening.

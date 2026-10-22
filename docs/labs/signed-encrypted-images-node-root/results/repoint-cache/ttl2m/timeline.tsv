@@ -5,3 +5,5 @@ t=25s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cd
 t=45s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
 t=65s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
 t=85s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+t=106s	poll	ALLOWED	kind-registry:5000/demo/app:v1@sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+t=126s	poll	DENIED	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/evil-6 was blocked due to the following policies   verify
