@@ -262,6 +262,36 @@ The contents are protected as advertised. What's around them isn't:
 - **Sizes are exact.** Ciphertext layers are byte-for-byte the same length as the plaintext ones
   (8,391,419 bytes for the model layer in the final run).
 
+### A node without the key, and a node that already had the layers
+
+Both workers got `ctd-decoder` as containerd's stream processor (`key_model = "node"`); only
+`supply-worker` got the private key. `scripts/23-run-encrypted.sh` wipes every demo image from a
+node and checks that no `model.bin` is left in its snapshots before each case:
+
+| Node | Before the pod | Result |
+|---|---|---|
+| `supply-worker2` (no key) | clean | `ErrImagePull`: `call to DecryptLayer failed: missing private key needed for decryption` |
+| `supply-worker2` (no key) | ran `app-plain:v1` first | **Running**. Pull took 10 ms |
+| `supply-worker` (key) | clean | Running, pull 118 ms |
+
+The second row is because encryption doesn't change the image's identity. Plain and encrypted
+images have the same config blob, so the same `diff_ids` and the same snapshot chain, and the
+10 ms pull is what you'd expect if containerd reused the unpacked snapshots instead of fetching
+and decrypting anything. My first, uncontrolled run of this test had the keyless node running the
+encrypted image too, before I worked out why. A node that has unpacked the plaintext layers, from
+the plain image or from another image that shares them, doesn't need the key for those layers.
+
+The overhead is small. Cold pull and start on the keyed node, clean before every sample, N=10,
+10.9 MB image:
+
+| | pull (kubelet event), median | min-max | create to Ready, median | min-max |
+|---|---|---|---|---|
+| plain | 78 ms | 64-83 | 584 ms | 565-863 |
+| encrypted | 116 ms | 104-129 | 628 ms | 602-645 |
+
+About 38 ms more to pull and 44 ms more to Ready, at this size. I only tested this one 10.9 MB
+image, so I don't know how the gap scales with multi-gigabyte layers.
+
 ## Appendix A: Methodology
 
 - **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
