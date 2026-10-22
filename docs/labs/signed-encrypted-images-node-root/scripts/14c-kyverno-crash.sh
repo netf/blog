@@ -17,4 +17,3 @@ try_pod crash-unsigned kind-registry:5000/demo/app:evil
 echo -e "#\tresource-webhooks-after-try\t$(hooks)"
 } | tee "$OUT/kyverno-crash.tsv"
 kubectl -n kyverno rollout status deploy/kyverno-admission-controller --timeout=180s >/dev/null
-kubectl -n kyverno get pod "$POD" -o jsonpath='{.status.containerStatuses[0].restartCount}{"\n"}' > "$OUT/kyverno-crash-restarts.txt"
