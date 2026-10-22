@@ -447,10 +447,10 @@ turn it off if tags are allowed anywhere; if every reference is a digest, the ca
      disk; deleting the pod didn't.
 
 What none of this fixes is the root user on a node reading the memory and disk of a running
-workload. That needs the workload to be opaque to the node it runs on: a confidential VM or
-Confidential Containers, where the decryption key is released only after the guest proves what
-it is. That's part 2. It needs hardware this Firecracker VM doesn't have, so I'll be running it
-somewhere that does, and I'll redo the twelve steps above against it.
+workload. The pitch for Confidential Containers is that the workload runs in a hardware-isolated
+guest the node can't read, and the image key goes to the guest, not the node. I haven't tested any
+of that yet. Part 2 runs it on hardware that has SEV-SNP or TDX, which this Firecracker VM doesn't,
+and repeats the twelve steps above to see which ones still work.
 
 ## Appendix A: Methodology
 
@@ -465,9 +465,38 @@ somewhere that does, and I'll redo the twelve steps above against it.
   hits `kernel BUG at arch/x86/kvm/x86.c:702` (`kvm_spurious_fault`). Confidential Containers
   needs a working nested hypervisor at minimum, so it's part 2, on different hardware. This lab
   ran no KVM, QEMU or Kata probes.
-- **Runs.** Parts 1 and the stolen-copy test ran on two blank VMs (2026-10-15 and 2026-10-22),
+- **Runs.** Part 1 and the stolen-copy test ran on two blank VMs (2026-10-15 and 2026-10-22),
   with different keys and digests and the same outcomes. The node-side encryption tests and the
   node-root attack ran on the second VM. Tables show the second run unless marked.
 - **Timing.** Admission latency is client wall time of `kubectl create --dry-run=server`, so it
   includes about 66 ms of client and API-server overhead that's present in every case.
   Node-root steps are timed around each `docker exec`, which adds its own startup cost.
+
+## Appendix B: Versions, workarounds and evidence
+
+Ubuntu 24.04 VM (Firecracker), kernel 6.12.94+, 4 vCPU. Docker 29.9.2 (29.9.1 on the first
+run), Kind v0.33.0, `kindest/node:v1.37.0@sha256:a1ed56cf…`, containerd 2.3.4, kubectl v1.37.1,
+Helm v3.22.0, Kyverno v1.19.1 (chart 3.9.1), cosign v3.1.3, syft v1.54.1, skopeo 1.13.3, imgcrypt
+v2.0.3 built with Go 1.26.9, `registry:2.8.3`, gdb 15.1. Exact output in `results/versions.txt`.
+
+Environment workarounds, none of which change what's measured (`environment.md`): `dockerd`
+started by hand because PID 1 isn't systemd; the Docker socket made world-writable on this
+throwaway VM; the Istio lab's legacy-iptables `FORWARD` fix for Kind bridge traffic.
+
+Mistakes I made along the way, kept in `results/` so you can see them:
+
+- `results/admission-exploratory/`: the first signing run, before I knew Docker pushes an OCI
+  index. `skopeo copy` without `--all` silently "restored" `:v1` to the unsigned platform
+  manifest instead of the signed index.
+- `results/repoint-cache/off-bool-dropped-by-chart/`: the cache-off run where Helm dropped the
+  flag.
+- `results/registry-down-stopstart/`: `docker stop`/`start` left Kyverno with `dial tcp` errors
+  after the restart, so I switched to `docker pause`.
+- `results/registry-down/results-audit-not-applied.tsv`: my policy helper swallowed Kyverno's
+  rejection of the Audit policy, so that "Audit" run was really Enforce. The helper now aborts.
+
+Reproduce everything from a blank Ubuntu VM:
+
+```bash
+cd docs/labs/signed-encrypted-images-node-root && ./reproduce.sh
+```
