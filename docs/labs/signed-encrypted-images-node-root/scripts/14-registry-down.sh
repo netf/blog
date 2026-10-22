@@ -6,7 +6,11 @@ source "$(dirname "$0")/lib.sh"
 OUT="$LAB/results/registry-down"; mkdir -p "$OUT"
 R=kind-registry:5000/demo/app
 P="$LAB/manifests/policy-verify.yaml"
-reg() { docker "$1" kind-registry >/dev/null; [ "$1" = start ] && sleep 3; }
+# pause/unpause rather than stop/start: after a docker start, Kyverno still got
+# "dial tcp" errors for the next admission, which confounded the warm-cache test.
+# A paused registry keeps its address and answers nothing.
+reg() { case $1 in stop) docker pause kind-registry >/dev/null ;;
+                   start) docker unpause kind-registry >/dev/null; sleep 2 ;; esac; }
 {
 kyverno_mode default; apply_policy "$P" type=SigstoreBundle 2>/dev/null
 reg stop;  try_pod regdown-cold "$R:v1"; reg start
