@@ -123,6 +123,16 @@ const showToc = toc.length > 2;
 </Base>
 
 <script>
+	// Mermaid diagrams: load the renderer only on posts that have one.
+	if (document.querySelector('pre.mermaid')) {
+		const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.esm.min.mjs').then(
+			({ default: mermaid }) => {
+				mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral' });
+				mermaid.run({ querySelector: 'pre.mermaid' });
+			},
+		);
+	}
 	// CodeBlock copy buttons (the bar itself is built at build time).
 	if (navigator.clipboard) {
 		for (const button of document.querySelectorAll<HTMLButtonElement>('.code-copy')) {
