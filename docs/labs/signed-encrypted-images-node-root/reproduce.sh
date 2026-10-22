@@ -11,7 +11,7 @@ s 11b-format-compat.sh; s 12-attacks.sh
 s 13-repoint-cache.sh ttl2m
 LIMIT=25 STEP=10 s 13-repoint-cache.sh off
 [ "${DEFAULT_TTL:-0}" = 1 ] && LIMIT=660 STEP=120 s 13-repoint-cache.sh default
-s 14-registry-down.sh; s 14b-failure-modes.sh; s 14c-kyverno-crash.sh; s 15-latency.sh
+s 14-registry-down.sh; s 14b-failure-modes.sh; s 14c-kyverno-crash.sh; s 14d-two-replicas.sh; s 15-latency.sh
 s 20-encrypt.sh; s 21-stolen-copy.sh; s 22-node-keys.sh; s 23-run-encrypted.sh
 s 30-node-root.sh
 echo "done: results/ refreshed"

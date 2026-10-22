@@ -1,0 +1,10 @@
+#	replicas	2
+#	resource-webhooks-before	2
+#	resource-webhooks-after-1s-more	2
+two-rep-unsigned-1	DENIED	62	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/two-rep-unsigned-1 was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 
+#	resource-webhooks-after-2s-more	2
+two-rep-unsigned-2	DENIED	54	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/two-rep-unsigned-2 was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 
+#	resource-webhooks-after-5s-more	2
+two-rep-unsigned-5	DENIED	57	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/two-rep-unsigned-5 was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 
+#	resource-webhooks-after-10s-more	2
+two-rep-unsigned-10	DENIED	55	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/two-rep-unsigned-10 was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 

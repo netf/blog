@@ -258,6 +258,10 @@ so `failurePolicy: Fail` had nothing to apply to and the unsigned pod was admitt
 5 to 10 seconds after the new pod was ready. A crash leaves the webhooks in place, and those fail
 closed. So the dangerous outage is the polite one. I only tested `kubectl scale`; I'd expect anything
 else that stops a single replica gracefully, such as draining its node, to behave the same.
+With `admissionController.replicas=2`, gracefully deleting one of the two pods left both webhooks
+in place, and unsigned pods were denied at 1, 2, 5 and 10 seconds into the shutdown
+(`scripts/14d-two-replicas.sh`). The chart prints a warning about running fewer than two replicas
+at install. It's worth taking literally.
 
 ## 2. Encrypted layers: what a stolen registry gets you
 
