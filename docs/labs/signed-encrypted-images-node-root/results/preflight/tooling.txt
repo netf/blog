@@ -1,21 +1,23 @@
 
 ## docker
-client 29.9.1 server 29.9.1
+client 29.9.2 server 29.9.2
  Storage Driver: overlayfs
  Cgroup Driver: cgroupfs
  Cgroup Version: 2
- Runtimes: runc io.containerd.runc.v2
+ Runtimes: io.containerd.runc.v2 runc
  Docker Root Dir: /var/lib/docker
 
 ## iptables
 iptables v1.8.10 (nf_tables)
 -P FORWARD DROP
--A FORWARD -j DOCKER-USER
--A FORWARD -j DOCKER-FORWARD
+-A FORWARD -o br-4531c37645b9 -j ACCEPT
+-A FORWARD -i br-4531c37645b9 -j ACCEPT
 table ip nat
 table ip filter
 table ip6 nat
 table ip6 filter
+table ip raw
+table ip6 raw
 
 ## tools
 kind v0.33.0 go1.26.7 linux/amd64

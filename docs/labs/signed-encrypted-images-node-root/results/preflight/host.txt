@@ -2,13 +2,13 @@
 ## compute
 4
                total        used        free      shared  buff/cache   available
-Mem:            15Gi        10Gi       2.4Gi        17Mi       2.7Gi       4.8Gi
+Mem:            15Gi       8.9Gi       2.3Gi        45Mi       4.9Gi       6.8Gi
 Swap:             0B          0B          0B
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/vdb        254G  8.0G  246G   4% /
+/dev/vdc        254G   15G  239G   6% /
 kvm
-MemTotal:       16387332 kB
-MemAvailable:    5019620 kB
+MemTotal:       16387280 kB
+MemAvailable:    7097764 kB
 
 ## kernel
 6.12.94+
@@ -16,7 +16,6 @@ cgroup2fs
 cpuset cpu io memory hugetlb pids
 
 ## modules
-ls: cannot access '/lib/modules': No such file or directory
 0
 nf_conntrack
 overlay

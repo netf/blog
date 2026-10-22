@@ -28,7 +28,7 @@ ls: cannot access '/dev/vhost-vsock': No such file or directory
 ls: cannot access '/dev/vhost-net': No such file or directory
 ls: cannot access '/dev/sev': No such file or directory
 ls: cannot access '/dev/tdx_guest': No such file or directory
-crw-rw---- 1 root 103 10, 232 Oct 15 11:42 /dev/kvm
+crw-rw---- 1 root 103 10, 232 Oct 21 07:00 /dev/kvm
 
 ## dmesg-boot-hints
 [    0.000000] Hypervisor detected: KVM
