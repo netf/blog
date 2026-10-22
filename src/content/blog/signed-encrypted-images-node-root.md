@@ -182,3 +182,29 @@ the boolean `false`, the `if` drops it, and the cache stays on. No warning; the 
 still admitted in that run (`results/repoint-cache/off-bool-dropped-by-chart/`). Pass it as a
 string with `--set-string`, then check that `--imageVerifyCacheEnabled=false` is actually in the
 container args.
+
+## 2. Encrypted layers: what a stolen registry gets you
+
+`skopeo copy --encryption-key jwe:enc-pub.pem` re-wrote both layers as
+`application/vnd.oci.image.layer.v1.tar+gzip+encrypted`. Each layer gets a random symmetric key
+(`AES_256_CTR_HMAC_SHA256`, per the layer's `pubopts` annotation), and that key is wrapped with
+my RSA public key into a 1,460-character `org.opencontainers.image.enc.keys.jwe` annotation.
+
+Then I played someone who has read access to the registry, or a copy of its storage, and no
+private key (`scripts/21-stolen-copy.sh`):
+
+| | plain copy | encrypted copy |
+|---|---|---|
+| `tar tzf` on each layer blob | lists `demoapp`, `opt/model/model.bin` | `gzip: stdin: not in gzip format` |
+| marker found after `gunzip` | 1 | **0** |
+
+The contents are protected as advertised. What's around them isn't:
+
+- **The image config is plaintext, and it's the same blob.** The encrypted image points at the
+  identical config digest as the plain one. It shows the entrypoint, the user (`65532:65532`)
+  and the build history, including `COPY model.bin /opt/model/model.bin # buildkit`.
+- **`diff_ids` are hashes of the plaintext.** The config's `rootfs.diff_ids` equal the SHA-256
+  of each *decrypted* layer tar; I checked both against the plain image. If an attacker can guess
+  a layer (a public base image, last quarter's model), they can confirm the guess without the key.
+- **Sizes are exact.** Ciphertext layers are byte-for-byte the same length as the plaintext ones
+  (8,391,419 bytes for the model layer in the final run).
