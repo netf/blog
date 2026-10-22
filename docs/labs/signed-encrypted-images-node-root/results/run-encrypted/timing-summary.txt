@@ -1,0 +1,2 @@
+app-plain  n=10 pull ms median=78 min=64 max=83 | ready ms median=584 min=565 max=863 | left_on_disk={'0'}
+app-enc    n=10 pull ms median=116 min=104 max=129 | ready ms median=628 min=602 max=645 | left_on_disk={'0'}
