@@ -32,4 +32,13 @@ jq -r '.layers[0].annotations | to_entries[] | "\(.key) (\(.value | length) char
 echo "== pubopts (base64 JSON):"
 jq -r '.layers[0].annotations["org.opencontainers.image.enc.pubopts"]' "$W/app-enc.manifest.json" | base64 -d; echo
 } | tee "$OUT/leaks.txt"
+
+# The config blob is shared and plaintext: its diff_ids are sha256 of the
+# *decrypted* layer tars, so a guessed plaintext layer can be confirmed.
+{
+for img in app-plain app-enc; do
+  echo "$img config=$(jq -r .config.digest "$W/$img.manifest.json") diff_ids=$(jq -c .rootfs.diff_ids "$W/$img.config.json")"
+done
+for b in "$W"/app-plain.*.blob; do echo "sha256(gunzip($(basename "$b")))=sha256:$(gzip -dc "$b" | sha256sum | cut -d' ' -f1)"; done
+} | tee "$OUT/diff-ids.txt"
 rm -rf "$W"
