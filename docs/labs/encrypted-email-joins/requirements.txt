@@ -1,0 +1,8 @@
+tink==1.16.1
+protobuf==7.36.2
+duckdb==2.0.0
+pyarrow==26.0.0
+adbc-driver-manager==1.12.0
+adbc-driver-postgresql==1.12.0
+psycopg[binary]==3.3.6
+psutil==7.2.2
