@@ -11,3 +11,4 @@ helm upgrade --install kyverno kyverno/kyverno --version 3.9.1 -n kyverno --crea
   --wait --timeout 6m
 kubectl -n kyverno get pods -o wide
 kubectl -n kyverno get deploy -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.spec.template.spec.containers[0].image}{"\n"}{end}'
+kubectl create ns prod --dry-run=client -o yaml | kubectl apply -f - >/dev/null

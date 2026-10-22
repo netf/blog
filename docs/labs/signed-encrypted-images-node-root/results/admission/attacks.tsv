@@ -1,10 +1,10 @@
-control-signed-tag	ALLOWED	99	pod/control-signed-tag created 
-control-signed-digest	ALLOWED	84	pod/control-signed-digest created 
-unsigned-tag	DENIED	46	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/unsigned-tag was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app:evil: .attestors[0].entries[0].keys: sigstore bundle verification failed: no matching signatures found' 
-unsigned-digest	DENIED	39	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/unsigned-digest was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app@sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114: .attestors[0].entries[0].keys: sigstore bundle verificatio
+control-signed-tag	DENIED	100	Error from server (NotFound): namespaces "prod" not found 
+control-signed-digest	DENIED	89	Error from server (NotFound): namespaces "prod" not found 
+unsigned-tag	DENIED	87	Error from server (NotFound): namespaces "prod" not found 
+unsigned-digest	DENIED	89	Error from server (NotFound): namespaces "prod" not found 
 #	transplant PUT	201
-transplanted-signature	DENIED	57	Error from server: admission webhook "mutate.kyverno.svc-fail" denied the request:   resource Pod/prod/transplanted-signature was blocked due to the following policies   verify-lab-images:   signed-with-sbom-and-provenance: 'failed to verify image kind-registry:5000/demo/app@sha256:1b04a9ae8bdc90da6582eddbc2931381d89f0534d944ea4381b06c1b03e9426e: .attestors[0].entries[0].keys: sigstore bundle veri
-#	v1 now resolves to	sha256:88e2f3c109deaac2f7539489aa305000259a34014e560467148bd57d7e06c114
-repointed-tag	ALLOWED	45	pod/repointed-tag created 
-repoint-pinned-digest	ALLOWED	43	pod/repoint-pinned-digest created 
-restored-tag	ALLOWED	43	pod/restored-tag created 
+transplanted-signature	DENIED	89	Error from server (NotFound): namespaces "prod" not found 
+#	v1 now resolves to	sha256:a843920c96347159e1b88cdae7963fc6046a06a9108a0549b2feccd44f502a2a
+repointed-tag	DENIED	87	Error from server (NotFound): namespaces "prod" not found 
+repoint-pinned-digest	DENIED	87	Error from server (NotFound): namespaces "prod" not found 
+restored-tag	DENIED	87	Error from server (NotFound): namespaces "prod" not found 
