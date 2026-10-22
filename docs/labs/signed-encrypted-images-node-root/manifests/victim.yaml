@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Secret
+metadata: {name: db-creds, namespace: enc}
+stringData:
+  password: "s3cr3t-db-password-4b1d"
+---
+apiVersion: v1
+kind: Secret
+metadata: {name: unrelated-secret, namespace: enc}
+stringData:
+  token: "not-mounted-on-any-pod-9e2c"
+---
+apiVersion: v1
+kind: Pod
+metadata: {name: victim, namespace: enc}
+spec:
+  nodeName: supply-worker
+  containers:
+  - name: app
+    image: kind-registry:5000/demo/app-enc:v1
+    env:
+    - {name: APP_SECRET, value: "env-secret-value-77aa"}
+    volumeMounts:
+    - {name: creds, mountPath: /var/run/creds, readOnly: true}
+  volumes:
+  - name: creds
+    secret: {secretName: db-creds}
