@@ -358,6 +358,69 @@ Secrets, not the cluster's.
 Signing didn't help here at all, and wasn't meant to. It answers "is this the image I built?",
 which is already settled by the time an attacker is reading `/proc`.
 
+## What I'd do on Monday
+
+Each setting below ran in the lab (the two Helm flags in separate runs), minus the lab-only
+`allowInsecure`. Kyverno install:
+
+```bash
+helm upgrade --install kyverno kyverno/kyverno --version 3.9.1 -n kyverno --create-namespace \
+  --set admissionController.replicas=2 \
+  --set-string admissionController.container.extraArgs.imageVerifyCacheEnabled=false
+# then check the flag really reached the container:
+kubectl -n kyverno get deploy kyverno-admission-controller \
+  -o jsonpath='{.spec.template.spec.containers[0].args}' | tr ',' '\n' | grep imageVerifyCache
+```
+
+The policy for images signed by cosign v3 with a key (full file:
+`manifests/policy-verify.yaml`):
+
+```yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-lab-images
+spec:
+  webhookTimeoutSeconds: 15
+  failurePolicy: Fail
+  rules:
+  - name: signed-with-sbom-and-provenance
+    match:
+      any:
+      - resources: {kinds: [Pod], namespaces: [prod]}
+    verifyImages:
+    - type: SigstoreBundle          # cosign v3 bundles; the default (Cosign) finds nothing
+      imageReferences: ["kind-registry:5000/*"]
+      failureAction: Enforce
+      mutateDigest: true
+      verifyDigest: true
+      required: true
+      attestors:
+      - entries:
+        - keys:
+            publicKeys: |-
+              -----BEGIN PUBLIC KEY-----
+              ...
+              -----END PUBLIC KEY-----
+            rekor: {ignoreTlog: true}
+            ctlog: {ignoreSCT: true}
+      attestations:
+      - type: https://cyclonedx.org/bom
+        attestors: [ ...same key... ]
+      - type: https://slsa.dev/provenance/v1
+        attestors: [ ...same key... ]
+        conditions:
+        - all:
+          - key: "{{ runDetails.builder.id }}"
+            operator: Equals
+            value: https://netf.io/lab/builder/laptop
+```
+
+And in the manifests, `image: registry/app@sha256:…`, not `:v1`. By digest, the repoint and the
+cache window didn't matter, and with a warm cache the pod was admitted through a registry outage.
+Turning the cache off gives that last part up: every admission then needs the registry. I'd still
+turn it off if tags are allowed anywhere; if every reference is a digest, the cache is harmless.
+
 ## Appendix A: Methodology
 
 - **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
