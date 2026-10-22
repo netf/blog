@@ -60,3 +60,24 @@ Admission decides *whether* a pod may run, using signatures fetched from the reg
 Encryption decides *who* can read the layers on the way to the node. Once containerd has
 decrypted them, the plaintext lives on the node's disk and in the process, next to the key that
 decrypted it. Steps 1 and 3 in the diagram are where the surprise below comes from.
+
+## The lab
+
+One Kind cluster (`supply`: a control plane and two workers, Kubernetes v1.37.0, containerd
+2.3.4) on a 4-vCPU VM, plus a plain-HTTP `registry:2.8.3` on the Kind network at
+`kind-registry:5000`. The same name resolves on the host, on the nodes and inside pods, which
+matters because Kyverno fetches signatures from inside a pod.
+
+- **The app** is a 5.8 MB (5,767,330-byte) static Go binary in a `scratch` image, plus an 8 MiB "proprietary
+  model" file whose first line is `PROPRIETARY-MODEL-MARKER-7f3a9c`. That marker is how I check
+  later whether someone can read the image. The app copies `APP_SECRET` from its environment
+  into a package variable, so the secret also lives in its heap.
+- **Signing:** cosign v3.1.3 with a local key pair, no Fulcio and no Rekor. syft v1.54.1 makes
+  the CycloneDX SBOM; the SLSA v1 provenance predicate is hand-written and names a builder ID
+  the policy checks.
+- **Admission:** Kyverno v1.19.1 (chart 3.9.1), one `ClusterPolicy` scoped to namespace `prod`
+  that requires the signature and both attestations and rewrites tags to digests.
+- **Encryption:** skopeo 1.13.3 `--encryption-key jwe:` (RSA-4096) and imgcrypt v2.0.3's
+  `ctd-decoder` as containerd's stream processor, with the private key on `supply-worker` only.
+- **The attacker** in part 3 is `docker exec supply-worker`, which on Kind is the same thing as a
+  root shell on the node.
