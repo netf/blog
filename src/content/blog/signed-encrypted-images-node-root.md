@@ -407,94 +407,37 @@ cluster's.
 Signing didn't help here at all, and wasn't meant to. It answers "is this the image I built?",
 which is already settled by the time an attacker is reading `/proc`.
 
-## What I'd do on Monday
+## How to think about your own cluster
 
-Each setting below ran in the lab, including the two Helm flags (in separate runs), minus the
-lab-only `allowInsecure`.
+The numbers above come from my cluster. Four questions tell you whether the same gaps exist in
+yours.
 
-**1. Enforce by digest, not by tag.** In every manifest, use `image: registry/app@sha256:…`, not
-`:v1`. By digest, the repoint and the cache window didn't matter, and with a warm cache the pod
-was still admitted through a registry outage.
-
-**2. If tags are allowed anywhere, turn the verification cache off.** That closes the window, at
-the cost of needing the registry on every admission.
+**Does every image reference a digest?** If every manifest uses `@sha256:…`, the repoint attack
+and the cache window don't apply. One tag anywhere reopens both. List the tags still in use:
 
 ```bash
-helm upgrade --install kyverno kyverno/kyverno --version 3.9.1 -n kyverno --create-namespace \
-  --set admissionController.replicas=2 \
-  --set-string admissionController.container.extraArgs.imageVerifyCacheEnabled=false
-# then check the flag really reached the container:
-kubectl -n kyverno get deploy kyverno-admission-controller \
-  -o jsonpath='{.spec.template.spec.containers[0].args}' | tr ',' '\n' | grep imageVerifyCache
+kubectl get pods -A \
+  -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' \
+  | grep -v '@sha256'
 ```
 
-If every reference is a digest, the cache is harmless. If you keep it, know that a tag can be
-admitted for up to its TTL after the last successful verification.
+**Would a freshly signed image pass your policy today?** Sign a throwaway image with the cosign
+version your CI uses and try to run it in a staging namespace. If it is denied with
+`no signatures found`, the policy is still looking for the old signature format. One pod at
+build time is cheaper than finding out after a cosign bump.
 
-**3. Run two admission replicas.** With one, a graceful shutdown deregistered the webhooks and
-`failurePolicy: Fail` protected nothing. With two, a graceful shutdown of one didn't open a gap.
-Don't treat Audit mode as a fail-open safety valve: it admits unsigned images, forbids digest
-pinning, and still denies on registry timeouts.
+**Does admission fail closed when it shuts down politely?** `failurePolicy: Fail` only applies
+while the webhooks exist. Scale the controller to zero, submit an unsigned pod, then scale back.
+If the pod runs, the webhooks left with the controller. Run at least two replicas and repeat the
+test by deleting one pod during a rollout.
 
-**4. Test your policy against your current cosign.** A version bump in CI silently changed the
-signature format, and the default `verifyImages` config couldn't see it. One pod with a fresh
-signature in staging catches this before production does. The policy that worked here:
-
-```yaml
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
-metadata:
-  name: verify-lab-images
-spec:
-  webhookTimeoutSeconds: 15
-  failurePolicy: Fail
-  rules:
-  - name: signed-with-sbom-and-provenance
-    match:
-      any:
-      - resources: {kinds: [Pod], namespaces: [prod]}
-    verifyImages:
-    - type: SigstoreBundle          # cosign v3 bundles; the default (Cosign) finds nothing
-      imageReferences: ["kind-registry:5000/*"]
-      failureAction: Enforce
-      mutateDigest: true
-      verifyDigest: true
-      required: true
-      attestors:
-      - entries:
-        - keys:
-            publicKeys: |-
-              -----BEGIN PUBLIC KEY-----
-              ...
-              -----END PUBLIC KEY-----
-            rekor: {ignoreTlog: true}
-            ctlog: {ignoreSCT: true}
-      attestations:
-      - type: https://cyclonedx.org/bom
-        attestors: [ ...same key... ]
-      - type: https://slsa.dev/provenance/v1
-        attestors: [ ...same key... ]
-        conditions:
-        - all:
-          - key: "{{ runDetails.builder.id }}"
-            operator: Equals
-            value: https://netf.io/lab/builder/laptop
-```
-
-**5. Keep the decryption key off nodes that don't need it.** The keyless node couldn't pull a
-clean encrypted image. Treat layer encryption as protection for the registry, not the node: it
-kept the model out of a stolen copy at about 40 ms per pull, but it didn't hide build history,
-`diff_ids` or sizes, and it didn't stop a keyless node that already had the plaintext layers.
-
-**6. Assume root on a node owns everything scheduled there.** In 8.3 seconds it got the key, the
-plaintext image (on disk after the pod was gone), environment and mounted secrets, and process
-memory. What it didn't get was a Secret that no pod on that node mounted. So the levers that work
-today are about *placement*:
-
-- **Keep sensitive pods and their Secrets on dedicated nodes**, because the kubelet identity
-  reads exactly the Secrets of the pods it runs.
-- **Remove images you no longer run.** `crictl rmi` is what took the plaintext `model.bin` off
-  disk; deleting the pod didn't.
+**What can root on one node read?** On a node, `ls /etc/containerd/ocicrypt/keys/` tells you
+whether the image key is there, and the snapshotter directory
+(`/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/`) tells you whether
+decrypted layers are. If either is present, root on that node is inside every image it has run,
+whatever admission allowed. That is where placement matters: keep the key off nodes that don't
+need it, keep sensitive pods on their own nodes, and remove images you no longer run. `crictl
+rmi` is what took the plaintext model off disk; deleting the pod didn't.
 
 ## The question this leaves open
 
