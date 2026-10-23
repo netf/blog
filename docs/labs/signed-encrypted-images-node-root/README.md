@@ -1,7 +1,7 @@
 # Lab: signed and encrypted images vs root on the node
 
 Reproduction kit for the post
-[I signed and encrypted every image. Then I logged into the node as root](../../../src/content/blog/signed-encrypted-images-node-root.md).
+[Securing our container supply chain](../../../src/content/blog/signed-encrypted-images-node-root.md).
 Every number in the post comes from `results/`, produced by these scripts.
 
 ## Run it
