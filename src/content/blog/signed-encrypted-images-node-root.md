@@ -1,499 +1,410 @@
 ---
-title: 'I signed and encrypted every image. Then I logged into the node as root'
-description: 'What signing, attestations, admission policies and encrypted layers actually buy you — measured on a real cluster, then attacked with root on one node.'
+title: 'I signed and encrypted every image. Then I logged in as root and read everything.'
+description: 'What image signing, attestations, admission policies and encrypted layers actually protect — measured on a real cluster, then attacked from the inside.'
 pubDate: 2026-10-22
 updatedDate: 2026-10-23
 tags: ['kubernetes', 'security', 'supply-chain', 'cosign', 'kyverno']
 ---
 
-The pod that got past my admission policy printed `EVIL secret-len=16`.
+There is a checklist that security teams hand out for container images, and it sounds convincing.
 
-That string came from me. I built a deliberately bad version of a small Go service, pushed it to
-my own registry without signing it, and moved the `:v1` tag onto it. The policy in front of the
-cluster requires a cosign signature, a CycloneDX SBOM and a SLSA provenance attestation from my
-key before anything can run in `prod`. A few seconds earlier it had denied that exact image by
-digest. Under the tag, it let it in, pinned it to the bad digest, and the pod started with
-`APP_SECRET` sitting in its environment.
+Sign every image, so you can prove where it came from. Add attestations, so you can prove how it
+was built. Encrypt the layers, so that a stolen copy of your registry is useless. Then put a
+policy in front of the cluster that refuses anything that doesn't match.
 
-Nothing errored. The policy reported Ready the whole time.
+Do all of that, the reasoning goes, and your software supply chain is safe.
 
-That is a shorter answer than most teams expect to the question they ask after hardening a
-Kubernetes supply chain: **if I sign everything and encrypt the layers, what is actually left to
-protect?**
+I wanted to know what "safe" means in practice. So I built the whole stack on a small test
+cluster — a five-megabyte service, a fake proprietary model, a private registry, and the same
+tools a real team would use — and then I attacked it. First from the outside, the way an
+intruder would. Then from inside, with root on one of the machines.
 
-Less than you'd think, and not the part you'd guess. Signing and encryption protect the image on
-its way to the cluster. Neither one protects the machine that runs it.
+The front door held. The back door was open, and walking through it took eight seconds.
 
-So I built the whole stack on a Kind cluster and then attacked it. Three questions:
+That is not an argument against signing or encryption. Both did exactly what they promise. The
+problem is that we have quietly stretched "supply chain security" to cover something the tools
+never claimed: the machine that runs your code.
 
-1. **Does admission enforcement block what it claims to?** Unsigned images, tampered signatures,
-   a moved tag, a registry outage. How many get through, and what does verification cost per pod?
-2. **What does layer encryption buy you?** A stolen copy of the registry, a node without the key,
-   and the pull and start overhead compared with a plain image.
-3. **What does root on one node get an attacker?** Decrypted image contents, process secrets,
-   memory, the decryption key. Exact commands, timed.
+## What I found
 
-Same rule as last time: **if I didn't observe it, it isn't here.** Scripts and raw output are in
-[`docs/labs/signed-encrypted-images-node-root/`](https://github.com/netf/blog/tree/main/docs/labs/signed-encrypted-images-node-root),
-and `./reproduce.sh` rebuilds everything from a blank VM.
+**Signing works.** Unsigned images were refused. A valid signature copied onto a different image
+was refused. So was every other forgery I tried. Checking a signature plus two attestations added
+about 43 milliseconds per pod.
 
-This is part 1 of 2. Part 2 is about the obvious fix for question 3, confidential containers and
-TEEs. I meant to test them here and couldn't; the methodology at the end explains why in two lines.
+**A tag is the crack in the wall.** The policy checks the name you wrote in the manifest. If that
+name is a tag like `:v1`, the cluster can verify one image and then run another, because the tag
+can be moved after the check. By default it remembers the tag, not the image, for up to an hour.
+I moved a tag and got an unsigned image into production.
 
-## The short version
+**Encryption protects the registry, not the machine.** A stolen copy of my registry was
+unreadable, as promised. But the image's configuration, build history and layer hashes were
+still readable. And a machine that had already run the unencrypted version could run the
+encrypted one without the key.
 
-- **The signature checks themselves are solid.** Unsigned images, by tag or digest, and a valid
-  signature copied onto another image were all denied. Verifying a signature plus two
-  attestations cost 43 ms per pod at the median, against a registry on the same network.
-- **cosign v3 and Kyverno's defaults don't agree on where signatures live.** A correctly signed
-  image was denied with `no signatures found` until I set `type: SigstoreBundle`.
-- **A moved tag keeps its old verification.** Kyverno caches "verified" against the tag string,
-  not the digest, for up to 60 minutes by default. Point the tag at an unsigned image and the
-  next pod is admitted anyway. With a 2-minute cache the window was 104 to 106 seconds. Digest
-  references and a disabled cache both closed it.
-- **Kyverno fails closed when it crashes and open when it is stopped politely.** After a graceful
-  scale-down its webhooks were gone within 2 seconds, and an unsigned pod was admitted.
-- **Encrypted layers protect the registry, not the node.** A stolen copy hid the model, but the
-  image config, build history, `diff_ids` and exact layer sizes stayed readable. A node without
-  the key couldn't pull the image — unless it had already unpacked the plaintext layers, in which
-  case it started in 10 ms.
-- **Root on the node got everything on that node in 8.3 seconds:** the environment secret, the
-  mounted Secret, the decrypted model on disk (still there after the pod was deleted), the
-  decryption key, a decrypted copy of the registry image, and a memory dump. It could not read a
-  Secret that no pod on that node mounts.
+**Root on a machine owns everything on it.** In 8.3 seconds I read the application's environment
+secrets, a mounted password, the decrypted model on disk, the decryption key, and a copy of the
+process's memory. The only thing I could not read was a Secret belonging to a pod that was not
+running there.
 
-## What each layer protects, and what it doesn't
+**A polite shutdown is a security hole.** When I shut the policy engine down the normal way, it
+took its enforcement with it, and unsigned pods ran. When I killed it abruptly, it failed safe.
 
-It helps to separate what each piece actually promises, because the promises are narrower than
-the names suggest.
+## What each piece is supposed to do
 
-| Piece | What it does | What it does not do |
+Five different things usually travel together under the name "supply chain security". They solve
+different problems, and keeping them apart makes the rest of this post easier to follow.
+
+A **signature** is a wax seal. It proves that the image came from the key you trust and that
+nobody changed it on the way. An **attestation** is the same idea applied to facts about the
+build: this SBOM lists the libraries, this provenance record says which builder produced it.
+
+A **digest reference** is an image's fingerprint rather than its name. `:v1` is a label that
+someone can move; `@sha256:…` always means those exact bytes.
+
+An **admission policy** is the guard at the door. Before a pod starts, the guard asks the
+registry for the signature and refuses the pod if it doesn't match.
+
+**Encrypted layers** are a locked case. Anyone can take the case from the registry, but only
+someone with the key can open it, so a stolen copy of the registry is not a stolen copy of your
+software.
+
+The **machine running the container** is the building. Everything above is about getting the
+right package through the door. None of it says much about what happens once the package is
+inside and opened.
+
+That distinction is the whole story of this post:
+
+| The piece | What it promises | What I actually found |
 |---|---|---|
-| cosign signature and attestations | Proves the image was built by my key and matches the SBOM and provenance I signed | Does not stop a tag from being moved to a different, unsigned digest |
-| Digest references | Fix the exact bytes a pod receives | Only if every manifest uses them; one tag anywhere reopens the gap |
-| Kyverno admission | Decides whether a pod may run, and can rewrite tags to digests | Does not survive a graceful shutdown with one replica; caches per tag, not per digest |
-| Layer encryption | Keeps layer contents out of a stolen registry copy | Does not hide the image config, build history, `diff_ids` or sizes; does not protect the node |
-| The node boundary | Limits the kubelet identity to Secrets mounted by pods on that node | Does not survive root on that node |
+| Signature and attestations | "This is the image I built, and I can prove how." | Held. Every unsigned or copied signature was rejected. |
+| Digest reference | "Exactly these bytes, and no others." | Held when used. Tags are the way around it. |
+| Admission policy | "Nothing runs unless it matches." | Held until the policy is unavailable, or the tag moves. |
+| Layer encryption | "A stolen registry copy is unreadable." | Held for the contents. Everything around them stayed readable. |
+| The machine boundary | "Workloads are separated from each other." | Held for the Kubernetes API. Not for root on the machine. |
 
-The short version: **signing answers "is this the image I built?" Encryption answers "who can
-read these layers on the way to the node?" Neither answers "who can read them once they are
-running?"**
+The rest of this post is the evidence for that table.
 
-## How the pieces fit
+## The setup
 
-Signing and encryption protect different hops, and neither one protects the node itself:
+Everything ran on one Kind cluster — Kubernetes running inside Docker on a single four-core
+virtual machine — with a control plane and two workers. A private registry lived on the same
+network, reachable by the same name from the host, the machines and the pods. That last part
+matters, because the policy engine fetches signatures from inside a pod.
 
-```mermaid
-flowchart TB
-  subgraph build [Build and publish]
-    B[docker build: OCI index] --> S[cosign sign + attest: SBOM, SLSA provenance]
-    S --> ENC[skopeo --encryption-key: layers +encrypted]
-  end
-  build --> REG[(Registry: image, sigstore bundle referrer, encrypted copy)]
-  subgraph admit [Admission, per pod]
-    K[Kyverno verifyImages] --> C{verify cache hit? key = policy + image ref, TTL 60m}
-    C -- miss --> V[fetch bundle from registry, verify]
-    C -- hit --> M
-    V --> M[mutateDigest: resolve the tag now, pin digest]
-  end
-  REG --> admit
-  subgraph node [Node]
-    KL[kubelet] --> CT[containerd + ctd-decoder, key on local disk]
-    CT --> SNAP[(snapshots: decrypted layers)]
-    SNAP --> P[process: env, memory, mounted Secrets]
-  end
-  admit --> node
-```
+The application is small on purpose. It is a 5.8 MB Go binary plus an 8 MiB file I called a
+"proprietary model". The first line of that file reads `PROPRIETARY-MODEL-MARKER-7f3a9c`, and
+that marker is how I checked whether someone could read the image. The application also copies
+its environment secret into memory, so the secret exists in two places.
 
-Admission decides *whether* a pod may run, using signatures fetched from the registry. Encryption
-decides *who* can read the layers on the way to the node. Once containerd has decrypted them, the
-plaintext lives on the node's disk and in the process, next to the key that decrypted it.
+Around it sat the stack a team would run: cosign for signing, syft for the SBOM, a provenance
+record, Kyverno for admission, and skopeo with imgcrypt for encryption, with the private key
+installed on one worker only.
 
-The cache-hit path that skips straight to `mutateDigest` is where the first surprise comes from.
+The attacker at the end is a root shell on that worker. On Kind, that is the same as root on a
+real node: the same files, the same processes, the same credentials.
 
-## The lab
+If I didn't observe it, it isn't in here. The scripts and raw output are in the
+[lab repository](https://github.com/netf/blog/tree/main/docs/labs/signed-encrypted-images-node-root),
+and one script rebuilds everything from a blank machine.
 
-Everything below ran on one Kind cluster (`supply`: a control plane and two workers, Kubernetes
-v1.37.0, containerd 2.3.4) on a 4-vCPU VM, plus a plain-HTTP `registry:2.8.3` on the Kind network
-at `kind-registry:5000`. The same name resolves on the host, on the nodes and inside pods. That
-matters, because Kyverno fetches signatures from inside a pod.
+## The front door: can the policy be fooled?
 
-The app is small on purpose. It is a 5.8 MB (5,767,330-byte) static Go binary in a `scratch`
-image, plus an 8 MiB "proprietary model" file whose first line is
-`PROPRIETARY-MODEL-MARKER-7f3a9c`. That marker is how I check, later, whether someone can read
-the image. The app copies `APP_SECRET` from its environment into a package variable, so the
-secret also lives in its heap.
+I started where an outsider would start: with an image the cluster had never seen, pushed to a
+registry I controlled.
 
-The rest is the stack a team would actually run. Signing is cosign v3.1.3 with a local key pair,
-no Fulcio and no Rekor. syft v1.54.1 makes the CycloneDX SBOM, and the SLSA v1 provenance
-predicate is hand-written and names a builder ID the policy checks. Admission is Kyverno v1.19.1
-(chart 3.9.1), one `ClusterPolicy` scoped to namespace `prod`, requiring the signature and both
-attestations and rewriting tags to digests. Encryption is skopeo 1.13.3 `--encryption-key jwe:`
-(RSA-4096) and imgcrypt v2.0.3's `ctd-decoder` as containerd's stream processor. The private key
-exists on `supply-worker` only.
+### The guard refused my own badge first
 
-The attacker in part 3 is `docker exec supply-worker`, which on Kind is the same thing as a root
-shell on the node.
+Before I could test an attack, my correctly signed image was rejected.
 
-## 1. Admission: what the policy actually blocks
+Signing tools had recently changed where they keep signatures. cosign v3 writes a "bundle" next
+to the image instead of the older detached signature. My registry was a plain `registry:2.8.3`
+image, which does not support the newer lookup, so cosign fell back to a tag named after the
+image digest. cosign itself was happy: it verified the signature and both attestations without
+complaint.
 
-### The first surprise: my own signed image was rejected
+Kyverno was not. It looked in the old place and reported that it found no signatures at all.
 
-Before I could test the attacks, my correctly signed image was denied.
+A policy setting that the documentation calls "the experimental OCI 1.1 behaviour" did not help.
+What worked was telling the policy that signatures arrive as bundles, with one line:
+`type: SigstoreBundle`.
 
-cosign v3 changed where signatures go. `cosign sign` now writes a Sigstore bundle
-(`application/vnd.dev.sigstore.bundle.v0.3+json`) as an OCI 1.1 *referrer* of the image. My
-`registry:2.8.3` has no referrers API, so cosign fell back to a tag named after the digest,
-`sha256-<digest>`, with no `.sig` suffix. cosign itself verified the signature and both
-attestations without complaint.
+To be sure that was not a policy accepting everything, I changed the expected builder name in the
+provenance check. The same image was then refused for having no valid attestation, which is the
+correct answer.
 
-Kyverno, with the policy's `type` left at its default (`Cosign`), denied the image:
+The failure was safe. But it was also the kind of failure that costs an afternoon. If you upgrade
+cosign in your build pipeline and not your policies, every new image is rejected, and the error
+message blames your signatures rather than your configuration.
 
-```text
-failed to verify image kind-registry:5000/demo/app:v1:
-.attestors[0].entries[0].keys: no signatures found
-```
+### What got through
 
-Setting `cosignOCI11: true` (described in the CRD as "the experimental OCI 1.1 behaviour")
-produced the same error. What worked was `type: SigstoreBundle` on the `verifyImages` entry.
+With the policy reading bundles, I tried the attacks that matter. Each row was one attempt to
+start a pod in `prod`.
 
-To make sure that wasn't a policy accepting anything, I changed the expected builder ID in the
-provenance condition. The same image was then denied with
-`image attestations verification failed, verifiedCount: 0, requiredCount: 1`.
-
-This failure is the safe kind: a format mismatch fails closed. But it is also the kind you will
-hit. If you upgrade cosign in CI and not your policies, every newly signed image is denied, and
-the error points at your signatures rather than at the policy.
-
-### The attacks
-
-With `type: SigstoreBundle`, I threw the obvious attacks at it. Each row is one `kubectl run` in
-`prod` (`results/admission/attacks.tsv`):
-
-| Attempt | What the attacker did | Result |
+| What I tried | How | Result |
 |---|---|---|
-| Signed image by tag | nothing (control) | allowed |
-| Signed image by digest | nothing (control) | allowed |
-| Unsigned image by tag | pushed `:evil`, never signed | **denied** |
-| Unsigned image by digest | same image, `@sha256:` | **denied** |
-| Transplanted signature | copied v1's valid bundle onto an unsigned image's referrer tag (raw manifest `GET` + `PUT`, HTTP 201) | **denied**: `sigstore bundle verification failed: no matching signatures found` |
-| Repointed tag | overwrote `:v1` so it resolves to the unsigned image | **allowed**, pinned to the unsigned digest |
-| Signed digest after repoint | `@sha256:` of the real v1 | allowed |
+| A normal signed image, by tag | control | allowed |
+| A normal signed image, by digest | control | allowed |
+| An unsigned image, by tag | pushed `:evil`, never signed | **refused** |
+| An unsigned image, by digest | the same image, referenced by hash | **refused** |
+| A forged signature | copied a valid signature onto the unsigned image | **refused** |
+| A moved tag | pointed `:v1` at the unsigned image | **allowed**, and pinned to the unsigned image |
+| A signed image, by digest, after the move | the original image, referenced by hash | allowed |
 
-Six of seven rows behave the way the brochure says. The bundle binds the digest it signed, so a
-copied signature is useless, and anything referenced by digest can't be swapped underneath you.
+Six of seven behaved the way the documentation says they should. The signature is tied to the
+exact image it signed, so copying it elsewhere is useless. An image referenced by hash cannot be
+swapped underneath you.
 
-The seventh row is the attack from the opening.
+The seventh is the one that worked, and it deserves its own section.
 
-### The tag that stayed verified
+### The tag that kept its trust
 
-My first guess was that the digest in that run had somehow picked up a valid signature.
-`cosign verify` said `no signatures found`. Then I restarted the Kyverno admission controller and
-retried the same tag. Denied.
+My first assumption was that the unsigned image had somehow acquired a valid signature. It had
+not; cosign confirmed there was nothing to find. I restarted the policy engine and tried the same
+tag again. This time it was refused.
 
-So it was state. The binary documents it:
+So the problem was not the signature. It was memory. Kyverno keeps a cache of images it has
+already verified. The cache defaults to one hour, and the key it stores is the image reference as
+written in your manifest — not the image it resolves to.
 
-```text
--imageVerifyCacheEnabled     Enable a TTL cache for verified images. (default true)
--imageVerifyCacheMaxSize     ... Keys are a combination of policy elements along with
-                             the image reference. Default is 1000.
--imageVerifyCacheTTLDuration ... Default is 60m.
-```
+When `app:v1` passed verification, the cache recorded "app:v1 is fine". Later, the tag was
+pointed at a different image. The next pod asked for `app:v1`, matched the cache, skipped
+verification, and then a separate step resolved the tag again and pinned whatever it found.
+Verification and resolution are two different lookups, and the cache sits between them.
 
-The cache key is the image reference as written in the pod spec, `kind-registry:5000/demo/app:v1`,
-not the digest it resolved to. When the signed `:v1` is admitted, "verified" is cached against
-the string `…/app:v1`. When the tag moves, the next pod with that string hits the cache, skips
-verification, and then `mutateDigest` resolves the tag again and pins whatever it points to
-*now*. Verification and digest resolution are two separate lookups, and the cache sits between
-them.
+I reproduced it by admitting `:v1`, moving the tag, and continuing to deploy:
 
-`scripts/13-repoint-cache.sh` reproduces it: admit `:v1`, repoint `:v1`, keep admitting.
-
-| Kyverno setting | Repointed tag admitted until | First denial |
+| Policy setting | How long the moved tag was admitted | When it was finally refused |
 |---|---|---|
-| `imageVerifyCacheTTLDuration=2m` (run 1) | t=104 s | t=124 s |
-| `imageVerifyCacheTTLDuration=2m` (run 2) | t=106 s | t=126 s |
-| default (60m TTL), polled every 2 min | still admitted at t=483 s, the last poll before the VM went away | not reached |
-| `imageVerifyCacheEnabled=false` | never | t=0 s |
+| Cache lifetime 2 minutes, first run | 104 seconds | 124 seconds |
+| Cache lifetime 2 minutes, second run | 106 seconds | 126 seconds |
+| Default 60-minute cache, checked every 2 minutes | still admitted at 483 seconds, the last check before the machine was torn down | never observed |
+| Cache disabled | never admitted | immediately |
 
-The first admitted pod in each run really was the evil build: a probe pod's `wget` of `/whoami`
-returned `EVIL secret-len=16`, and the kubelet reported the unsigned digest as its `imageID`.
-In the 2-minute runs, a cache hit every 20 seconds did not extend the window. It closed one TTL
-after the legitimate `:v1` was verified.
+The first admitted pod really was the bad build: a test request came back with the string I had
+hard-coded into that build, and the node reported the unsigned image's hash as the one running.
+In the two-minute runs, checking every 20 seconds did not extend the window. It closed one
+cache lifetime after the good image was last checked.
 
-**So anyone who can push a tag gets up to an hour of unverified deploys of that tag after it was
-last verified.** With the default TTL, that is the default behaviour.
+**So anyone who can push a tag gets up to an hour of deploys of whatever that tag points at.**
+That is the default behaviour, not a misconfiguration.
 
-The fix is one flag, and the chart ate it the first time. Kyverno's chart renders extra args like
-this:
+There is a fix: turn the cache off. It comes with a trap. The Helm chart that installs Kyverno
+treats the boolean `false` as an empty value and silently drops the flag, so you have to pass it
+as the string `"false"` and then check the running container's arguments to be sure it arrived.
+I made that mistake once, and the moved tag was still admitted in that run.
 
-```yaml
-{{- range $key, $value := .Values.admissionController.container.extraArgs }}
-{{- if $value }}
-- --{{ $key }}={{ $value }}
-{{- end }}
-{{- end }}
-```
+### What the checking costs
 
-`--set admissionController.container.extraArgs.imageVerifyCacheEnabled=false` makes `$value` the
-boolean `false`, the `if` drops it, and the cache stays on. No warning; the repointed tag was
-still admitted in that run (`results/repoint-cache/off-bool-dropped-by-chart/`). Pass it as a
-string with `--set-string`, then check that `--imageVerifyCacheEnabled=false` is actually in the
-container args.
+A signature check is worth having only if it is cheap enough to leave on. I measured it by
+creating a pod with a server-side dry run, which runs the entire admission chain without
+starting anything. Thirty samples per case, against a registry on the same network:
 
-### What verification costs per pod
-
-`scripts/15-latency.sh` times `kubectl create --dry-run=server` for a pod. Dry-run runs the
-whole admission chain, verification and digest mutation included, so it is a fair proxy for what
-a real pod pays. The script aborts if a dry-run of the unsigned image is *not* denied.
-
-30 samples per case, wall time in ms, local registry:
-
-| Case | p50 | p90 | p99 | max |
-|---|---|---|---|---|
-| No policy (namespace `default`) | 66 | 70 | 84 | 87 |
-| Policy, verify-cache hit | 71 | 76 | 96 | 103 |
-| Policy, cache disabled (full signature + 2 attestation checks) | 109 | 117 | 127 | 130 |
-
-Full verification adds about 43 ms at the median against a registry on the same Docker network.
-Turning the cache off costs 38 ms per pod over a warm cache. A registry across a WAN will add its
-round trips on top, and I didn't test that.
-
-### What happens when things are down
-
-The registry tests pause the registry container (`docker pause`), so connections hang rather than
-get refused. The Kyverno tests take the admission controller away two ways: a normal scale-down
-to zero, and a `kill -9` of its process (`scripts/14*.sh`).
-
-| Situation | Unsigned or signed? | Result | Time |
+| Case | Median | 90th percentile | Worst |
 |---|---|---|---|
-| Registry hung, cold cache, by tag | signed | denied: webhook `context deadline exceeded` | 15,043 ms |
-| Registry hung, warm cache, by tag | signed | denied, same timeout | 15,039 ms |
-| Registry hung, warm cache, **by digest** | signed | allowed | 54 ms |
-| `failureAction: Audit` | unsigned | **allowed**, client gets a `Warning:` line | 57 ms |
-| `failureAction: Audit`, registry hung | signed | denied, same timeout | 15,042 ms |
-| Kyverno `kill -9`'d, `failurePolicy: Fail` | unsigned | denied: `connection refused` | 47 ms |
-| Kyverno **scaled to 0**, `failurePolicy: Fail` | unsigned | **allowed** | 44 ms |
-| Kyverno scaled to 0, `failurePolicy: Ignore` | unsigned | allowed | 46 ms |
+| No policy at all | 66 ms | 70 ms | 87 ms |
+| Policy, with a warm cache | 71 ms | 76 ms | 103 ms |
+| Policy, cache disabled, full verification | 109 ms | 117 ms | 130 ms |
 
-Three of these surprised me.
+Full verification adds about 43 milliseconds to the median. Turning the cache off costs another
+38 milliseconds against a warm cache. A registry across the internet would add its own round
+trips, which I did not test.
 
-**A warm cache doesn't save a tag from a registry outage.** It covers verification, but
-`mutateDigest` still has to ask the registry what the tag points to, and that call hangs until
-the 15-second webhook timeout. The same signed image by digest went straight through. So digest
-references make you both safer and more available.
+### When the guard goes away
 
-**Audit mode can't pin digests, and it isn't fail-open either.** Kyverno's own policy validation
-refused my Audit policy with `mutateDigest must be set to false for 'Audit' failure action`. So
-Audit means unsigned images run *and* tags stay mutable. Yet with the registry hung, Audit still
-denied a signed pod after 15 seconds, because a webhook timeout is governed by `failurePolicy`,
-not by `failureAction`.
+The interesting failures were not attacks. They were outages.
 
-**A graceful Kyverno shutdown removes the enforcement, not just the enforcer.** Before the
-scale-down there were two `kyverno-resource-*` webhook configurations. Two seconds after it,
-zero, so `failurePolicy: Fail` had nothing to apply to and the unsigned pod was admitted. They
-came back 5 to 10 seconds after the new pod was ready. A crash leaves the webhooks in place, and
-those fail closed. **So the dangerous outage is the polite one.**
+I tested two kinds. For the registry, I paused the container so that connections hung instead of
+being refused, which is closer to a real network partition. For the policy engine, I took it away
+two ways: a normal scale-down to zero, and a hard kill.
 
-I only tested `kubectl scale`. I'd expect anything else that stops a single replica gracefully,
-such as draining its node, to behave the same.
+| Situation | Image | Result | Time |
+|---|---|---|---|
+| Registry frozen, cold cache, by tag | signed | refused, request timed out | 15.0 s |
+| Registry frozen, warm cache, by tag | signed | refused, same timeout | 15.0 s |
+| Registry frozen, warm cache, **by digest** | signed | allowed | 54 ms |
+| Audit mode instead of enforce | unsigned | **allowed**, with a warning | 57 ms |
+| Audit mode, registry frozen | signed | refused, same timeout | 15.0 s |
+| Policy engine hard-killed | unsigned | refused, connection rejected | 47 ms |
+| Policy engine scaled to zero | unsigned | **allowed** | 44 ms |
+| Policy engine scaled to zero, ignore failures | unsigned | allowed | 46 ms |
 
-With `admissionController.replicas=2`, gracefully deleting one of the two pods left both webhooks
-in place, and unsigned pods were denied at 1, 2, 5 and 10 seconds into the shutdown
-(`scripts/14d-two-replicas.sh`). The chart prints a warning about running fewer than two
-replicas at install. It's worth taking literally.
+Three results surprised me.
 
-## 2. Encrypted layers: what a stolen registry gets you
+**A warm cache does not survive a registry outage.** The cache covers verification, but the
+policy still has to ask the registry what the tag points at, and that request hangs until the
+15-second timeout. The same image, referenced by digest, went straight through. Digest references
+make you both safer and more available.
 
-`skopeo copy --encryption-key jwe:enc-pub.pem` rewrote both layers as
-`application/vnd.oci.image.layer.v1.tar+gzip+encrypted`. Each layer gets a random symmetric key
-(`AES_256_CTR_HMAC_SHA256`, per the layer's `pubopts` annotation), and that key is wrapped with
-my RSA public key into a 1,460-character `org.opencontainers.image.enc.keys.jwe` annotation.
+**Audit mode is not the safety valve people think it is.** Kyverno refuses to pin digests in
+audit mode, so unsigned images run *and* tags stay mutable. At the same time, a registry timeout
+still blocks a signed pod, because timeouts are governed by a different setting than policy
+violations.
 
-Then I played someone who has read access to the registry, or a copy of its storage, and no
-private key (`scripts/21-stolen-copy.sh`):
+**A graceful shutdown removes the enforcement, not just the enforcer.** Before the scale-down
+there were two webhook configurations telling Kubernetes to call Kyverno. Two seconds after it,
+there were none, so a "fail closed" policy had nothing left to fail closed. They came back five
+to ten seconds after the replacement pod was ready. A hard kill leaves the webhooks in place, and
+those do fail closed.
 
-| | plain copy | encrypted copy |
+That last one is the uncomfortable conclusion: **the dangerous outage is the polite one.** I only
+tested `kubectl scale`, but I would expect anything that stops a single replica gracefully, such
+as draining its node, to behave the same way. With two replicas, deleting one of them left both
+webhooks in place, and unsigned pods were refused throughout. The chart warns you about running
+fewer than two. It is worth taking literally.
+
+## The locked box: what encryption hides
+
+Now the second promise: if someone steals your registry, they get nothing.
+
+Encryption works by re-writing each layer so that it can only be opened with a key. skopeo did
+that with an RSA public key. Each layer got its own random symmetric key, and that key was
+wrapped with the public key and stored in an annotation on the image.
+
+I then played the part of someone with read access to the registry, or a copy of its disk, and no
+private key:
+
+| What I tried | Plain image | Encrypted image |
 |---|---|---|
-| `tar tzf` on each layer blob | lists `demoapp`, `opt/model/model.bin` | `gzip: stdin: not in gzip format` |
-| marker found after `gunzip` | 1 | **0** |
+| List the contents of each layer | shows the binary and the model file | `not in gzip format` |
+| Search for the marker after decompressing | found | **not found** |
 
-The contents are protected as advertised. What's around them isn't.
+So the contents are protected. What sits around the contents is not.
 
 ### What the encryption does not hide
 
-- **The image config is plaintext, and it's the same blob.** The encrypted image points at the
-  identical config digest as the plain one. It shows the entrypoint, the user (`65532:65532`)
-  and the build history, including `COPY model.bin /opt/model/model.bin # buildkit`.
-- **`diff_ids` are hashes of the plaintext.** The config's `rootfs.diff_ids` equal the SHA-256
-  of each *decrypted* layer tar. I checked both against the plain image. If an attacker can guess
-  a layer, say a public base image or last quarter's model, they can confirm the guess without
-  the key.
-- **Sizes are exact.** Ciphertext layers are byte-for-byte the same length as the plaintext ones
-  (8,391,419 bytes for the model layer in the final run).
+**The configuration is plain text, and it is shared.** The encrypted image points at exactly the
+same configuration file as the plain one. That file shows the entrypoint, the user the container
+runs as, and the build history, including the line that copied the model into the image.
 
-### A node without the key
+**The layer hashes are hashes of the plain text.** The configuration lists a digest for every
+decrypted layer. I checked both against the unencrypted image and they matched. If an attacker
+can guess a layer, a public base image or last quarter's model, they can confirm the guess
+without the key.
 
-Both workers got `ctd-decoder` as containerd's stream processor (`key_model = "node"`). Only
-`supply-worker` got the private key. `scripts/23-run-encrypted.sh` wipes every demo image from a
-node and checks that no `model.bin` is left in its snapshots before each case:
+**The sizes are exact.** Encrypted layers are byte-for-byte the same length as the plain ones.
+The model layer was 8,391,419 bytes in the final run, and that number alone tells you something.
 
-| Node | Before the pod | Result |
+None of this is a bug. It is the cost of keeping the image a normal OCI image. But it means
+encryption protects the contents of the box, not the fact that you shipped a box of that shape.
+
+### The machine that didn't need the key
+
+This was the result I did not expect.
+
+I installed the decryption key on one worker only. The other worker had the decoder, but no key.
+Wiped clean, it refused to pull the encrypted image, exactly as it should:
+
+| Worker | State before starting | Result |
 |---|---|---|
-| `supply-worker2` (no key) | clean | `ErrImagePull`: `call to DecryptLayer failed: missing private key needed for decryption` |
-| `supply-worker2` (no key) | ran `app-plain:v1` first | **Running**. Pull took 10 ms |
-| `supply-worker` (key) | clean | Running, pull 118 ms |
+| No key | clean | refused: missing private key |
+| No key | had already run the plain image | **started in 10 ms** |
+| Key installed | clean | started, pulled in 118 ms |
 
-The second row is because encryption doesn't change the image's identity. Plain and encrypted
-images have the same config blob, so the same `diff_ids` and the same snapshot chain. The 10 ms
-pull is what you'd expect if containerd reused the unpacked snapshots instead of fetching and
-decrypting anything.
+The second row is the important one. Encryption does not change the image's identity: the plain
+and encrypted versions share a configuration, which means they share layer hashes and therefore
+share the unpacked layers on disk. A machine that has already unpacked the plain text does not
+need the key for those layers. It just reuses them.
 
-My first, uncontrolled run of this test had the keyless node running the encrypted image too,
-before I worked out why. **A node that has already unpacked the plaintext layers, from the plain
-image or from another image that shares them, doesn't need the key for those layers.**
+My first run of that test was uncontrolled, and the keyless worker ran the encrypted image
+before I understood why. That is worth saying plainly, because the mistake is easy to make when
+you test this yourself.
 
-### What the encryption costs
+### What encryption costs
 
-Cold pull and start on the keyed node, clean before every sample, N=10, 10.9 MB image:
+At this size, not much. Cold pull and start on the worker with the key, ten samples, a 10.9 MB
+image:
 
-| | pull (kubelet event), median | min-max | create to Ready, median | min-max |
-|---|---|---|---|---|
-| plain | 78 ms | 64-83 | 584 ms | 565-863 |
-| encrypted | 116 ms | 104-129 | 628 ms | 602-645 |
+| | Pull, median | Create to ready, median |
+|---|---|---|
+| Plain | 78 ms | 584 ms |
+| Encrypted | 116 ms | 628 ms |
 
-That is about 38 ms more to pull and 44 ms more to Ready, at this size. I only tested this one
-10.9 MB image, so I don't know how the gap scales with multi-gigabyte layers.
+About 38 milliseconds more to pull and 44 more to reach ready. I only tested one image at this
+size, so I cannot tell you how the gap grows with multi-gigabyte layers.
 
-## 3. Root on the node
+## The back door: root on one machine
 
-The victim is the encrypted app on `supply-worker`, the node with the key. It has
-`APP_SECRET=env-secret-value-77aa` in its environment and a Secret `db-creds` mounted at
-`/var/run/creds`. The attacker has a root shell on that node and nothing else: no kubeconfig, no
-registry credentials.
+Here is where the story changes. Everything above is about an attacker outside the cluster. This
+part is about someone who already has root on one of the machines.
 
-Each step is one command, timed around `docker exec` (`scripts/30-node-root.sh`, output in
-`results/node-root/`):
+The victim was the encrypted application on the worker that had the key. It had a secret in its
+environment and a password mounted as a file. The attacker had a root shell and nothing else: no
+cluster credentials, no registry credentials, no application code.
 
-| # | What | Command (inside the node unless noted) | ms | Got |
-|---|---|---|---|---|
-| 1 | find the process | `crictl inspect --output go-template --template '{{.info.pid}}' $(crictl ps -q --label io.kubernetes.pod.name=victim)` | 83 | PID |
-| 2 | environment | `tr '\0' '\n' < /proc/$PID/environ` | 82 | `APP_SECRET=env-secret-value-77aa` |
-| 3 | mounted Secret | `cat /proc/$PID/root/var/run/creds/password` | 77 | `s3cr3t-db-password-4b1d` (a tmpfs, so memory, not disk; root reads it anyway) |
-| 4 | decrypted image, live | `head -c 31 /proc/$PID/root/opt/model/model.bin` | 73 | the marker |
-| 5 | decrypted image, on disk | `head -c 31 /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/opt/model/model.bin` | 53 | the marker, in `snapshots/243/fs` |
-| 6 | the decryption key | `cat /etc/containerd/ocicrypt/keys/enc-priv.pem` | 29 | a 3,272-byte RSA private key |
-| 7 | decrypt the registry copy | on the attacker's machine: `skopeo copy --decryption-key stolen.pem docker://…/app-enc:v1 dir:dec`, then grep | 155 | the marker |
-| 8 | process memory | on the host: `gcore` the app, `strings` the core | 7,406 | the env secret, 2 occurrences |
-| 9 | kubelet identity, mounted Secret | `kubectl --kubeconfig /etc/kubernetes/kubelet.conf -n enc get secret db-creds` | 121 | the password |
-| 10 | kubelet identity, other Secret | same, `unrelated-secret` | 87 | `Forbidden` |
-| 11 | kubelet identity, list | `get secrets -A` | 126 | `Forbidden` |
-| 12 | after `kubectl delete pod victim` | step 5 again | 54 | the marker, still on disk |
+I wrote down twelve things to try, in the order an impatient person would try them. Each took one
+command:
 
-All twelve took 8.3 seconds, 7.4 of them waiting for `gcore`.
+| Step | What I did | Time | What I got |
+|---|---|---|---|
+| 1 | Found the container's process | 83 ms | its process ID |
+| 2 | Read its environment | 82 ms | the application secret |
+| 3 | Read the mounted password | 77 ms | the database password |
+| 4 | Read the model through the running process | 73 ms | the marker |
+| 5 | Read the model from disk | 53 ms | the marker, in a snapshot directory |
+| 6 | Read the decryption key | 29 ms | a 3,272-byte private key |
+| 7 | Decrypt the registry copy on another machine | 155 ms | the marker |
+| 8 | Dump the process's memory | 7.4 s | the secret, twice |
+| 9 | Use the node's credentials on its own Secret | 121 ms | the password |
+| 10 | Try the same on an unrelated Secret | 87 ms | forbidden |
+| 11 | List every Secret in the cluster | 126 ms | forbidden |
+| 12 | Read the disk again after deleting the pod | 54 ms | the marker, still there |
 
-None of this is an exploit. It's the node doing its job. To run the container, containerd had to
-decrypt the layers, so plaintext sits in the snapshot directory for as long as the image is
-cached, not just while the pod runs. To decrypt them, the key had to be on the node, so root has
-it, and with it every copy of the image anywhere, including the "stolen registry" from part 2.
-The process has its secrets in its environment and memory because that's how it uses them.
+All twelve took 8.3 seconds. 7.4 of those were waiting for the memory dump.
 
-The one boundary that held is the Kubernetes API. The kubelet's credentials are confined by the
-Node authorizer to Secrets that pods on that node mount: `db-creds` yes, `unrelated-secret` and
-`list` no (`node: no relationship found between node 'supply-worker' and this object`). So root
-on one node gets that node's workloads, its decryption keys and its pods' Secrets, not the
-cluster's.
+None of this is an exploit. It is the machine doing its job.
 
-Signing didn't help here at all, and wasn't meant to. It answers "is this the image I built?",
-which is already settled by the time an attacker is reading `/proc`.
+To run the container, containerd had to decrypt the layers, so the plain text sits in the
+snapshot directory for as long as the image is cached, not just while the pod is running. To
+decrypt them, the key had to be on the machine, so root has it, and with it every copy of the
+image anywhere, including the "stolen registry" from the previous section. The process keeps its
+secrets in its environment and its memory because that is how it uses them. Deleting the pod
+removes the process, not the unpacked image.
 
-## How to think about your own cluster
+One boundary did hold: the Kubernetes API. The credentials that the node uses are limited to
+Secrets that pods on that node actually mount. The mounted password was readable. An unrelated
+Secret, and a cluster-wide list, were refused. So root on one machine gets that machine's
+workloads, its keys and its pods' Secrets. It does not get the cluster.
 
-The numbers above come from my cluster. Four questions tell you whether the same gaps exist in
-yours.
+Signing did not help here, and was never meant to. A signature answers "is this the image I
+built?" That question was settled long before the attacker opened a shell.
 
-**Does every image reference a digest?** If every manifest uses `@sha256:…`, the repoint attack
-and the cache window don't apply. One tag anywhere reopens both. List the tags still in use:
+## What this means for your own cluster
+
+My numbers describe my cluster, not yours. Four questions will tell you whether the same gaps
+exist in yours.
+
+**Does every image reference a digest?** If every manifest uses `@sha256:…`, the moved tag and
+the cache window do not apply. A single tag reopens both. You can list every image running in the
+cluster, and anything without `@sha256:` is a tag:
 
 ```bash
-kubectl get pods -A \
-  -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' \
-  | grep -v '@sha256'
+kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}'
 ```
 
-**Would a freshly signed image pass your policy today?** Sign a throwaway image with the cosign
-version your CI uses and try to run it in a staging namespace. If it is denied with
-`no signatures found`, the policy is still looking for the old signature format. One pod at
-build time is cheaper than finding out after a cosign bump.
+**Would a freshly signed image pass your policy today?** Sign a throwaway image with the same
+cosign version your build pipeline uses, and try to run it in a staging namespace. If it is
+refused with `no signatures found`, the policy is still looking in the old place. One test pod is
+cheaper than discovering this after a routine upgrade.
 
 **Does admission fail closed when it shuts down politely?** `failurePolicy: Fail` only applies
-while the webhooks exist. Scale the controller to zero, submit an unsigned pod, then scale back.
-If the pod runs, the webhooks left with the controller. Run at least two replicas and repeat the
+while the webhooks exist. Scale the policy engine to zero, try an unsigned pod, then scale back.
+If the pod runs, the enforcement left with the engine. Run at least two replicas, and repeat the
 test by deleting one pod during a rollout.
 
-**What can root on one node read?** On a node, `ls /etc/containerd/ocicrypt/keys/` tells you
-whether the image key is there, and the snapshotter directory
-(`/var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/`) tells you whether
-decrypted layers are. If either is present, root on that node is inside every image it has run,
-whatever admission allowed. That is where placement matters: keep the key off nodes that don't
-need it, keep sensitive pods on their own nodes, and remove images you no longer run. `crictl
-rmi` is what took the plaintext model off disk; deleting the pod didn't.
+**What can root on one machine read?** On a node, `ls /etc/containerd/ocicrypt/keys/` tells you
+whether the image key is there, and the snapshot directory under the containerd data path tells
+you whether decrypted layers are. If either is present, root on that machine is inside every
+image it has ever run, whatever admission allowed. That is where placement matters: keep the key
+off machines that don't need it, keep sensitive pods on their own machines, and remove images you
+no longer run. `crictl rmi` is what removed the plain-text model from disk; deleting the pod did
+not.
 
-## The question this leaves open
+## What comes next
 
-None of the above fixes the root user on a node reading the memory and disk of a running
-workload.
+None of this fixes the root user on a machine reading the memory and disk of a running workload.
 
-The pitch for Confidential Containers is that the workload runs in a hardware-isolated guest the
-node can't read, and the image key goes to the guest, not the node. I haven't tested any of that
-yet. Part 2 runs it on hardware that has SEV-SNP or TDX, which this Firecracker VM doesn't, and
-repeats the twelve steps above to see which ones still work.
-
-## Appendix A: Methodology
-
-- **Scope.** One Kind cluster on one 4-vCPU VM, a local plain-HTTP registry, a key-based cosign
-  flow without Fulcio or Rekor, Kyverno's `ClusterPolicy` API (deprecated in 1.19 in favour of
-  `ImageValidatingPolicy`, which I didn't test), and node-model key distribution for ocicrypt.
-  "Root on the node" means `docker exec` into the Kind node container, which gives the same
-  filesystem, process and kubelet view a root shell on a real node would.
-- **Why there's no TEE here.** The VM is a Firecracker microVM. `/proc/cpuinfo` shows `vmx` and
-  `hypervisor` but none of `sev`, `sev_snp`, `tdx_guest` or `sgx`, there is no
-  `/sys/hypervisor` and no `/dev/vhost-vsock`, and an earlier run found that `KVM_CREATE_VCPU`
-  hits `kernel BUG at arch/x86/kvm/x86.c:702` (`kvm_spurious_fault`). Confidential Containers
-  needs a working nested hypervisor at minimum, so it's part 2, on different hardware. This lab
-  ran no KVM, QEMU or Kata probes.
-- **Runs.** Part 1 and the stolen-copy test ran on two blank VMs (2026-10-15 and 2026-10-22),
-  with different keys and digests and the same outcomes. The node-side encryption tests and the
-  node-root attack ran on the second VM. Tables show the second run unless marked.
-- **Timing.** Admission latency is client wall time of `kubectl create --dry-run=server`, so it
-  includes about 66 ms of client and API-server overhead that's present in every case.
-  Node-root steps are timed around each `docker exec`, which adds its own startup cost.
-
-## Appendix B: Versions, workarounds and evidence
-
-Ubuntu 24.04 VM (Firecracker), kernel 6.12.94+, 4 vCPU. Docker 29.9.2 (29.9.1 on the first
-run), Kind v0.33.0, `kindest/node:v1.37.0@sha256:a1ed56cf…`, containerd 2.3.4, kubectl v1.37.1,
-Helm v3.22.0, Kyverno v1.19.1 (chart 3.9.1), cosign v3.1.3, syft v1.54.1, skopeo 1.13.3, imgcrypt
-v2.0.3 built with Go 1.26.9, `registry:2.8.3`, gdb 15.1. Exact output in `results/versions.txt`.
-
-Environment workarounds, none of which change what's measured (`environment.md`): `dockerd`
-started by hand because PID 1 isn't systemd; the Docker socket made world-writable on this
-throwaway VM; the Istio lab's legacy-iptables `FORWARD` fix for Kind bridge traffic.
-
-Mistakes I made along the way, kept in `results/` so you can see them:
-
-- `results/admission-exploratory/`: the first signing run, before I knew Docker pushes an OCI
-  index. `skopeo copy` without `--all` silently "restored" `:v1` to the unsigned platform
-  manifest instead of the signed index.
-- `results/repoint-cache/off-bool-dropped-by-chart/`: the cache-off run where Helm dropped the
-  flag.
-- `results/registry-down-stopstart/`: `docker stop`/`start` left Kyverno with `dial tcp` errors
-  after the restart, so I switched to `docker pause`.
-- `results/registry-down/results-audit-not-applied.tsv`: my policy helper swallowed Kyverno's
-  rejection of the Audit policy, so that "Audit" run was really Enforce. The helper now aborts.
-
-Reproduce everything from a blank Ubuntu VM:
-
-```bash
-cd docs/labs/signed-encrypted-images-node-root && ./reproduce.sh
-```
+The pitch for Confidential Containers is that the workload runs in a hardware-isolated guest
+that the machine cannot read, and the image key goes to the guest rather than the host. I have
+not tested any of that. Part 2 runs it on hardware with SEV-SNP or TDX, which this virtual
+machine does not have, and repeats the twelve steps above to see which ones still work.
