@@ -1,29 +1,24 @@
 ---
 title: 'I signed and encrypted every image. Then I logged in as root and read everything.'
-description: 'What image signing, attestations, admission policies and encrypted layers actually protect — measured on a real cluster, then attacked from the inside.'
+description: 'We sign, attest and encrypt every image before it reaches the cluster. I rebuilt that delivery pipeline and attacked it end to end — including from inside the node.'
 pubDate: 2026-10-22
 updatedDate: 2026-10-23
 tags: ['kubernetes', 'security', 'supply-chain', 'cosign', 'kyverno']
 ---
 
-There is a checklist that security teams hand out for container images, and it sounds convincing.
+Every image we ship goes through the same pipeline: build, sign, attach the SBOM and provenance,
+encrypt the layers, then verify all of it at admission. Nothing reaches production without
+passing that gate.
 
-Sign every image, so you can prove where it came from. Add attestations, so you can prove how it
-was built. Encrypt the layers, so that a stolen copy of your registry is useless. Then put a
-policy in front of the cluster that refuses anything that doesn't match.
-
-Do all of that, the reasoning goes, and your software supply chain is safe.
-
-I wanted to know what "safe" means in practice. So I built the whole stack on a small test
-cluster — a five-megabyte service, a fake proprietary model, a private registry, and the same
-tools a real team would use — and then I attacked it. First from the outside, the way an
-intruder would. Then from inside, with root on one of the machines.
+It is the part of our delivery I trust most. So I rebuilt it on a test cluster and attacked it at
+each stage — from the registry, from the admission layer, and finally from the machine that runs
+the container.
 
 The front door held. The back door was open, and walking through it took eight seconds.
 
 That is not an argument against signing or encryption. Both did exactly what they promise. The
-problem is that we have quietly stretched "supply chain security" to cover something the tools
-never claimed: the machine that runs your code.
+problem is that we stretched "supply chain security" to cover something the tools never claimed:
+the machine that runs your code.
 
 ## What I found
 
@@ -49,17 +44,17 @@ running there.
 **A polite shutdown is a security hole.** When I shut the policy engine down the normal way, it
 took its enforcement with it, and unsigned pods ran. When I killed it abruptly, it failed safe.
 
-## What each piece is supposed to do
+## The pipeline, piece by piece
 
-Five different things usually travel together under the name "supply chain security". They solve
-different problems, and keeping them apart makes the rest of this post easier to follow.
+Five things travel together under the name "supply chain security". They solve different
+problems, and keeping them apart makes the rest of this post easier to follow.
 
-A **signature** is a wax seal. It proves that the image came from the key you trust and that
-nobody changed it on the way. An **attestation** is the same idea applied to facts about the
-build: this SBOM lists the libraries, this provenance record says which builder produced it.
+A **signature** is a wax seal. It proves the image came from the key you trust and that nobody
+changed it on the way. An **attestation** is the same idea applied to a fact about the build:
+this SBOM lists the libraries, this provenance record names the builder.
 
-A **digest reference** is an image's fingerprint rather than its name. `:v1` is a label that
-someone can move; `@sha256:…` always means those exact bytes.
+A **digest reference** is an image's fingerprint rather than its name. `:v1` is a label someone
+can move; `@sha256:…` always means those exact bytes.
 
 An **admission policy** is the guard at the door. Before a pod starts, the guard asks the
 registry for the signature and refuses the pod if it doesn't match.
@@ -72,8 +67,6 @@ The **machine running the container** is the building. Everything above is about
 right package through the door. None of it says much about what happens once the package is
 inside and opened.
 
-That distinction is the whole story of this post:
-
 | The piece | What it promises | What I actually found |
 |---|---|---|
 | Signature and attestations | "This is the image I built, and I can prove how." | Held. Every unsigned or copied signature was rejected. |
@@ -82,59 +75,132 @@ That distinction is the whole story of this post:
 | Layer encryption | "A stolen registry copy is unreadable." | Held for the contents. Everything around them stayed readable. |
 | The machine boundary | "Workloads are separated from each other." | Held for the Kubernetes API. Not for root on the machine. |
 
-The rest of this post is the evidence for that table.
+## The pipeline as code
+
+Three steps produce the artifact, and one policy decides whether it runs.
+
+**Sign by digest, then attach the evidence.** Resolve the digest once and reuse it everywhere, so
+nothing can be swapped between steps:
+
+```bash
+DIGEST=$(skopeo inspect --tls-verify=false docker://registry/demo/app:v1 | jq -r .Digest)
+REF=registry/demo/app@$DIGEST
+
+cosign sign --key cosign.key --tlog-upload=false "$REF"
+
+syft scan "registry:$REF" -o cyclonedx-json > sbom.cdx.json
+cosign attest --key cosign.key --type cyclonedx --predicate sbom.cdx.json "$REF"
+cosign attest --key cosign.key --type slsaprovenance1 --predicate provenance.json "$REF"
+```
+
+**Encrypt the copy the cluster pulls.** A separate tag holds the encrypted layers; the plaintext
+image stays around as a baseline:
+
+```bash
+openssl rsa -in keys/enc-priv.pem -pubout -out keys/enc-pub.pem
+skopeo copy --all --encryption-key jwe:keys/enc-pub.pem \
+  "docker://$REF" docker://registry/demo/app-enc:v1
+```
+
+**Verify at admission.** This is the policy that decides whether a pod in `prod` may start. The
+`type` line is the one that matters for cosign v3:
+
+```yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-images
+spec:
+  webhookTimeoutSeconds: 15
+  failurePolicy: Fail
+  rules:
+  - name: signed-with-sbom-and-provenance
+    match:
+      any:
+      - resources: {kinds: [Pod], namespaces: [prod]}
+    verifyImages:
+    - type: SigstoreBundle            # required for cosign v3 bundles
+      imageReferences: ["registry/demo/*"]
+      failureAction: Enforce
+      mutateDigest: true                # resolve the tag once, then pin the digest
+      verifyDigest: true
+      attestors:
+      - entries:
+        - keys:
+            publicKeys: |-
+              __COSIGN_PUBLIC_KEY__
+      attestations:
+      - type: https://cyclonedx.org/bom
+        attestors:
+        - entries:
+          - keys:
+              publicKeys: |-
+                __COSIGN_PUBLIC_KEY__
+      - type: https://slsa.dev/provenance/v1
+        attestors:
+        - entries:
+          - keys:
+              publicKeys: |-
+                __COSIGN_PUBLIC_KEY__
+        conditions:
+        - all:
+          - key: "{{ runDetails.builder.id }}"
+            operator: Equals
+            value: https://netf.io/lab/builder/laptop
+```
+
+That is the whole delivery contract: an image may run if it carries a valid signature and both
+attestations, and if the provenance names our builder.
 
 ## The setup
 
-Everything ran on one Kind cluster — Kubernetes running inside Docker on a single four-core
-virtual machine — with a control plane and two workers. A private registry lived on the same
-network, reachable by the same name from the host, the machines and the pods. That last part
-matters, because the policy engine fetches signatures from inside a pod.
+Everything ran on one Kind cluster — Kubernetes inside Docker on a single four-core machine —
+with a control plane and two workers. A private registry lived on the same network, reachable by
+the same name from the host, the machines and the pods. That last part matters, because the
+policy engine fetches signatures from inside a pod.
 
-The application is small on purpose. It is a 5.8 MB Go binary plus an 8 MiB file I called a
-"proprietary model". The first line of that file reads `PROPRIETARY-MODEL-MARKER-7f3a9c`, and
-that marker is how I checked whether someone could read the image. The application also copies
-its environment secret into memory, so the secret exists in two places.
+The application is small on purpose: a 5.8 MB Go binary plus an 8 MiB file I called a
+"proprietary model". Its first line reads `PROPRIETARY-MODEL-MARKER-7f3a9c`, and that marker is
+how I checked whether someone could read the image. The application also copies its environment
+secret into memory, so the secret exists in two places.
 
-Around it sat the stack a team would run: cosign for signing, syft for the SBOM, a provenance
-record, Kyverno for admission, and skopeo with imgcrypt for encryption, with the private key
-installed on one worker only.
+Images were signed with cosign and a local key, scanned with syft, encrypted with skopeo and
+imgcrypt, and admitted by Kyverno. The private key was installed on one worker only.
 
 The attacker at the end is a root shell on that worker. On Kind, that is the same as root on a
-real node: the same files, the same processes, the same credentials.
+real node: the same files, processes and credentials.
 
-If I didn't observe it, it isn't in here. The scripts and raw output are in the
+If I didn't observe it, it isn't in here. The scripts, manifests and raw output are in the
 [lab repository](https://github.com/netf/blog/tree/main/docs/labs/signed-encrypted-images-node-root),
 and one script rebuilds everything from a blank machine.
 
 ## The front door: can the policy be fooled?
 
-I started where an outsider would start: with an image the cluster had never seen, pushed to a
-registry I controlled.
+I started where an outsider would: with an image the cluster had never seen, pushed to a registry
+I controlled.
 
 ### The guard refused my own badge first
 
 Before I could test an attack, my correctly signed image was rejected.
 
-Signing tools had recently changed where they keep signatures. cosign v3 writes a "bundle" next
-to the image instead of the older detached signature. My registry was a plain `registry:2.8.3`
+Signing tools had recently changed where they keep signatures. cosign v3 writes a bundle next to
+the image instead of the older detached signature. My registry was a plain `registry:2.8.3`
 image, which does not support the newer lookup, so cosign fell back to a tag named after the
 image digest. cosign itself was happy: it verified the signature and both attestations without
 complaint.
 
 Kyverno was not. It looked in the old place and reported that it found no signatures at all.
 
-A policy setting that the documentation calls "the experimental OCI 1.1 behaviour" did not help.
-What worked was telling the policy that signatures arrive as bundles, with one line:
-`type: SigstoreBundle`.
+The policy above sets `type: SigstoreBundle` for exactly this reason. Without it, cosign v3
+images fail with `no signatures found`, and the error blames your signatures rather than your
+configuration. The "experimental OCI 1.1" setting does not help.
 
 To be sure that was not a policy accepting everything, I changed the expected builder name in the
 provenance check. The same image was then refused for having no valid attestation, which is the
 correct answer.
 
-The failure was safe. But it was also the kind of failure that costs an afternoon. If you upgrade
-cosign in your build pipeline and not your policies, every new image is rejected, and the error
-message blames your signatures rather than your configuration.
+The failure was safe. But it is also the kind of failure that costs an afternoon: upgrade cosign
+in your build pipeline and not your policies, and every new image is rejected.
 
 ### What got through
 
@@ -151,7 +217,7 @@ start a pod in `prod`.
 | A moved tag | pointed `:v1` at the unsigned image | **allowed**, and pinned to the unsigned image |
 | A signed image, by digest, after the move | the original image, referenced by hash | allowed |
 
-Six of seven behaved the way the documentation says they should. The signature is tied to the
+Six of seven behaved the way the configuration says they should. The signature is tied to the
 exact image it signed, so copying it elsewhere is useless. An image referenced by hash cannot be
 swapped underneath you.
 
@@ -183,16 +249,35 @@ I reproduced it by admitting `:v1`, moving the tag, and continuing to deploy:
 
 The first admitted pod really was the bad build: a test request came back with the string I had
 hard-coded into that build, and the node reported the unsigned image's hash as the one running.
-In the two-minute runs, checking every 20 seconds did not extend the window. It closed one
-cache lifetime after the good image was last checked.
+In the two-minute runs, checking every 20 seconds did not extend the window. It closed one cache
+lifetime after the good image was last checked.
 
 **So anyone who can push a tag gets up to an hour of deploys of whatever that tag points at.**
 That is the default behaviour, not a misconfiguration.
 
-There is a fix: turn the cache off. It comes with a trap. The Helm chart that installs Kyverno
-treats the boolean `false` as an empty value and silently drops the flag, so you have to pass it
-as the string `"false"` and then check the running container's arguments to be sure it arrived.
-I made that mistake once, and the moved tag was still admitted in that run.
+Turning the cache off takes two flags, and the second one is easy to lose:
+
+```bash
+helm upgrade --install kyverno kyverno/kyverno --version 3.9.1 -n kyverno --create-namespace \
+  --set admissionController.replicas=2 \
+  --set-string admissionController.container.extraArgs.imageVerifyCacheEnabled=false
+
+kubectl -n kyverno get deploy kyverno-admission-controller \
+  -o jsonpath='{.spec.template.spec.containers[0].args}' | tr ',' '\n' | grep imageVerifyCache
+```
+
+It must be `--set-string`. The chart renders extra arguments like this:
+
+```yaml
+{{- range $key, $value := .Values.admissionController.container.extraArgs }}
+{{- if $value }}
+- --{{ $key }}={{ $value }}
+{{- end }}
+{{- end }}
+```
+
+A boolean `false` is empty, so the flag disappears without a warning and the cache stays on. I
+made that mistake once, and the moved tag was still admitted in that run.
 
 ### What the checking costs
 
@@ -257,9 +342,9 @@ fewer than two. It is worth taking literally.
 
 Now the second promise: if someone steals your registry, they get nothing.
 
-Encryption works by re-writing each layer so that it can only be opened with a key. skopeo did
-that with an RSA public key. Each layer got its own random symmetric key, and that key was
-wrapped with the public key and stored in an annotation on the image.
+The pipeline encrypts each layer with a key that only the cluster has. skopeo did that with an
+RSA public key; each layer got its own random symmetric key, wrapped with the public key and
+stored in an annotation on the image.
 
 I then played the part of someone with read access to the registry, or a copy of its disk, and no
 private key:
@@ -288,12 +373,32 @@ The model layer was 8,391,419 bytes in the final run, and that number alone tell
 None of this is a bug. It is the cost of keeping the image a normal OCI image. But it means
 encryption protects the contents of the box, not the fact that you shipped a box of that shape.
 
-### The machine that didn't need the key
+### The node side of decryption
 
-This was the result I did not expect.
+Encryption only works if containerd can decrypt on the way in. This is the configuration that
+does it, installed on every worker:
 
-I installed the decryption key on one worker only. The other worker had the decoder, but no key.
-Wiped clean, it refused to pull the encrypted image, exactly as it should:
+```toml
+[plugins."io.containerd.cri.v1.images".image_decryption]
+  key_model = "node"
+
+[stream_processors."io.containerd.ocicrypt.decoder.v1.tar.gzip"]
+  accepts = ["application/vnd.oci.image.layer.v1.tar+gzip+encrypted"]
+  returns = "application/vnd.oci.image.layer.v1.tar+gzip"
+  path = "/usr/local/bin/ctd-decoder"
+  args = ["--decryption-keys-path", "/etc/containerd/ocicrypt/keys"]
+```
+
+`key_model = "node"` means the node holds the key, not the workload. That is the design decision
+with the longest shadow in this post. In the lab, the private key was copied to one worker only:
+
+```bash
+docker cp keys/enc-priv.pem \
+  supply-worker:/etc/containerd/ocicrypt/keys/enc-priv.pem
+```
+
+The other worker had the decoder but no key. Wiped clean, it refused the encrypted image, exactly
+as it should:
 
 | Worker | State before starting | Result |
 |---|---|---|
@@ -328,12 +433,22 @@ size, so I cannot tell you how the gap grows with multi-gigabyte layers.
 Here is where the story changes. Everything above is about an attacker outside the cluster. This
 part is about someone who already has root on one of the machines.
 
-The victim was the encrypted application on the worker that had the key. It had a secret in its
+The victim was the encrypted application on the worker with the key. It had a secret in its
 environment and a password mounted as a file. The attacker had a root shell and nothing else: no
 cluster credentials, no registry credentials, no application code.
 
-I wrote down twelve things to try, in the order an impatient person would try them. Each took one
-command:
+I wrote down twelve things to try, in the order an impatient person would try them:
+
+```bash
+PID=$(crictl inspect --output go-template --template '{{.info.pid}}' \
+  $(crictl ps -q --label io.kubernetes.pod.name=victim))
+
+tr '\0' '\n' < /proc/$PID/environ          # the application secret
+cat /proc/$PID/root/var/run/creds/password # the mounted password
+head -c 31 /proc/$PID/root/opt/model/model.bin
+head -c 31 /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*/fs/opt/model/model.bin
+cat /etc/containerd/ocicrypt/keys/enc-priv.pem
+```
 
 | Step | What I did | Time | What I got |
 |---|---|---|---|
@@ -369,17 +484,27 @@ workloads, its keys and its pods' Secrets. It does not get the cluster.
 Signing did not help here, and was never meant to. A signature answers "is this the image I
 built?" That question was settled long before the attacker opened a shell.
 
-## What this means for your own cluster
+## What this means for our pipeline
 
-My numbers describe my cluster, not yours. Four questions will tell you whether the same gaps
-exist in yours.
+My numbers describe my cluster, not yours. Four checks tell you whether the same gaps exist in
+your delivery.
 
 **Does every image reference a digest?** If every manifest uses `@sha256:…`, the moved tag and
-the cache window do not apply. A single tag reopens both. You can list every image running in the
-cluster, and anything without `@sha256:` is a tag:
+the cache window do not apply. A single tag reopens both. List every image running in the
+cluster; anything without `@sha256:` is a tag:
 
 ```bash
-kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}'
+kubectl get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' \
+  | grep -v '@sha256'
+```
+
+Then pin them in the workload spec:
+
+```yaml
+spec:
+  containers:
+  - name: app
+    image: registry/demo/app@sha256:6f1c…   # not :v1
 ```
 
 **Would a freshly signed image pass your policy today?** Sign a throwaway image with the same
@@ -405,6 +530,7 @@ not.
 None of this fixes the root user on a machine reading the memory and disk of a running workload.
 
 The pitch for Confidential Containers is that the workload runs in a hardware-isolated guest
-that the machine cannot read, and the image key goes to the guest rather than the host. I have
-not tested any of that. Part 2 runs it on hardware with SEV-SNP or TDX, which this virtual
-machine does not have, and repeats the twelve steps above to see which ones still work.
+that the machine cannot read, and the image key goes to the guest rather than the host. That
+would change `key_model` from `node` to something the host cannot open. I have not tested any of
+it. Part 2 runs it on hardware with SEV-SNP or TDX, which this virtual machine does not have, and
+repeats the twelve steps above to see which ones still work.
