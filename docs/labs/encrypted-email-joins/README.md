@@ -9,11 +9,12 @@ All data is synthetic, generated from fixed seeds.
 
 ```bash
 cd docs/labs/encrypted-email-joins
-./reproduce.sh        # or: make reproduce. About 1.5 hours on 4 vCPUs, ~20 GB of disk
+./reproduce.sh        # or: make reproduce. About 1.5 hours on 4 vCPUs, ~40 GB of disk
 ```
 
-Smaller run: `N_CUSTOMERS=1000000 N_ORDERS=5000000 ./reproduce.sh`. Ubuntu 24.04 is assumed
-(PostgreSQL comes from the PGDG apt repo); `sudo` is needed for the Postgres install.
+Ubuntu 24.04 is assumed (PostgreSQL comes from the PGDG apt repo); `sudo` is needed for the
+Postgres install. `N_CUSTOMERS` and `N_ORDERS` change the dataset size, but only the full
+10M / 50M scale has been run.
 
 ## What it builds
 

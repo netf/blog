@@ -1,0 +1,3 @@
+flip byte in SIV -> rejected (TinkError)
+flip byte in ciphertext -> rejected (TinkError)
+wrong associated data -> rejected (TinkError)

@@ -6,14 +6,15 @@ pillar: data
 tags: ['data-platforms', 'security', 'duckdb', 'parquet', 'encryption']
 ---
 
-It took DuckDB 123 seconds to turn 10 million "anonymised" phone numbers back into phone numbers.
+It took DuckDB 123 seconds to turn 10 million "anonymized" phone numbers back into phone numbers.
 No dictionary, no GPU, one SQL query on a 4 vCPU VM. Every UK mobile number has the shape `+447`
 followed by nine digits, so there are only a billion of them, and a billion SHA-256 hashes is a
 coffee break.
 
 The column was salted, too. It didn't matter. A join key needs the same salt on every row,
-otherwise `customers.email` and `orders.customer_email` stop matching, so the salt sits in the
-pipeline config, and anyone who can read the config can run the query.
+otherwise `customers.email` and `orders.customer_email` stop matching. So every job that writes
+the column needs the salt, which usually means it lives in config, and anyone who can read that
+config can run the query.
 
 That's the usual compromise for PII in a warehouse: analysts need to join on email, security
 doesn't want plaintext email in the warehouse, so someone hashes it. **A hash is a lookup table
@@ -49,8 +50,8 @@ Every row of data is synthetic.
   phone hashes in about 2 minutes. A 10-million-entry dictionary recovered every email it
   contained. Against AES-SIV, both attacks recovered 0.
 - **Compute is cheap: about 1 extra CPU-second per million rows at ingest,** and joins still
-  work, 8% to 38% slower. Most of the join cost is Tink's constant 5-byte key prefix. Without it,
-  the 50M × 10M join was 4% slower than plaintext.
+  work. The 50M × 10M join was 8% to 38% slower. Most of that is Tink's constant 5-byte key prefix:
+  without it, the join was 4% slower than plaintext.
 - **Storage is the real bill.** The PII columns grew 4.6x (email) and 7.2x (phone), and the
   warehouse grew 2.8x, because a 45-byte random token compresses 1.07x. Sorting orders by the token
   brought that table back to roughly the unsorted plaintext size.
@@ -83,7 +84,8 @@ SIV ("synthetic IV") removes the randomness and derives the IV from the message 
 Same key, same associated data and same email always give the same SIV, so the same token. Change
 one byte of the email and the SIV is unrelated. Decryption recomputes the SIV from the recovered
 plaintext and rejects the token if it doesn't match, so a tampered token fails loudly instead of
-decrypting to garbage.
+decrypting to garbage. I flipped one bit in the SIV, one in the ciphertext, and tried the wrong
+associated data: Tink rejected all three.
 
 **What leaks is exactly one thing: equality.** Two rows with the same token have the same email.
 That's what makes the join work, and it's also the attack surface I come back to in the frequency
@@ -207,19 +209,19 @@ pence.
 
 Two things surprised me. The hashed column, longer than the plaintext, joined about as fast as
 plaintext and ran point lookups twice as fast. And the token column was slowest on native tables
-but beat plaintext on a Parquet point lookup. I don't have a full explanation for the second one.
-My guess for the first is that fixed-width 32-byte values are cheap to compare, and it led to the
-prefix experiment further down.
+but beat plaintext on a Parquet point lookup. I don't have an explanation for the second one. For
+the first, my guess was fixed width. The next experiment points somewhere else: the first few bytes.
 
 **For an analyst, a 2.2-second join became a 3.1-second join.** The difference is real, but it's
 not the kind anyone files a ticket about.
 
 ### The 5 bytes that slowed the joins
 
-Every Tink token starts with the same five bytes: `0x01` and the key id. DuckDB keeps a short prefix
-of every string inline and compares that first, so it can skip most of the work when two strings
-differ early. My guess was that for tokens that prefix never differs, so every comparison falls
-through to the full value. Hashes, by contrast, are random from the first byte.
+Every Tink token starts with the same five bytes: `0x01` and the key id. As I understand DuckDB's
+string format, it keeps the first few bytes of each string inline and compares those first, which
+is cheap when strings differ early. For tokens that prefix never differs, so I suspected every
+comparison was falling through to the full value. Hashes, by contrast, are random from the first
+byte.
 
 Tink can produce tokens without the prefix: a key with output prefix type `RAW`. I checked that a
 RAW key gives exactly the Tink token minus its first 5 bytes (1,000 of 1,000 identical), then built
@@ -258,8 +260,8 @@ once `ORDER BY customer_email`, for each variant:
 **Sorted, the encrypted orders table is about the size of the unsorted plaintext one.** The file
 metadata shows why: unsorted, DuckDB wrote the email column as `PLAIN` in all 50 row groups; sorted,
 it switched to `PLAIN_DICTIONARY` in all 50. The column shrank 4.7x, to roughly what it costs to
-store each of the 9.67 million distinct tokens once (9.67M × 45.3 bytes is 438 MB). The sort roughly doubled the write time, from 11.3 to 21.2 seconds
-for 50 million rows. Plaintext gets the same benefit, so the *gap* doesn't close, but most of the
+store each of the 9.67 million distinct tokens once (9.67M × 45.3 bytes is 438 MB). The sort
+roughly doubled the write time, from 11.3 to 21.2 seconds for 50 million rows. Plaintext gets the same benefit, so the *gap* doesn't close, but most of the
 absolute bill does.
 
 ## What it stops
@@ -305,13 +307,13 @@ never touched the real customer list.
 | AES-SIV, no key (tried sha256, salted sha256, a fresh AES-SIV key) | 0 | |
 | AES-SIV, attacker holds the pipeline's keyset | **1,257,968** | 9.6 s encrypting, ~3 s matching |
 
-The counts were identical in all three runs, on both lab VMs. The 12.58% is a property of my name
+The counts were identical in all three runs. The 12.58% is a property of my name
 generator and the attacker's list, so don't read anything into it. The part that doesn't depend on
 the generator is the second row: **the hash gave up every address the attacker thought to guess, at
 1.7 million guesses per second on one core in Python.**
 
-The last row is the one to remember. **Deterministic encryption is not magic, it's a keyed
-function.** Whoever holds the key, or can ask a service to tokenize for them, can run the exact
+The last row is the one to remember. **Deterministic encryption is a keyed function, and keyed
+functions can be called.** Whoever holds the key, or can ask a service to tokenize for them, can run the exact
 same dictionary attack, at a million guesses per second. Encryption doesn't remove the risk. It
 moves it from "anyone with the salt" to "anyone with the key", and a key can live in a KMS, show up
 in an audit log and be rotated without going back to the source. A salt in a dbt project can't.
@@ -453,7 +455,10 @@ from tink import aead, daead
 aead.register()
 daead.register()
 
-# In production: kek = tink.KmsClient(...).get_aead("gcp-kms://..." or "aws-kms://...")
+# Lab stand-in. In production, use your KMS (pip install "tink[gcpkms]"), e.g.:
+#   from tink.integration import gcpkms
+#   uri = "gcp-kms://projects/.../cryptoKeys/pii-kek"
+#   kek = gcpkms.GcpKmsClient(uri, None).get_aead(uri)
 kek = tink.new_keyset_handle(aead.aead_key_templates.AES256_GCM).primitive(aead.Aead)
 
 for column in ("email", "phone"):
@@ -551,22 +556,22 @@ your files.
   categories. A rough prior labelled up to 89% of a 30-value column.
 
 If I had to change one thing on Monday, I'd find every `sha256(` in the dbt project that touches an
-email or phone column and ask who can read the salt. The answer is usually "everyone who can read
-the repo".
+email or phone column and ask who can read the salt. My bet is the answer turns out to be "anyone
+who can read the repo".
 
 What I still don't know is how much of the ingest cost is Python. The tokenizer spent 0.83 µs per
-value calling into Tink's C++ one value at a time. A vectorised tokenizer, or doing it inside the
+value calling into Tink's C++ one value at a time. A vectorized tokenizer, or doing it inside the
 engine, would probably cut that, and that's the next lab.
 
 ## Reproduce it
 
 ```bash
 git clone https://github.com/netf/blog && cd blog/docs/labs/encrypted-email-joins
-./reproduce.sh     # Ubuntu 24.04, 4 vCPU, ~20 GB disk, about 1.5 hours
+./reproduce.sh     # or: make reproduce. Ubuntu 24.04, 4 vCPU, ~40 GB disk, about 1.5 hours
 ```
 
-`N_CUSTOMERS=1000000 N_ORDERS=5000000 ./reproduce.sh` runs a smaller version in a fraction of the
-time. Corrections are welcome. If you get different numbers, I'd like to see them.
+It runs the preflight first and stops if the machine is missing something. Corrections are
+welcome. If you get different numbers, I'd like to see them.
 
 ## Appendix A: Methodology
 
