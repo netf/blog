@@ -1,0 +1,28 @@
+# preflight 2026-11-13T08:46:58Z
+## compute
+nproc: 4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi        10Gi       4.6Gi       9.2Mi       590Mi       4.9Gi
+Swap:             0B          0B          0B
+balloon pages (inflate-deflate): 2621440
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdc        254G  7.1G  247G   3% /
+virt: kvm
+pid1: tini
+Model name:                              Intel(R) Xeon(R) Processor
+Thread(s) per core:                      1
+Core(s) per socket:                      4
+Socket(s):                               1
+cpu flags of interest: aes avx2 avx512f pclmulqdq sha_ni vaes 
+## kernel
+6.12.113+
+cgroup fs: cgroup2fs
+ulimit -n: 524288
+## tools
+Python 3.12.3
+docker: not installed (not required by this lab)
+postgres: MISSING
+venv: MISSING (run scripts/01-setup.sh)
+## network
+https://pypi.org/simple/tink/ -> 200
+https://apt.postgresql.org/pub/repos/apt/ -> 200

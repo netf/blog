@@ -1,0 +1,8 @@
+plain/customers vm2 154142270 vm1 154142270
+plain/orders vm2 1111614608 vm1 1111614608
+sha256/customers vm2 662766226 vm1 662766226
+sha256/orders vm2 2255244747 vm1 2255244747
+daead/customers vm2 740072407 vm1 740072255
+daead/orders vm2 2763414424 vm1 2763413180
+715fd398cd43918039fd130d40f7ac2c5b54415b58702b8c205a41fbb19d39ce  data/warehouse/plain/customers.parquet
+634c49b6b7d9c129491f00dc4b20e16d57eb9be02706917058cccf4b724949d8  data/warehouse/plain/orders.parquet

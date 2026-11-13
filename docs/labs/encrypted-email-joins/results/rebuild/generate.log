@@ -1,0 +1,4 @@
+customers: 10000000 rows in 74s
+orders: 50000000 rows in 104s
+size customers 1662 MB 10000311
+size orders 5111 MB 50001324

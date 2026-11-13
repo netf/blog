@@ -19,11 +19,9 @@ $PY sizes.py > ../results/sizes/sizes.json
 rm -f ../data/warehouse/*.duckdb ../data/warehouse/*.duckdb.wal
 $PY bench_join.py 3 5 > ../results/join/runs.jsonl
 ./04-rotate.sh 3
-for r in 1 2 3; do
-  $PY attack_dictionary.py 10000000 > "../results/attack/dictionary-run$r.json"
-  $PY attack_phone.py "$r" > "../results/attack/phone-run$r.json"
-done
-$PY frequency.py 3 > ../results/frequency/frequency.json
-$PY test_reid.py 3 > ../results/reid/reid.json
+./05-security.sh
+mkdir -p ../results/layout
+$PY extra_layout.py sort > ../results/layout/sort.json
+$PY extra_layout.py prefix 3 5 > ../results/layout/prefix.jsonl
 $PY summarize.py > ../results/summary.md
 cat ../results/summary.md

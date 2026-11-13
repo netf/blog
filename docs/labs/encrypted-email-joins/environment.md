@@ -42,3 +42,11 @@ duckdb 2.0.0, pyarrow 26.0.0, adbc-driver-postgresql 1.12.0, psycopg 3.3.6, psut
    the keyset protobuf directly in `scripts/keys.py`. Tink's own primitives do all the crypto.
 6. **Scale.** The full requested scale ran: 10M customers and 50M orders, key rotation over all
    60M email cells. Nothing was scaled down.
+7. **Two VMs.** The first VM (kernel 6.12.94+) was recycled partway through the attack runs. The
+   ingest, size, join and rotation benchmarks are from VM 1. The dictionary and phone attacks,
+   frequency analysis, re-identification checks and the two layout follow-ups are from VM 2: same
+   shape (4 vCPU Xeon, same CPU flags, same balloon size), kernel 6.12.113+, same pinned versions
+   (`results/environment-raw-vm2.txt`). `scripts/rebuild.sh` regenerated the data from the same
+   seeds and created new keys; `results/rebuild/` holds that pass's numbers and the check that the
+   plaintext Parquet files are the same size as on VM 1. VM 1's first dictionary run is kept as
+   `results/attack/vm1-dictionary-run1.json`.
