@@ -48,5 +48,5 @@ duckdb 2.0.0, pyarrow 26.0.0, adbc-driver-postgresql 1.12.0, psycopg 3.3.6, psut
    shape (4 vCPU Xeon, same CPU flags, same balloon size), kernel 6.12.113+, same pinned versions
    (`results/environment-raw-vm2.txt`). `scripts/rebuild.sh` regenerated the data from the same
    seeds and created new keys; `results/rebuild/` holds that pass's numbers and the check that the
-   plaintext Parquet files are the same size as on VM 1. VM 1's first dictionary run is kept as
-   `results/attack/vm1-dictionary-run1.json`.
+   plaintext Parquet files are the same size as on VM 1. The dictionary attack had finished on
+   VM 1 too, but its output was never committed, so every attack number comes from VM 2.

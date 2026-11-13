@@ -1,0 +1,20 @@
+{
+ "run": "1",
+ "candidates": 1000000000,
+ "duckdb": "2.0.0",
+ "write_candidates_s": 7.4,
+ "sha256": {
+  "rows": 10000000,
+  "recovered": 10000000,
+  "pct": 100.0,
+  "seconds": 123.1,
+  "candidates_per_s": 8124583
+ },
+ "daead": {
+  "rows": 10000000,
+  "recovered": 0,
+  "pct": 0.0,
+  "seconds": 121.9,
+  "candidates_per_s": 8204206
+ }
+}

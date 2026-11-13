@@ -1,0 +1,87 @@
+{
+ "matrix": {
+  "ana/reidentify/email": 403,
+  "ana/reidentify/phone": 403,
+  "ana/tokenize/email": 403,
+  "ana/tokenize/phone": 403,
+  "sam/reidentify/email": 200,
+  "sam/reidentify/phone": 403,
+  "sam/tokenize/email": 200,
+  "sam/tokenize/phone": 403,
+  "fio/reidentify/email": 200,
+  "fio/reidentify/phone": 200,
+  "fio/tokenize/email": 200,
+  "fio/tokenize/phone": 200,
+  "etl/reidentify/email": 403,
+  "etl/reidentify/phone": 403,
+  "etl/tokenize/email": 200,
+  "etl/tokenize/phone": 200
+ },
+ "round_trip_100": {
+  "status": 200,
+  "all_match_plaintext": true
+ },
+ "tokenize_matches_warehouse_100": true,
+ "phone_token_sent_as_email": 400,
+ "unknown_caller": 401,
+ "support_over_per_request_cap": 413,
+ "support_budget_20x4_within_a_minute": [
+  200,
+  200,
+  429,
+  429
+ ],
+ "single_token_latency": [
+  {
+   "run": 0,
+   "p50_ms": 0.38,
+   "p99_ms": 0.93,
+   "max_ms": 4.049
+  },
+  {
+   "run": 1,
+   "p50_ms": 0.587,
+   "p99_ms": 0.988,
+   "max_ms": 1.2
+  },
+  {
+   "run": 2,
+   "p50_ms": 0.773,
+   "p99_ms": 1.244,
+   "max_ms": 4.607
+  }
+ ],
+ "audit": {
+  "records": 3025,
+  "plaintext_emails_found_in_log": 0,
+  "sample": [
+   {
+    "status": 403,
+    "action": "reidentify",
+    "column": "email",
+    "count": 1,
+    "caller": "ana",
+    "role": "analyst",
+    "ts": 1794561249.83
+   },
+   {
+    "status": 403,
+    "action": "reidentify",
+    "column": "phone",
+    "count": 1,
+    "caller": "ana",
+    "role": "analyst",
+    "ts": 1794561249.831
+   },
+   {
+    "status": 429,
+    "action": "reidentify",
+    "column": "email",
+    "count": 20,
+    "caller": "sam",
+    "role": "support",
+    "ts": 1794561249.843
+   }
+  ]
+ }
+}

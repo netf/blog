@@ -1,0 +1,6 @@
+orders-daead-sorted.parquet row_groups 50 customer_email encodings ['PLAIN_DICTIONARY']
+orders-daead-unsorted.parquet row_groups 50 customer_email encodings ['PLAIN']
+orders-plain-sorted.parquet row_groups 50 customer_email encodings ['PLAIN_DICTIONARY']
+orders-plain-unsorted.parquet row_groups 50 customer_email encodings ['PLAIN']
+orders-sha256-sorted.parquet row_groups 50 customer_email encodings ['PLAIN_DICTIONARY']
+orders-sha256-unsorted.parquet row_groups 50 customer_email encodings ['PLAIN']

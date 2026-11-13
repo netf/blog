@@ -1,0 +1,35 @@
+{
+ "candidates": 10000000,
+ "dictionary_build_s": 24.2,
+ "warehouse_rows": 10000000,
+ "upper_bound": {
+  "rows": 1257968,
+  "pct": 12.58
+ },
+ "sha256_salt_known": {
+  "recovered_rows": 1257968,
+  "pct": 12.58,
+  "hash_s": 5.7,
+  "match_s": 2.6,
+  "guesses_per_s": 1767252
+ },
+ "sha256_salt_unknown": {
+  "recovered_rows": 0,
+  "hash_s": 5.1
+ },
+ "daead_no_key": {
+  "recovered_rows": 0,
+  "tried": {
+   "sha256": 0,
+   "sha256_with_salt": 0,
+   "fresh_aes_siv_key": 0
+  }
+ },
+ "daead_pipeline_key": {
+  "recovered_rows": 1257968,
+  "pct": 12.58,
+  "encrypt_s": 9.6,
+  "match_s": 2.9,
+  "guesses_per_s": 1037842
+ }
+}

@@ -1,0 +1,29 @@
+{"raw_prefix_tink_equals_stripped_token": true}
+{"round": 0, "variant": "plaintext", "query": "join_agg", "ms": [2433.52, 2347.35, 2220.45, 2227.32, 2249.81], "median": 2249.81}
+{"round": 0, "variant": "plaintext", "query": "distinct", "ms": [2250.32, 2328.16, 2305.72, 2656.07, 2446.32], "median": 2328.16}
+{"round": 0, "variant": "plaintext", "query": "point", "ms": [434.02, 422.9, 422.61, 419.82, 432.3], "median": 422.9}
+{"round": 0, "variant": "tinkprefix", "query": "join_agg", "ms": [3220.85, 2936.83, 2887.86, 2860.86, 2873.51], "median": 2887.86}
+{"round": 0, "variant": "tinkprefix", "query": "distinct", "ms": [3307.84, 3325.53, 3327.29, 3285.76, 3277.57], "median": 3307.84}
+{"round": 0, "variant": "tinkprefix", "query": "point", "ms": [566.79, 564.84, 565.22, 568.95, 565.96], "median": 565.96}
+{"round": 0, "variant": "stripped", "query": "join_agg", "ms": [2528.26, 2334.61, 2361.38, 2348.32, 2363.13], "median": 2361.38}
+{"round": 0, "variant": "stripped", "query": "distinct", "ms": [2771.34, 2627.37, 2585.47, 2638.34, 2687.47], "median": 2638.34}
+{"round": 0, "variant": "stripped", "query": "point", "ms": [156.72, 155.86, 154.9, 154.47, 154.52], "median": 154.9}
+{"round": 1, "variant": "tinkprefix", "query": "join_agg", "ms": [2853.05, 2873.16, 2858.3, 2848.54, 3258.02], "median": 2858.3}
+{"round": 1, "variant": "tinkprefix", "query": "distinct", "ms": [3471.1, 3291.86, 3283.26, 3231.75, 3322.43], "median": 3291.86}
+{"round": 1, "variant": "tinkprefix", "query": "point", "ms": [569.12, 569.64, 571.18, 561.66, 560.8], "median": 569.12}
+{"round": 1, "variant": "stripped", "query": "join_agg", "ms": [2377.58, 2373.42, 2343.43, 2534.19, 2412.59], "median": 2377.58}
+{"round": 1, "variant": "stripped", "query": "distinct", "ms": [3110.63, 3021.81, 2587.48, 2647.68, 2790.92], "median": 2790.92}
+{"round": 1, "variant": "stripped", "query": "point", "ms": [158.7, 156.89, 156.29, 157.11, 155.77], "median": 156.89}
+{"round": 1, "variant": "plaintext", "query": "join_agg", "ms": [2256.1, 2263.88, 2295.29, 2288.75, 2277.3], "median": 2277.3}
+{"round": 1, "variant": "plaintext", "query": "distinct", "ms": [2364.01, 2337.78, 2673.27, 2579.66, 2490.42], "median": 2490.42}
+{"round": 1, "variant": "plaintext", "query": "point", "ms": [442.68, 440.05, 436.67, 423.59, 413.88], "median": 436.67}
+{"round": 2, "variant": "stripped", "query": "join_agg", "ms": [2400.69, 2403.98, 2451.79, 2356.64, 2431.57], "median": 2403.98}
+{"round": 2, "variant": "stripped", "query": "distinct", "ms": [2709.51, 2812.27, 2628.99, 2728.48, 2648.78], "median": 2709.51}
+{"round": 2, "variant": "stripped", "query": "point", "ms": [161.44, 160.47, 156.85, 157.65, 156.72], "median": 157.65}
+{"round": 2, "variant": "plaintext", "query": "join_agg", "ms": [2390.46, 2344.06, 2276.91, 2316.13, 2383.53], "median": 2344.06}
+{"round": 2, "variant": "plaintext", "query": "distinct", "ms": [2608.06, 2636.9, 2304.4, 2386.27, 2392.07], "median": 2392.07}
+{"round": 2, "variant": "plaintext", "query": "point", "ms": [415.5, 411.96, 398.28, 423.06, 412.08], "median": 412.08}
+{"round": 2, "variant": "tinkprefix", "query": "join_agg", "ms": [2952.64, 3386.27, 2914.56, 2920.67, 2977.86], "median": 2952.64}
+{"round": 2, "variant": "tinkprefix", "query": "distinct", "ms": [3496.89, 3270.83, 3417.51, 3603.33, 3522.78], "median": 3496.89}
+{"round": 2, "variant": "tinkprefix", "query": "point", "ms": [572.71, 568.21, 574.49, 570.31, 566.34], "median": 570.31}
+{"identical_results": true}

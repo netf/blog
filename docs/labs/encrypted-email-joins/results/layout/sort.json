@@ -1,0 +1,32 @@
+{
+ "plain/unsorted": {
+  "file_bytes": 1038861350,
+  "customer_email_bytes": 443415037,
+  "seconds": 6.9
+ },
+ "plain/sorted": {
+  "file_bytes": 764719363,
+  "customer_email_bytes": 113039602,
+  "seconds": 14.0
+ },
+ "sha256/unsorted": {
+  "file_bytes": 2211092573,
+  "customer_email_bytes": 1615643991,
+  "seconds": 8.7
+ },
+ "sha256/sorted": {
+  "file_bytes": 1009814950,
+  "customer_email_bytes": 358134436,
+  "seconds": 14.3
+ },
+ "daead/unsorted": {
+  "file_bytes": 2698453693,
+  "customer_email_bytes": 2103002410,
+  "seconds": 11.3
+ },
+ "daead/sorted": {
+  "file_bytes": 1102941502,
+  "customer_email_bytes": 451254206,
+  "seconds": 21.2
+ }
+}
