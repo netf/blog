@@ -1,0 +1,40 @@
+# preflight 2026-10-22T16:33:40Z
+## compute
+nproc: 4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi        10Gi       3.7Gi        48Mi       1.5Gi       4.9Gi
+Swap:             0B          0B          0B
+balloon pages (inflate-deflate): 2621440
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdc        254G  7.7G  246G   4% /
+virt: kvm
+pid1: tini
+Model name:                              Intel(R) Xeon(R) Processor
+Thread(s) per core:                      1
+Core(s) per socket:                      4
+Socket(s):                               1
+cpu flags of interest: aes avx2 avx512f pclmulqdq sha_ni vaes 
+## kernel
+6.12.94+
+cgroup fs: cgroup2fs
+ulimit -n: 524288
+## tools
+Python 3.12.3
+docker: not installed (not required by this lab)
+postgres (PostgreSQL) 18.6 (Ubuntu 18.6-1.pgdg24.04+2)
+absl-py==2.5.1
+adbc-driver-manager==1.12.0
+adbc-driver-postgresql==1.12.0
+bazel_runfiles==2.4.3
+duckdb==2.0.0
+importlib_resources==7.1.0
+protobuf==7.36.2
+psutil==7.2.2
+psycopg==3.3.6
+psycopg-binary==3.3.6
+pyarrow==26.0.0
+tink==1.16.1
+typing_extensions==4.16.0
+## network
+https://pypi.org/simple/tink/ -> 200
+https://apt.postgresql.org/pub/repos/apt/ -> 200

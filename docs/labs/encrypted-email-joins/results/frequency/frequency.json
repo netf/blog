@@ -1,0 +1,40 @@
+{
+ "rows": 10000000,
+ "distinct_plaintext": 30,
+ "distinct_daead_tokens": 30,
+ "runs": [
+  {
+   "seed": 0,
+   "rows_labelled_correctly_pct": 87.36,
+   "countries_identified": 19,
+   "top5_correct": 5
+  },
+  {
+   "seed": 1,
+   "rows_labelled_correctly_pct": 88.83,
+   "countries_identified": 17,
+   "top5_correct": 5
+  },
+  {
+   "seed": 2,
+   "rows_labelled_correctly_pct": 82.75,
+   "countries_identified": 20,
+   "top5_correct": 3
+  }
+ ],
+ "only_knowing_gb_is_biggest": {
+  "token_prefix_hex": "0121c2df06092ac7",
+  "is": "GB",
+  "rows_pct": 40.62
+ },
+ "control_randomized_aead": {
+  "rows": 1000000,
+  "distinct_tokens": 1000000
+ },
+ "email_equality_in_orders": {
+  "orders": 50000000,
+  "distinct_tokens": 9673196,
+  "max_orders_one_token": 15835,
+  "tokens_with_100plus_orders": 6425
+ }
+}

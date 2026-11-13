@@ -1,0 +1,415 @@
+{
+ "files": {
+  "plain/customers": {
+   "file_bytes": 154142270,
+   "rows": 10000000,
+   "row_groups": 19,
+   "columns": {
+    "customer_id": {
+     "stored_bytes": 13418704,
+     "logical_bytes": 80000000,
+     "ratio": 5.96,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "email": {
+     "stored_bytes": 92935060,
+     "logical_bytes": 243097044,
+     "ratio": 2.62,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "phone": {
+     "stored_bytes": 40921321,
+     "logical_bytes": 130000000,
+     "ratio": 3.18,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "country": {
+     "stored_bytes": 5109637,
+     "logical_bytes": 20000000,
+     "ratio": 3.91,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "plan": {
+     "stored_bytes": 1603772,
+     "logical_bytes": 37499782,
+     "ratio": 23.38,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "signup_date": {
+     "stored_bytes": 140045,
+     "logical_bytes": 40000000,
+     "ratio": 285.62,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  },
+  "plain/orders": {
+   "file_bytes": 1111614608,
+   "rows": 50000000,
+   "row_groups": 81,
+   "columns": {
+    "order_id": {
+     "stored_bytes": 175465591,
+     "logical_bytes": 200000000,
+     "ratio": 1.14,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "customer_email": {
+     "stored_bytes": 461246918,
+     "logical_bytes": 1211851441,
+     "ratio": 2.63,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "amount_pence": {
+     "stored_bytes": 97736412,
+     "logical_bytes": 200000000,
+     "ratio": 2.05,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "ordered_at": {
+     "stored_bytes": 367863924,
+     "logical_bytes": 400000000,
+     "ratio": 1.09,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "status": {
+     "stored_bytes": 9250340,
+     "logical_bytes": 289989344,
+     "ratio": 31.35,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  },
+  "sha256/customers": {
+   "file_bytes": 662766226,
+   "rows": 10000000,
+   "row_groups": 19,
+   "columns": {
+    "customer_id": {
+     "stored_bytes": 13418704,
+     "logical_bytes": 80000000,
+     "ratio": 5.96,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "email": {
+     "stored_bytes": 321239513,
+     "logical_bytes": 320000000,
+     "ratio": 1.0,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "phone": {
+     "stored_bytes": 321239513,
+     "logical_bytes": 320000000,
+     "ratio": 1.0,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "country": {
+     "stored_bytes": 5109637,
+     "logical_bytes": 20000000,
+     "ratio": 3.91,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "plan": {
+     "stored_bytes": 1603772,
+     "logical_bytes": 37499782,
+     "ratio": 23.38,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "signup_date": {
+     "stored_bytes": 140045,
+     "logical_bytes": 40000000,
+     "ratio": 285.62,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  },
+  "sha256/orders": {
+   "file_bytes": 2255244747,
+   "rows": 50000000,
+   "row_groups": 81,
+   "columns": {
+    "order_id": {
+     "stored_bytes": 175465591,
+     "logical_bytes": 200000000,
+     "ratio": 1.14,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "customer_email": {
+     "stored_bytes": 1604875622,
+     "logical_bytes": 1600000000,
+     "ratio": 1.0,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "amount_pence": {
+     "stored_bytes": 97736412,
+     "logical_bytes": 200000000,
+     "ratio": 2.05,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "ordered_at": {
+     "stored_bytes": 367863924,
+     "logical_bytes": 400000000,
+     "ratio": 1.09,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "status": {
+     "stored_bytes": 9250340,
+     "logical_bytes": 289989344,
+     "ratio": 31.35,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  },
+  "daead/customers": {
+   "file_bytes": 740072255,
+   "rows": 10000000,
+   "row_groups": 19,
+   "columns": {
+    "customer_id": {
+     "stored_bytes": 13418704,
+     "logical_bytes": 80000000,
+     "ratio": 5.96,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "email": {
+     "stored_bytes": 424520481,
+     "logical_bytes": 453097044,
+     "ratio": 1.07,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "phone": {
+     "stored_bytes": 295263823,
+     "logical_bytes": 340000000,
+     "ratio": 1.15,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "country": {
+     "stored_bytes": 5109637,
+     "logical_bytes": 20000000,
+     "ratio": 3.91,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "plan": {
+     "stored_bytes": 1603772,
+     "logical_bytes": 37499782,
+     "ratio": 23.38,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "signup_date": {
+     "stored_bytes": 140045,
+     "logical_bytes": 40000000,
+     "ratio": 285.62,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  },
+  "daead/orders": {
+   "file_bytes": 2763413180,
+   "rows": 50000000,
+   "row_groups": 81,
+   "columns": {
+    "order_id": {
+     "stored_bytes": 175465591,
+     "logical_bytes": 200000000,
+     "ratio": 1.14,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "customer_email": {
+     "stored_bytes": 2113041470,
+     "logical_bytes": 2261851441,
+     "ratio": 1.07,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "amount_pence": {
+     "stored_bytes": 97736412,
+     "logical_bytes": 200000000,
+     "ratio": 2.05,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "ordered_at": {
+     "stored_bytes": 367863924,
+     "logical_bytes": 400000000,
+     "ratio": 1.09,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    },
+    "status": {
+     "stored_bytes": 9250340,
+     "logical_bytes": 289989344,
+     "ratio": 31.35,
+     "encodings": [
+      "PLAIN",
+      "RLE",
+      "RLE_DICTIONARY"
+     ]
+    }
+   }
+  }
+ },
+ "codecs": {
+  "sample_rows": 2000000,
+  "plain/customers.email/none": 29315663,
+  "plain/customers.email/snappy": 14803700,
+  "plain/customers.email/zstd3": 9477900,
+  "plain/customers.email/zstd9": 8780089,
+  "plain/customers.phone/none": 17834080,
+  "plain/customers.phone/snappy": 9639933,
+  "plain/customers.phone/zstd3": 4260106,
+  "plain/customers.phone/zstd9": 4107649,
+  "plain/orders.customer_email/none": 34955786,
+  "plain/orders.customer_email/snappy": 17727593,
+  "plain/orders.customer_email/zstd3": 11377313,
+  "plain/orders.customer_email/zstd9": 10543805,
+  "sha256/customers.email/none": 33331585,
+  "sha256/customers.email/snappy": 33333325,
+  "sha256/customers.email/zstd3": 33327856,
+  "sha256/customers.email/zstd9": 33327856,
+  "sha256/customers.phone/none": 33331585,
+  "sha256/customers.phone/snappy": 33333325,
+  "sha256/customers.phone/zstd3": 33327856,
+  "sha256/customers.phone/zstd9": 33327856,
+  "sha256/orders.customer_email/none": 39578396,
+  "sha256/orders.customer_email/snappy": 39580451,
+  "sha256/orders.customer_email/zstd3": 39576800,
+  "sha256/orders.customer_email/zstd9": 39576800,
+  "daead/customers.email/none": 51039770,
+  "daead/customers.email/snappy": 45481014,
+  "daead/customers.email/zstd3": 43841238,
+  "daead/customers.email/zstd9": 43722310,
+  "daead/customers.phone/none": 39533673,
+  "daead/customers.phone/snappy": 33120379,
+  "daead/customers.phone/zstd3": 30633243,
+  "daead/customers.phone/zstd9": 30470057,
+  "daead/orders.customer_email/none": 60793524,
+  "daead/orders.customer_email/snappy": 54174580,
+  "daead/orders.customer_email/zstd3": 52107799,
+  "daead/orders.customer_email/zstd9": 51938344
+ }
+}
