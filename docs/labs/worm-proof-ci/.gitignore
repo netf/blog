@@ -1,0 +1,5 @@
+# Scratch run state: tokens, workspaces, pids, logs, registry storage.
+.run/
+registry/
+landlock/landlock-run
+corpus/projects/*/node_modules/
