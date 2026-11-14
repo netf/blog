@@ -29,8 +29,10 @@ if (attack.length) {
   w('');
 }
 
-const ov = rd('overhead.jsonl').filter((r) => r.cache_state === 'warm' || r.cache_state === 'cold');
+for (const [file, label] of [['overhead.jsonl', 'default Node compile cache'], ['overhead-compile-cache.jsonl', 'persistent Node compile cache per regime']]) {
+const ov = rd(file).filter((r) => r.cache_state === 'warm' || r.cache_state === 'cold');
 if (ov.length) {
+  w(`# Overhead dataset: ${file} (${label})\n`);
   const modes = [...new Set(ov.map((r) => r.mode))];
   const projects = [...new Set(ov.map((r) => r.project))].sort();
   const allow = (p) => { try { return fs.readFileSync(path.join(LAB, 'corpus/projects', p, 'allowlist.txt'), 'utf8').trim(); } catch (e) { return ''; } };
@@ -61,6 +63,7 @@ if (ov.length) {
     w(`- ${m}: ${rs.filter((r) => r.exit_code === 0).length}/${rs.length}`);
   }
   w('');
+}
 }
 
 try {
