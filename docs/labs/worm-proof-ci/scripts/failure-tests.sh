@@ -67,4 +67,19 @@ node -e 'require("fs").writeFileSync(process.argv[1],JSON.stringify({name:"@worm
 if bash "${LAB_DIR}/scripts/stage-publish.sh" --project "${P}" >/dev/null 2>&1; then PUB=ok; else PUB=fail; fi
 emit test publish_stage install_stage_worm_publish "${INSTALL_ERR}" publish_stage_publish "${PUB}" \
   publish_stage_ran_lifecycle_script "$([ -f "${P}/PREPUBLISH_RAN" ] && echo yes || echo no)"
+log "6. a node-gyp package (better-sqlite3) when its install script is allowed to run in the jail"
+# npm ci runs an implicit `node-gyp rebuild` for it (binding.gyp present; the lockfile has no
+# hasInstallScript flag). The build is a no-op when a prebuild exists, but node-gyp first fetches
+# Node headers from nodejs.org, which the registry-only egress policy blocks.
+D6="${LAB_DIR}/corpus/projects/better-sqlite3"
+for CASE in "sandbox:on::0" "hardened:off:better-sqlite3:0" "hardened:off:better-sqlite3:1" "landlock:off:better-sqlite3:0" "landlock:off:better-sqlite3:1"; do
+  IFS=: read -r M SC A H <<<"${CASE}"
+  rm -rf "${D6}/node_modules"; : > "${RUN_DIR}/t6.json"
+  GYP_LOCAL_HEADERS="${H}" bash "${LAB_DIR}/scripts/stage-install.sh" --mode "${M}" --project "${D6}" --scripts "${SC}" \
+    --allow "${A}" --cache "${RUN_DIR}/cache-${M}" --out "${RUN_DIR}/t6.json"
+  RC="$(node -e 'console.log(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).exit_code)' "${RUN_DIR}/t6.json")"
+  WHY=-; grep -q 'headers.tar.gz failed' "${RUN_DIR}/install-${M}.out" && WHY="node-gyp could not fetch Node headers from nodejs.org"
+  DNSWHY="$(grep -oE 'getaddrinfo [A-Z_]+' "${RUN_DIR}/install-${M}.out" | head -1 || true)"; [ -n "${DNSWHY}" ] && WHY="${WHY} (${DNSWHY})"
+  emit test node_gyp_in_jail mode "${M}" scripts "${SC}" allow "${A:--}" local_node_headers "$([ "${H}" = 1 ] && echo yes || echo no)" install_exit "${RC}" failure "${WHY:--}"
+done
 log "failure tests complete -> ${OUT}"

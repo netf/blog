@@ -33,6 +33,9 @@ WR="${REPORTS}/worm-${MODE}.jsonl"; : > "${WR}"
 LL="${LAB_DIR}/landlock/landlock-run"
 CC_ENV=(); [ "${COMPILE_CACHE}" = keep ] && CC_ENV=(NODE_COMPILE_CACHE="${CACHE}/node-compile-cache")
 CC_BW=(); [ "${COMPILE_CACHE}" = keep ] && CC_BW=(--setenv NODE_COMPILE_CACHE "${CACHE}/node-compile-cache")
+# GYP_LOCAL_HEADERS=1 points node-gyp at the headers that ship with the Node install, so native
+# builds do not need to fetch them from nodejs.org (which the egress allowlist blocks).
+if [ "${GYP_LOCAL_HEADERS:-0}" = 1 ]; then CC_BW+=(--setenv npm_config_nodedir "${NODE_DIR}"); CC_ENV+=(npm_config_nodedir="${NODE_DIR}"); fi
 U="$(id -u)"; G="$(id -g)"
 
 if [ -f "${PROJECT}/package-lock.json" ]; then NPMSUB=ci; else NPMSUB=install; fi

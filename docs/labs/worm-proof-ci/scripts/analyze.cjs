@@ -76,6 +76,18 @@ try {
   w('');
 } catch (e) {}
 
+const census = rd('script-census.jsonl');
+if (census.length) {
+  const ran = census.filter((r) => r.scripts_ran.length);
+  w('## Script census: what `npm ci` actually ran (scripts on, --foreground-scripts)\n');
+  w(`- Projects where npm ran at least one lifecycle script: ${ran.length}/${census.length} (${ran.map((r) => r.project).join(', ')}).`);
+  w(`- Scripts that ran: ${[...new Set(census.flatMap((r) => r.scripts_ran))].sort().join(', ')}.`);
+  w(`- Ran but not flagged hasInstallScript in the lockfile: ${[...new Set(census.flatMap((r) => r.ran_but_not_flagged))].join(', ') || 'none'}.`);
+  w(`- Flagged but never ran on this platform: ${[...new Set(census.flatMap((r) => r.flagged_but_not_ran))].join(', ') || 'none'}.`);
+  w(`- Install success with scripts on: ${census.filter((r) => r.exit_code === 0).length}/${census.length}.`);
+  w('');
+}
+
 const ft = rd('failure-tests.jsonl');
 if (ft.length) {
   w('## Failure tests\n');

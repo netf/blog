@@ -51,6 +51,7 @@ bash scripts/registry-up.sh               # Verdaccio, publish account, seed the
 bash scripts/sink-up.sh                   # canary sink
 bash scripts/plant-canaries.sh            # victim $HOME and env
 bash scripts/corpus-build.sh              # lockfiles (reused if present) + allowlists
+bash scripts/script-census.sh             # results/script-census.jsonl (what npm ci really runs)
 N=5 bash scripts/run-attack.sh            # results/attack.jsonl
 WARM_N=5 COLD_N=3 bash scripts/measure-overhead.sh                                  # results/overhead.jsonl
 COMPILE_CACHE=keep OVERHEAD_OUT=overhead-compile-cache.jsonl bash scripts/measure-overhead.sh
@@ -68,6 +69,7 @@ Don't run two suites at once: they share the network namespace and the sink.
 | `results/overhead.jsonl` | 30 projects × 3 regimes × (5 warm + 3 cold), default Node compile cache |
 | `results/overhead-compile-cache.jsonl` | the same with a persistent compile cache per regime |
 | `results/failure-tests.jsonl` | detached process, HTTP/DNS exfil with a repo secret, native binaries, checkout writes, publish stage |
+| `results/script-census.jsonl` | per project: scripts npm ci actually ran vs the lockfile flags, packages with binding.gyp |
 | `results/netns-allowlist.nft` | the egress ruleset as loaded |
 | `results/summary.md` | everything above, tabulated |
 
