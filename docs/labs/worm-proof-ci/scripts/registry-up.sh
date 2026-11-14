@@ -15,7 +15,7 @@ cp "${LAB_DIR}/config/verdaccio.yaml" "${REG}/config.yaml"
 # apr1 hashes are accepted by verdaccio's htpasswd plugin.
 printf '%s:%s\n' "${PUBLISH_USER}" "$(openssl passwd -apr1 -salt wormsalt "${PUBLISH_PASS}")" > "${REG}/htpasswd"
 
-pkill -f "verdaccio --config" 2>/dev/null || true; sleep 0.5
+[ -f "${RUN_DIR}/verdaccio.pid" ] && kill "$(cat "${RUN_DIR}/verdaccio.pid")" 2>/dev/null; pkill -x verdaccio 2>/dev/null || true; sleep 0.5  # verdaccio renames its process
 # setsid + </dev/null so the daemon never holds the caller's pipe open.
 ( cd "${REG}" && setsid "${VERDACCIO}" --config config.yaml --listen "0.0.0.0:${REGISTRY_PORT}" \
     </dev/null > "${REG}/stdout.log" 2>&1 & echo $! > "${RUN_DIR}/verdaccio.pid" )
