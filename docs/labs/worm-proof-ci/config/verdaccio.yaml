@@ -1,0 +1,36 @@
+# Verdaccio config for the worm-proof-ci lab.
+# Listens on all addresses so both the host netns and the wormlab netns (via the veth) reach it.
+# Self-registration is disabled (max_users: -1) and publishing requires an authenticated user,
+# so an install-stage worm without a credential cannot publish.
+storage: ./storage
+auth:
+  htpasswd:
+    file: ./htpasswd
+    max_users: -1
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+    maxage: 60m
+    timeout: 60s
+    # Do not let a burst of parallel metadata requests trip the circuit breaker; with the
+    # defaults, uncached packages started returning 404 halfway through building the corpus.
+    max_fails: 1000
+    fail_timeout: 1s
+    cache: true
+packages:
+  '@wormlab/*':
+    access: $all
+    publish: $authenticated
+    unpublish: $authenticated
+  '**':
+    access: $all
+    publish: $authenticated
+    unpublish: $authenticated
+    proxy: npmjs
+log:
+  type: file
+  path: ./verdaccio.log
+  level: http
+listen:
+  - 0.0.0.0:4873
+max_body_size: 100mb

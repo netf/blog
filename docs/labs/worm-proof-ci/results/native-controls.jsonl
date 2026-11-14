@@ -1,0 +1,6 @@
+{"project":"esbuild","binary_removed":"@esbuild/linux-x64","smoke_intact":"pass","smoke_after_removal":"fail"}
+{"project":"bcrypt","binary_removed":"bcrypt/prebuilds","smoke_intact":"pass","smoke_after_removal":"fail"}
+{"project":"swc-core","binary_removed":"@swc/core-linux-x64-gnu","smoke_intact":"pass","smoke_after_removal":"fail"}
+{"project":"sharp","binary_removed":"@img/sharp-linux-x64 @img/sharp-wasm32","smoke_intact":"pass","smoke_after_removal":"fail"}
+{"project":"better-sqlite3","binary_removed":"better-sqlite3/prebuilds/linux-x64.node","smoke_intact":"pass","smoke_after_removal":"fail"}
+{"project":"jest","binary_removed":"@parcel/watcher-linux-x64-glibc","smoke_intact":"pass","smoke_after_removal":"fail"}

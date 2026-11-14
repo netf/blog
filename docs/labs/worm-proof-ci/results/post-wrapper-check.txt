@@ -1,0 +1,7 @@
+# wrapper extracted from the post: 45 lines
+express allowlist=[] exit=0 installed_top_level=65
+  registry from jail: 200
+  C2 tcp/9099 from jail: blocked (timeout)
+  udp/53 to 1.1.1.1 from jail: blocked EPERM
+  entries in $HOME: 0; env vars containing TOKEN: 0
+esbuild allowlist=[esbuild] exit=0 installed_top_level=2
