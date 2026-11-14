@@ -23,6 +23,7 @@ bash scripts/failure-tests.sh
 bash scripts/native-controls.sh
 bash scripts/compile-cache-evidence.sh
 bash scripts/gyp-ci-vs-install.sh
+bash scripts/test-post-wrapper.sh
 node scripts/analyze.cjs > /dev/null
 bash scripts/registry-down.sh
 sudo ip netns del wormlab 2>/dev/null || true; sudo ip link del veth-wh 2>/dev/null || true
