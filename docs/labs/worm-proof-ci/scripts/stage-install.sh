@@ -16,6 +16,9 @@
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 MODE=hardened PROJECT="" SCRIPTS=off CACHE="" ALLOW="" OUT=/dev/null BEHAVIORS=""
+# COMPILE_CACHE=keep gives every regime a persistent Node compile cache inside its npm cache dir.
+# Without it the sandboxes start with an empty one on every run (fresh /tmp), the baseline does not.
+COMPILE_CACHE="${COMPILE_CACHE:-default}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --mode) MODE="$2";; --project) PROJECT="$2";; --scripts) SCRIPTS="$2";; --cache) CACHE="$2";;
@@ -28,6 +31,8 @@ CACHE="${CACHE:-${RUN_DIR}/npm-cache-${MODE}}"; mkdir -p "${CACHE}"
 REPORTS="${RUN_DIR}/reports"; mkdir -p "${REPORTS}"
 WR="${REPORTS}/worm-${MODE}.jsonl"; : > "${WR}"
 LL="${LAB_DIR}/landlock/landlock-run"
+CC_ENV=(); [ "${COMPILE_CACHE}" = keep ] && CC_ENV=(NODE_COMPILE_CACHE="${CACHE}/node-compile-cache")
+CC_BW=(); [ "${COMPILE_CACHE}" = keep ] && CC_BW=(--setenv NODE_COMPILE_CACHE "${CACHE}/node-compile-cache")
 U="$(id -u)"; G="$(id -g)"
 
 if [ -f "${PROJECT}/package-lock.json" ]; then NPMSUB=ci; else NPMSUB=install; fi
@@ -46,7 +51,7 @@ in_bwrap() {
       --bind "${PROJECT}" "${PROJECT}" --bind "${CACHE}" "${CACHE}" --bind "${REPORTS}" "${REPORTS}" \
       --chdir "${PROJECT}" --clearenv \
       --setenv HOME /sbx-home --setenv PATH "${NODE_DIR}/bin:/usr/bin:/bin" \
-      --setenv WORM_REPORT "${WR}" --setenv WORM_BEHAVIORS "${BEHAVIORS}" \
+      --setenv WORM_REPORT "${WR}" --setenv WORM_BEHAVIORS "${BEHAVIORS}" "${CC_BW[@]}" \
       "$@" </dev/null
 }
 
@@ -54,7 +59,7 @@ in_bwrap() {
 in_landlock() {
   local T; T="$(mktemp -d /tmp/ll-XXXXXX)"; mkdir -p "${T}/home"
   ( cd "${PROJECT}" && env -i HOME="${T}/home" TMPDIR="${T}" PATH="${NODE_DIR}/bin:/usr/bin:/bin" \
-      WORM_REPORT="${WR}" WORM_BEHAVIORS="${BEHAVIORS}" \
+      WORM_REPORT="${WR}" WORM_BEHAVIORS="${BEHAVIORS}" "${CC_ENV[@]}" \
       "${LL}" -r /usr -r /bin -r /sbin -r /lib -r /lib64 -r /etc -r /proc -r /sys -r /dev -r "${NODE_DIR}" \
         -w /dev/null -w "${PROJECT}" -w "${CACHE}" -w "${T}" -w "${REPORTS}" \
         -c "${REGISTRY_PORT}" -- "$@" </dev/null )
@@ -65,7 +70,7 @@ run_install() {
   case "${MODE}" in
     baseline)
       ( cd "${PROJECT}" && env -i HOME="${RUN_DIR}/victim-home" PATH="${NODE_DIR}/bin:/usr/bin:/bin" \
-          $(cat "${RUN_DIR}/victim.env") WORM_REPORT="${WR}" WORM_BEHAVIORS="${BEHAVIORS}" \
+          $(cat "${RUN_DIR}/victim.env") WORM_REPORT="${WR}" WORM_BEHAVIORS="${BEHAVIORS}" "${CC_ENV[@]}" \
           npm "${NPMSUB}" "${NPM_FLAGS[@]}" </dev/null ) ;;
     sandbox|hardened) in_bwrap npm "${NPMSUB}" "${NPM_FLAGS[@]}" ;;
     landlock) in_landlock npm "${NPMSUB}" "${NPM_FLAGS[@]}" ;;
@@ -89,3 +94,4 @@ set -e
 T1=$(date +%s.%N)
 node -e 'const a=process.argv.slice(1);process.stdout.write(JSON.stringify({project:a[0],mode:a[1],scripts:a[2],install_seconds:+(+a[3]).toFixed(3),exit_code:+a[4],npm:a[5]})+"\n")' \
   "$(basename "${PROJECT}")" "${MODE}" "${SCRIPTS}" "$(echo "${T1} - ${T0}" | bc)" "${RC}" "${NPMSUB}" >> "${OUT}"
+# (compile_cache is recorded by the overhead driver)

@@ -6,10 +6,12 @@
 #   landlock  Landlock + cleared env, --ignore-scripts, rebuild of allowlisted packages
 # Warm: npm cache primed once, then WARM_N timed runs. Cold: npm cache wiped before each of
 # COLD_N runs (the registry stays warm, as a CI registry proxy would be).
+# COMPILE_CACHE=keep OVERHEAD_OUT=overhead-compile-cache.jsonl reruns it with a persistent Node
+# compile cache per regime (see stage-install.sh).
 # Modes are interleaved per project so drift on the VM hits all three equally.
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 WARM_N="${WARM_N:-5}"; COLD_N="${COLD_N:-3}"; MODES=(${MODES:-baseline hardened landlock})
-OUT="${RESULTS}/overhead.jsonl"; : > "${OUT}"
+OUT="${RESULTS}/${OVERHEAD_OUT:-overhead.jsonl}"; : > "${OUT}"
 sudo bash "${LAB_DIR}/scripts/netns-up.sh" allowlist >/dev/null 2>&1
 
 one() { # dir mode state cachedir run emit(0/1)
@@ -19,7 +21,7 @@ one() { # dir mode state cachedir run emit(0/1)
   : > "${T}"
   bash "${LAB_DIR}/scripts/stage-install.sh" --mode "${M}" --project "${D}" --scripts "${SC}" \
     --cache "${C}" --allow "${ALLOW}" --out "${T}"
-  [ "${E}" = 1 ] && node -e 'const o=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));o.cache_state=process.argv[2];o.run=+process.argv[3];console.log(JSON.stringify(o))' "${T}" "${S}" "${R}" >> "${OUT}"
+  [ "${E}" = 1 ] && node -e 'const o=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));o.cache_state=process.argv[2];o.compile_cache=process.env.COMPILE_CACHE||"default";o.run=+process.argv[3];console.log(JSON.stringify(o))' "${T}" "${S}" "${R}" >> "${OUT}"
   return 0
 }
 

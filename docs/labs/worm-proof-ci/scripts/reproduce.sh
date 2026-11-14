@@ -17,6 +17,7 @@ bash scripts/plant-canaries.sh
 bash scripts/corpus-build.sh
 N=5 bash scripts/run-attack.sh
 WARM_N=5 COLD_N=3 bash scripts/measure-overhead.sh
+COMPILE_CACHE=keep OVERHEAD_OUT=overhead-compile-cache.jsonl WARM_N=5 COLD_N=3 bash scripts/measure-overhead.sh
 bash scripts/failure-tests.sh
 node scripts/analyze.cjs > /dev/null
 bash scripts/registry-down.sh

@@ -1,0 +1,15 @@
+{"test":"detached_bg_process","mode":"baseline","bg_processes_alive_after_exit":2,"bg_sink_hits_after_exit":16}
+{"test":"detached_bg_process","mode":"sandbox","bg_processes_alive_after_exit":0,"bg_sink_hits_after_exit":0}
+{"test":"detached_bg_process","mode":"landlock","bg_processes_alive_after_exit":2,"bg_sink_hits_after_exit":0}
+{"test":"exfiltration","mode":"baseline","secrets_found":5,"http_canaries":4,"dns_canaries":4,"repo_secret_found":2,"repo_secret_out_http":2,"repo_secret_out_dns":2}
+{"test":"exfiltration","mode":"sandbox","secrets_found":1,"http_canaries":0,"dns_canaries":0,"repo_secret_found":2,"repo_secret_out_http":0,"repo_secret_out_dns":0}
+{"test":"exfiltration","mode":"landlock","secrets_found":1,"http_canaries":0,"dns_canaries":1,"repo_secret_found":2,"repo_secret_out_http":0,"repo_secret_out_dns":2}
+{"test":"native_binary","project":"esbuild","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"bcrypt","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"swc-core","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"sharp","declares_install_script":"no","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"better-sqlite3","declares_install_script":"no","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"workspace_writes","mode":"baseline","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"yes"}
+{"test":"workspace_writes","mode":"sandbox","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"no"}
+{"test":"workspace_writes","mode":"landlock","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"no"}
+{"test":"publish_stage","install_stage_worm_publish":"ENEEDAUTH","publish_stage_publish":"ok","publish_stage_ran_lifecycle_script":"no"}

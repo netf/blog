@@ -61,7 +61,7 @@ done
 log "5. the publish stage: the install stage cannot publish, the publish stage can"
 reset_victim
 bash "${LAB_DIR}/scripts/stage-install.sh" --mode sandbox --project "${VA}" --scripts on --behaviors publish
-INSTALL_ERR="$(worm_field sandbox '(r.steps.publish.stderr.match(/code (\w+)/)||[])[1]')"
+INSTALL_ERR="$(worm_field sandbox 'steps.publish&&(r.steps.publish.stderr.match(/code (\w+)/)||[])[1]')"
 P="${RUN_DIR}/workspaces/release-demo"; rm -rf "${P}"; mkdir -p "${P}"; echo 'module.exports=1' > "${P}/index.js"
 node -e 'require("fs").writeFileSync(process.argv[1],JSON.stringify({name:"@wormlab/release-demo",version:"1.0."+Date.now(),files:["index.js"],scripts:{prepublishOnly:"touch PREPUBLISH_RAN"}}))' "${P}/package.json"
 if bash "${LAB_DIR}/scripts/stage-publish.sh" --project "${P}" >/dev/null 2>&1; then PUB=ok; else PUB=fail; fi
