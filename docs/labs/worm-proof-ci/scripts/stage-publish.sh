@@ -16,5 +16,5 @@ sudo ip netns exec "${NETNS}" setpriv --reuid "${U}" --regid "${G}" --clear-grou
     --ro-bind "${NODE_DIR}" "${NODE_DIR}" --proc /proc --dev /dev --tmpfs /tmp \
     --ro-bind "${PUBHOME}" "${PUBHOME}" --bind "${PROJECT}" "${PROJECT}" \
     --chdir "${PROJECT}" --clearenv \
-    --setenv HOME "${PUBHOME}" --setenv PATH "${NODE_DIR}/bin:/usr/bin:/bin" \
+    --setenv HOME "${PUBHOME}" --setenv npm_config_cache /tmp/npm-cache --setenv PATH "${NODE_DIR}/bin:/usr/bin:/bin" \
     npm publish --registry "${REGISTRY_URL}" --ignore-scripts --auth-type=legacy --loglevel=error </dev/null

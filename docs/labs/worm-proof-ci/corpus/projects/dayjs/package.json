@@ -1,0 +1,2 @@
+{ "name": "corpus-dayjs", "version": "1.0.0", "private": true,
+  "dependencies": { "dayjs": "latest" } }

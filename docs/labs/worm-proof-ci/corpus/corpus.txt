@@ -1,0 +1,35 @@
+# 30 real OSS npm packages. Each becomes a one-dependency project whose full transitive tree is
+# installed from the local registry (which proxies npmjs read-only). Chosen to span servers,
+# utilities, build tools, test/lint, UI frameworks, and packages that ship native code or
+# declare install scripts (esbuild, sharp, better-sqlite3, bcrypt, @swc/core, core-js).
+# Exact resolved versions are pinned by the committed lockfiles and listed in versions.txt.
+express
+koa
+fastify
+axios
+lodash
+chalk
+commander
+yargs
+dayjs
+uuid
+rxjs
+typescript
+esbuild
+rollup
+vite
+webpack
+terser
+eslint
+prettier
+jest
+mocha
+react
+react-dom
+vue
+svelte
+sharp
+better-sqlite3
+bcrypt
+@swc/core
+core-js

@@ -1,0 +1,2 @@
+{ "name": "corpus-rollup", "version": "1.0.0", "private": true,
+  "dependencies": { "rollup": "latest" } }
