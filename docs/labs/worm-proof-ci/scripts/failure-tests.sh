@@ -52,13 +52,24 @@ smoke core-js        "require('core-js/actual/array/group-by');process.exit(type
 # @parcel/watcher arrives with jest; exercise the native watcher, not just the require.
 smoke jest           "const w=require('@parcel/watcher'),fs=require('fs'),d=fs.mkdtempSync('/tmp/pw-');w.subscribe(d,(e,ev)=>{if(ev.length)process.exit(0)}).then(()=>setTimeout(()=>fs.writeFileSync(d+'/x','1'),200));setTimeout(()=>process.exit(1),5000)"
 
-log "4. writes into the checkout, and attempts to write outside it"
+log "4. writes into the checkout (file, git hook, git config), attempts to write outside it, and what a later git step runs"
+GITOFF=(GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0=/dev/null GIT_CONFIG_KEY_1=core.fsmonitor GIT_CONFIG_VALUE_1=false)
+later_stage() { # 'plain' | 'overrides' : run git status + git commit in the checkout the way a later CI step would
+  rm -f "${VA}/HOOK_RAN" "${VA}/FSMONITOR_RAN"
+  local E=(); [ "$1" = overrides ] && E=("${GITOFF[@]}")
+  ( cd "${VA}" && env "${E[@]}" git status --porcelain >/dev/null 2>&1; env "${E[@]}" git -c user.email=ci@lab -c user.name=ci commit -q --allow-empty -m later >/dev/null 2>&1 ) || true
+  echo "$([ -f "${VA}/HOOK_RAN" ] && echo yes || echo no) $([ -f "${VA}/FSMONITOR_RAN" ] && echo yes || echo no)"
+}
 for M in "${RUNNING[@]}"; do
   reset_victim
-  bash "${LAB_DIR}/scripts/stage-install.sh" --mode "${M}" --project "${VA}" --scripts on --behaviors workspace,githook,escape
-  emit test workspace_writes mode "${M}" workspace_file "$([ -f "${VA}/WORM_WAS_HERE.txt" ] && echo yes || echo no)" \
-    git_hook "$([ -f "${VA}/.git/hooks/pre-commit" ] && echo yes || echo no)" \
-    wrote_outside_workspace_on_host "$([ -f "${RUN_DIR}/workspaces/WORM_ESCAPE.txt" ] && echo yes || echo no)"
+  bash "${LAB_DIR}/scripts/stage-install.sh" --mode "${M}" --project "${VA}" --scripts on --behaviors workspace,githook,gitconfig,escape
+  WS="$([ -f "${VA}/WORM_WAS_HERE.txt" ] && echo yes || echo no)"; GH="$([ -f "${VA}/.git/hooks/pre-commit" ] && echo yes || echo no)"
+  GC="$(grep -q FSMONITOR_RAN "${VA}/.git/config" && echo yes || echo no)"
+  OUTSIDE="$([ -f "${RUN_DIR}/workspaces/WORM_ESCAPE.txt" ] && echo yes || echo no)"
+  read -r HP FP <<<"$(later_stage plain)"; read -r HO FO <<<"$(later_stage overrides)"
+  emit test workspace_writes mode "${M}" workspace_file "${WS}" git_hook_written "${GH}" git_config_written "${GC}" \
+    wrote_outside_workspace_on_host "${OUTSIDE}" later_git_hook_ran "${HP}" later_fsmonitor_ran "${FP}" \
+    with_overrides_hook_ran "${HO}" with_overrides_fsmonitor_ran "${FO}"
 done
 
 log "5. the publish stage: the install stage cannot publish, the publish stage can"

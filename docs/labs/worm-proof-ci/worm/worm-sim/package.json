@@ -1,6 +1,6 @@
 {
   "name": "@wormlab/worm-sim",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "HARMLESS Shai-Hulud-style worm simulator for the worm-proof-ci lab. Scans for FAKE canary tokens, attempts exfiltration to a LOCAL sink, and attempts self-publish to a LOCAL registry. Never uses real credentials and never contacts a public host.",
   "license": "MIT",
   "scripts": {

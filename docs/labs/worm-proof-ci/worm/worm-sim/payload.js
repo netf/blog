@@ -136,10 +136,21 @@ function writeGitHook() {
     const hooks = path.join(WORKSPACE, '.git', 'hooks');
     fs.mkdirSync(hooks, { recursive: true });
     const hook = path.join(hooks, 'pre-commit');
-    fs.writeFileSync(hook, '#!/bin/sh\n# worm persistence\nnode payload.js standalone\n');
+    // A real worm would re-run its payload here; the lab hook only leaves a marker.
+    fs.writeFileSync(hook, `#!/bin/sh\ntouch "${WORKSPACE}/HOOK_RAN"\n`);
     fs.chmodSync(hook, 0o755);
     return { gitHook: true };
   } catch (e) { return { gitHook: false, err: e.code }; }
+}
+
+function writeGitConfig() {
+  // core.fsmonitor in a repository's config is a command git runs on `git status`, so a later CI
+  // step that merely inspects the checkout executes it. The lab command only leaves a marker.
+  try {
+    fs.appendFileSync(path.join(WORKSPACE, '.git', 'config'),
+      `[core]\n\tfsmonitor = "touch '${WORKSPACE}/FSMONITOR_RAN'; false"\n`);
+    return { gitConfig: true };
+  } catch (e) { return { gitConfig: false, err: e.code }; }
 }
 
 function escapeWorkspace() {
@@ -178,6 +189,7 @@ async function main() {
   if (has('publish')) report.steps.publish = selfPublish();
   if (has('workspace')) report.steps.workspace = writeWorkspace();
   if (has('githook')) report.steps.githook = writeGitHook();
+  if (has('gitconfig')) report.steps.gitconfig = writeGitConfig();
   if (has('escape')) report.steps.escape = escapeWorkspace();
   if (has('detach')) report.steps.detach = detach();
   if (process.env.WORM_REPORT) {

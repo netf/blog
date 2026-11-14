@@ -70,6 +70,11 @@ Don't run two suites at once: they share the network namespace and the sink.
 | `results/overhead-compile-cache.jsonl` | the same with a persistent compile cache per regime |
 | `results/failure-tests.jsonl` | detached process, HTTP/DNS exfil with a repo secret, native binaries, checkout writes, publish stage |
 | `results/script-census.jsonl` | per project: scripts npm ci actually ran vs the lockfile flags, packages with binding.gyp |
+| `results/native-controls.jsonl` | negative controls: each native smoke test fails once the prebuilt binary is removed |
+| `results/compile-cache-evidence.txt` | denied compile-cache opens under Landlock; npm startup cold vs warm compile cache |
+| `results/gyp-ci-vs-install.txt` | better-sqlite3: `npm ci` runs node-gyp, `npm install` does not |
+| `results/sample-worm-report-*.jsonl` | the worm's own view of one run per regime (errors it hit) |
+| `results/reproduce-check/` | summary from a fresh-clone `make reproduce`, and how it compares |
 | `results/netns-allowlist.nft` | the egress ruleset as loaded |
 | `results/summary.md` | everything above, tabulated |
 

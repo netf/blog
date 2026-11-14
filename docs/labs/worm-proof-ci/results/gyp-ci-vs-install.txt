@@ -1,0 +1,5 @@
+# npm 10.9.9; better-sqlite3 13.2.0
+registry metadata: {"gypfile":false,"hasInstallScript":null,"install":null}
+lockfile entry hasInstallScript: false
+npm ci: > better-sqlite3@13.2.0 install > node-gyp rebuild 
+npm install: no lifecycle script ran for better-sqlite3
