@@ -15,10 +15,13 @@ cp "${LAB_DIR}/config/verdaccio.yaml" "${REG}/config.yaml"
 # apr1 hashes are accepted by verdaccio's htpasswd plugin.
 printf '%s:%s\n' "${PUBLISH_USER}" "$(openssl passwd -apr1 -salt wormsalt "${PUBLISH_PASS}")" > "${REG}/htpasswd"
 
-[ -f "${RUN_DIR}/verdaccio.pid" ] && kill "$(cat "${RUN_DIR}/verdaccio.pid")" 2>/dev/null; pkill -x verdaccio 2>/dev/null || true; sleep 0.5  # verdaccio renames its process
+if [ -f "${RUN_DIR}/verdaccio.pid" ]; then kill "$(cat "${RUN_DIR}/verdaccio.pid")" 2>/dev/null || true; fi; pkill -x verdaccio 2>/dev/null || true; sleep 0.5  # verdaccio renames its process
 # setsid + </dev/null so the daemon never holds the caller's pipe open.
-( cd "${REG}" && setsid "${VERDACCIO}" --config config.yaml --listen "0.0.0.0:${REGISTRY_PORT}" \
-    </dev/null > "${REG}/stdout.log" 2>&1 & echo $! > "${RUN_DIR}/verdaccio.pid" )
+# Background only the daemon itself (not a `cd && ...` list, which would leave a waiting bash
+# holding the caller's stdout open).
+( cd "${REG}" || exit 1
+  setsid "${VERDACCIO}" --config config.yaml --listen "0.0.0.0:${REGISTRY_PORT}" </dev/null > "${REG}/stdout.log" 2>&1 &
+  echo $! > "${RUN_DIR}/verdaccio.pid" ) </dev/null >/dev/null 2>&1
 for i in $(seq 1 60); do
   curl -fsS "${REGISTRY_URL}/-/ping" >/dev/null 2>&1 && break
   sleep 0.5
