@@ -48,6 +48,9 @@ smoke bcrypt         "const b=require('bcrypt');process.exit(b.compareSync('pw',
 smoke swc-core       "process.exit(require('@swc/core').transformSync('let x=1+1').code?0:1)"
 smoke sharp          "require('sharp')({create:{width:2,height:2,channels:3,background:'#123'}}).png().toBuffer().then(b=>process.exit(b.length?0:1),()=>process.exit(1))"
 smoke better-sqlite3 "const db=new (require('better-sqlite3'))(':memory:');db.exec('create table t(x)');db.prepare('insert into t values (1)').run();process.exit(db.prepare('select count(*) c from t').get().c===1?0:1)"
+smoke core-js        "require('core-js/actual/array/group-by');process.exit(typeof [].includes==='function'&&typeof Object.groupBy==='function'?0:1)"
+# @parcel/watcher arrives with jest; exercise the native watcher, not just the require.
+smoke jest           "const w=require('@parcel/watcher'),fs=require('fs'),d=fs.mkdtempSync('/tmp/pw-');w.subscribe(d,(e,ev)=>{if(ev.length)process.exit(0)}).then(()=>setTimeout(()=>fs.writeFileSync(d+'/x','1'),200));setTimeout(()=>process.exit(1),5000)"
 
 log "4. writes into the checkout, and attempts to write outside it"
 for M in "${RUNNING[@]}"; do

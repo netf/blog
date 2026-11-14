@@ -9,6 +9,8 @@
 {"test":"native_binary","project":"swc-core","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
 {"test":"native_binary","project":"sharp","declares_install_script":"no","without_allowlist":"pass","with_allowlist":"pass"}
 {"test":"native_binary","project":"better-sqlite3","declares_install_script":"no","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"core-js","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
+{"test":"native_binary","project":"jest","declares_install_script":"yes","without_allowlist":"pass","with_allowlist":"pass"}
 {"test":"workspace_writes","mode":"baseline","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"yes"}
 {"test":"workspace_writes","mode":"sandbox","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"no"}
 {"test":"workspace_writes","mode":"landlock","workspace_file":"yes","git_hook":"yes","wrote_outside_workspace_on_host":"no"}
