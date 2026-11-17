@@ -55,35 +55,41 @@ def make_handler(name, port_kind):
     return H
 
 
-class TLSServer(ThreadingHTTPServer):
+class DualStackServer(ThreadingHTTPServer):
+    # Binds "::" so one socket serves IPv4 and IPv6; the lab clusters are dual-stack.
+    address_family = socket.AF_INET6
     daemon_threads = True
 
+
+class TLSServer(DualStackServer):
     def __init__(self, addr, handler, ctx):
         super().__init__(addr, handler)
         self.ctx = ctx
+        self.ctx.sni_callback = lambda sock, name, c: setattr(sock, "sni", name)
 
     def finish_request(self, request, client_address):
-        sni = {}
-        self.ctx.sni_callback = lambda s, name, c: sni.__setitem__("sni", name)
+        tls = self.ctx.wrap_socket(request, server_side=True, do_handshake_on_connect=False)
         try:
-            tls = self.ctx.wrap_socket(request, server_side=True)
+            tls.do_handshake()
         except (ssl.SSLError, OSError) as e:
             log(event="tls_fail", responder=self.name, peer=client_address[0],
-                sni=sni.get("sni"), error=str(e)[:120])
+                sni=getattr(tls, "sni", None), error=str(e)[:120])
+            tls.close()
             return
-        self.RequestHandlerClass(tls, client_address, self)
+        try:
+            self.RequestHandlerClass(tls, client_address, self)
+        finally:
+            tls.close()
 
 
 def serve(a):
     name = a.name
     servers = []
-    ThreadingHTTPServer.address_family = socket.AF_INET6
-    httpd = ThreadingHTTPServer(("::", a.http_port), make_handler(name, "http"))
+    httpd = DualStackServer(("::", a.http_port), make_handler(name, "http"))
     servers.append(httpd)
     if a.cert:
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(a.cert, a.key)
-        TLSServer.address_family = socket.AF_INET6
         tlsd = TLSServer(("::", a.tls_port), make_handler(name, "https"), ctx)
         tlsd.name = name
         servers.append(tlsd)

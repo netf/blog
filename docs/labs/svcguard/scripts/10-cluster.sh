@@ -5,7 +5,8 @@
 #   payments-ext  172.18.0.200 / fc00:f853:ccd:e793::200  "payments.internal" (real cert)
 #   orders-db     172.18.0.210                              a legitimate external database
 set -euo pipefail
-DP=$1
+DP=${1:-}
+case "$DP" in iptables|nftables|cilium) ;; *) echo "usage: $0 iptables|nftables|cilium" >&2; exit 2;; esac
 cd "$(dirname "$0")/.."
 export PATH=~/bin:$PATH
 CL=svcg-$DP
@@ -16,6 +17,10 @@ TRAEFIK_IMAGE=v3.7.19
 
 kind get clusters | grep -qx "$CL" || kind create cluster --name "$CL" --config "kind-$DP.yaml"
 kubectl config use-context "kind-$CL"
+# Refuse to reuse a cluster whose dataplane doesn't match its name (stale run).
+mode=$(kubectl -n kube-system get cm kube-proxy -o jsonpath='{.data.config\.conf}' 2>/dev/null | awk '/^mode:/{print $2}' | tr -d '"' || true)
+want=$DP; [ "$DP" = cilium ] && want=""
+[ "$mode" = "$want" ] || { echo "$CL runs kube-proxy mode '${mode:-none}', expected '${want:-none}'; delete it with: kind delete cluster --name $CL" >&2; exit 1; }
 ./scripts/02b-host-iptables-fix.sh
 if [ "$DP" = cilium ]; then
   helm upgrade --install cilium cilium/cilium --version 1.20.4 -n kube-system -f scripts/cilium-values.yaml
@@ -26,6 +31,11 @@ kind load docker-image svcguard-lab:1 --name "$CL"
 
 ./scripts/03-certs.sh >/dev/null
 C=$PWD/.work/certs
+for addr in 172.18.0.200 172.18.0.210 fc00:f853:ccd:e793::200; do
+  python3 -c "import ipaddress,sys; a=ipaddress.ip_address(sys.argv[1]); sys.exit(0 if any(a in ipaddress.ip_network(n) for n in sys.argv[2:] if ipaddress.ip_network(n).version==a.version) else 1)" \
+    "$addr" $(docker network inspect kind -f '{{range .IPAM.Config}}{{.Subnet}} {{end}}') ||
+    { echo "$addr is outside the kind network's subnets; the lab's fixed external hosts assume 172.18.0.0/16 and fc00:f853:ccd:e793::/64" >&2; exit 1; }
+done
 docker rm -f payments-ext orders-db >/dev/null 2>&1 || true
 docker run -d --name payments-ext --network kind --ip 172.18.0.200 --ip6 fc00:f853:ccd:e793::200 \
   -v "$C":/certs:ro svcguard-lab:1 serve --name payments-ext-real --http-port 80 --tls-port 443 \
