@@ -1,0 +1,25 @@
+# kube-proxy iptables mode on kindest/node:v1.37.2, host kernel 6.12.113+, 2026-11-17T09:14:33Z
+## kube-proxy log (worker)
+	line 71: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-TCOU7JCQXEZGVUNU
+	line 79: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+ > ipFamily="IPv4"
+I1117 09:13:41.185390       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+E1117 09:14:11.249680       1 proxier.go:1390] "Failed to execute iptables-restore" err=<
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	iptables-restore v1.8.9 (nf_tables): 
+	line 63: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-JD5MR3NA4I4DYORP
+	line 71: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-TCOU7JCQXEZGVUNU
+	line 79: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+ > ipFamily="IPv4"
+I1117 09:14:11.249708       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+
+## Service ClusterIP vs pod IP from the control-plane node
+pod 10.244.1.6:9443 -> 404
+svc 10.96.16.178:443 -> 000 (000 = timeout)
+
+## KUBE-SVC chains for multi-endpoint services are empty
+0
+
+## kernel config
+# CONFIG_NETFILTER_XT_MATCH_RECENT is not set
+# CONFIG_NETFILTER_XT_MATCH_STATISTIC is not set

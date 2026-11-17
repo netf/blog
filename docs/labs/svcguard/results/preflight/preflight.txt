@@ -4,19 +4,19 @@
 
 ### free
                total        used        free      shared  buff/cache   available
-Mem:            15Gi        10Gi       1.1Gi        17Mi       3.9Gi       4.7Gi
+Mem:            15Gi       8.9Gi       5.1Gi        17Mi       2.0Gi       6.8Gi
 Swap:             0B          0B          0B
 
 ### balloon
 balloon_inflate 2621440
-balloon_deflate 0
-balloon_migrate 0
-sum RSS MiB 997.562
+balloon_deflate 524288
+balloon_migrate 98113
+sum RSS MiB 904.574
 
 ### df
 Filesystem      Size  Used Avail Use% Mounted on
-/dev/vdc        254G   11G  244G   4% /
-/dev/vdc        254G   11G  244G   4% /var/lib/docker
+/dev/vdc        254G   11G  243G   5% /
+/dev/vdc        254G   11G  243G   5% /var/lib/docker
 
 ### virt
 kvm
@@ -35,8 +35,8 @@ cpuset cpu io memory hugetlb pids
 iptables v1.8.10 (nf_tables)
 iptables v1.8.10 (legacy)
 -P FORWARD DROP
--A FORWARD -j DOCKER-USER
--A FORWARD -j DOCKER-FORWARD
+-A FORWARD -o br-799356b1b19a -j ACCEPT
+-A FORWARD -i br-799356b1b19a -j ACCEPT
 nftables v1.0.9 (Old Doc Yak #3)
 
 ### nft-usable
@@ -48,7 +48,6 @@ table inet preflight {
 NFT_OK
 
 ### modules
-ls: cannot access '/lib/modules': No such file or directory
 0
 br_netfilter: no /sys/module entry
 overlay: present
@@ -60,6 +59,37 @@ xt_socket: no /sys/module entry
 ### kconfig
 ls: cannot access '/boot/config-6.12.113+': No such file or directory
 /proc/config.gz
+CONFIG_BPF_SYSCALL=y
+CONFIG_BPF_JIT=y
+CONFIG_CGROUP_BPF=y
+# CONFIG_INET_UDP_DIAG is not set
+CONFIG_BRIDGE_NETFILTER=y
+CONFIG_NFT_NUMGEN=y
+CONFIG_NFT_CT=y
+CONFIG_NFT_MASQ=y
+CONFIG_NFT_NAT=y
+CONFIG_NFT_REJECT=y
+CONFIG_NFT_COMPAT=y
+CONFIG_NFT_FIB_INET=y
+CONFIG_NETFILTER_XT_MARK=y
+# CONFIG_NETFILTER_XT_TARGET_CT is not set
+CONFIG_NETFILTER_XT_NAT=y
+CONFIG_NETFILTER_XT_TARGET_MASQUERADE=y
+# CONFIG_NETFILTER_XT_TARGET_TPROXY is not set
+CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y
+CONFIG_NETFILTER_XT_MATCH_COMMENT=y
+CONFIG_NETFILTER_XT_MATCH_CONNTRACK=y
+# CONFIG_NETFILTER_XT_MATCH_MULTIPORT is not set
+# CONFIG_NETFILTER_XT_MATCH_PHYSDEV is not set
+# CONFIG_NETFILTER_XT_MATCH_RECENT is not set
+# CONFIG_NETFILTER_XT_MATCH_SOCKET is not set
+# CONFIG_NETFILTER_XT_MATCH_STATISTIC is not set
+# CONFIG_IP_SET is not set
+# CONFIG_IP_VS is not set
+CONFIG_NET_CLS_BPF=y
+# CONFIG_VXLAN is not set
+# CONFIG_GENEVE is not set
+# CONFIG_NETKIT is not set
 
 ### sysctl
 net.bridge.bridge-nf-call-iptables = 1
@@ -71,7 +101,7 @@ net.ipv6.conf.all.disable_ipv6 = 0
 -r--r--r-- 1 root root 5530818 Nov 17 08:35 /sys/kernel/btf/vmlinux
 
 ### bpf
-2
+1
 sudo: bpftool: command not found
 bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
 tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
@@ -117,8 +147,8 @@ https://dl.k8s.io/release/stable.txt 200
 63994
 
 ### clock
-Tue Nov 17 08:38:53 AM UTC 2026
-./scripts/01-preflight.sh: line 27: chronyc: command not found
+Tue Nov 17 09:16:52 AM UTC 2026
+./scripts/01-preflight.sh: line 30: chronyc: command not found
 System has not been booted with systemd as init system (PID 1). Can't operate.
 Failed to connect to bus: Host is down
 ntp offset s (1s resolution): 0

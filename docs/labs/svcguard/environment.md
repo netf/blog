@@ -1,5 +1,63 @@
 # Environment preflight: svcguard
 
+## Status: BLOCKED before the first measurement
+
+**The kube-proxy iptables arm cannot run on this VM's kernel.** The guest kernel (6.12.113+,
+monolithic, supplied by the host) is built without the iptables `statistic` match
+(`# CONFIG_NETFILTER_XT_MATCH_STATISTIC is not set`) and without `recent`
+(`# CONFIG_NETFILTER_XT_MATCH_RECENT is not set`). kube-proxy's iptables mode uses
+`-m statistic --mode random` to spread a Service across endpoints and `-m recent` for ClientIP
+affinity. On the first lab cluster every sync failed:
+
+```
+Warning: Extension statistic revision 0 not supported, missing kernel module?
+iptables-restore v1.8.9 (nf_tables):
+line 61: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+"Sync failed" ipFamily="IPv4" retryingTime="30s"
+```
+
+`iptables-restore` is all-or-nothing, so this is not limited to multi-endpoint Services: from the
+control-plane node the MetalLB webhook pod answered on its pod IP (HTTP 404) but its
+single-endpoint ClusterIP timed out, the API server could not call the webhook, and MetalLB could
+not be configured. Raw evidence: `results/preflight/blocker-kube-proxy-iptables.txt`. My first
+preflight pass missed this because I did not list `xt_statistic` among the kernel options to
+check; `scripts/01-preflight.sh` now prints it. (The Istio lab hit the same gap on this VM image
+and moved to nftables mode.)
+
+**Why it matters here:** the attack matrix is path × dataplane, and the pitch's surprise
+candidate is that kube-proxy and eBPF dataplanes honour these fields differently. iptables is
+still kube-proxy's default mode on Linux in v1.37.2 (`cmd/kube-proxy/app/server_linux.go`:
+"No kube-proxy mode specified: defaulting to 'iptables'. Note that in Kubernetes 1.40 the default
+mode will switch to 'nftables'"), so dropping it removes the column most readers would map to
+their own cluster.
+
+**What does work on this kernel (checked):**
+
+- kube-proxy **nftables** mode: 0 sync errors; 30 requests from a node to a two-endpoint ClusterIP
+  split 15/15 (`results/preflight/nftables-check.txt`).
+- **Cilium v1.20.4 kube-proxy replacement**, with the deviations listed below (native routing, L7
+  proxy off). ClusterIP routing through eBPF checked.
+
+**Options (Piotr to choose):**
+
+1. **Run the lab on a host whose kernel has `xt_statistic` and `xt_recent`** (any stock
+   distribution kernel ships them as modules, e.g. Ubuntu `linux-image-generic`, a GitHub Actions
+   `ubuntu-latest` runner, or a workstation). Nothing in the plan changes. That host would also
+   have VXLAN, so Cilium could run in its default tunnel mode and deviation 1 below goes away.
+   This is what I'd pick.
+2. **Drop the iptables arm and run nftables + Cilium here.** Everything else in the plan runs as
+   designed. The post would have to say plainly that iptables mode was not measured, and any
+   dataplane-difference finding would be nftables vs eBPF only.
+3. **Force the iptables arm to work by keeping every Service at one endpoint** (CoreDNS, the
+   gateways, every chart scaled to 1). kube-proxy omits the `statistic` rule for single-endpoint
+   Services, so the restore might succeed. I don't recommend it: it changes the cluster under
+   test, the 25-chart false-positive run would break the dataplane the moment any chart runs two
+   replicas, and ClientIP affinity would still fail.
+
+The guest kernel can't be rebuilt or extended from inside the VM (`nomodule`, no `/lib/modules`).
+
+---
+
 Recorded 2026-11-17 before the first measurement. `scripts/01-preflight.sh` prints the raw facts
 (`results/preflight/preflight.txt`); `results/preflight/kconfig.txt` holds the kernel config lines
 that matter; `results/preflight/sources.md` records what each cited source says today.
@@ -31,7 +89,9 @@ load can't leak into another's latency numbers.
 | nftables usable | yes: created a table with a hook chain and deleted it (`nft` 1.0.9) |
 | `ip_vs`, `ip_set` | **not built** (`# CONFIG_IP_VS is not set`, `# CONFIG_IP_SET is not set`). No arm uses IPVS. |
 | VXLAN / GENEVE | **not built** (`# CONFIG_VXLAN is not set`, `# CONFIG_GENEVE is not set`) |
-| iptables `CT` target, `xt_socket`, `TPROXY` | **not built** |
+| iptables `statistic`, `recent` matches | **not built**: blocks kube-proxy iptables mode (see Status) |
+| iptables `CT` target, `xt_socket`, `TPROXY`, `multiport`, `physdev` | **not built** |
+| `INET_UDP_DIAG` | **not built** (Cilium UDP socket termination) |
 | BTF | `/sys/kernel/btf/vmlinux` present (5.5 MB) |
 | eBPF | `CONFIG_BPF_SYSCALL=y`, `CONFIG_BPF_JIT=y`, `CONFIG_CGROUP_BPF=y`, `CONFIG_NET_CLS_BPF=y`, `CONFIG_NET_CLS_ACT=y`; bpffs mounted; `unprivileged_bpf_disabled=2` (root-only, which is what Cilium runs as); LSMs `capability,landlock,selinux,bpf` |
 | netns / tc | `ip netns add`, `tc qdisc add ... clsact` inside it: OK (with sudo). `netem` is not built; nothing here needs it. |
@@ -63,8 +123,10 @@ internet after the iptables fix below.
 | Kind | v0.33.0 | v0.33.0 | v0.33.0 |
 | Cilium | v1.20.4 | v1.20.4 (chart and images, digests in `results/versions.txt`) | v1.20.4 |
 | Envoy Gateway | latest | v1.10.0 | v1.10.0 |
-| Traefik | latest | v3.7.19 (chart version recorded in `results/versions.txt`) | v3.7.19 |
-| MetalLB | (not pinned) | recorded in `results/versions.txt` | |
+| Traefik | latest | v3.7.19 image on chart 42.4.0 (the chart's default is still v3.7.18) | v3.7.19 |
+| MetalLB | (not pinned) | chart/app 0.16.2, L2 mode, frr-k8s disabled | 0.16.2 |
+| Cilium CLI | | v0.20.3 | v0.20.3 |
+| Helm | | v3.22.1 (v4.3.2 also exists; v3 kept to match the earlier labs) | |
 
 ## Deviations and workarounds (read these before the numbers)
 

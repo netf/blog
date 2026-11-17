@@ -16,6 +16,9 @@ s nft-usable; sudo nft add table inet preflight && sudo nft add chain inet prefl
 s modules; ls /lib/modules 2>&1 | head -2; wc -l < /proc/modules
 for m in br_netfilter overlay nf_conntrack ip_vs nf_tables xt_socket; do printf '%s: ' $m; if [ -d /sys/module/$m ]; then echo present; else zcat /proc/config.gz 2>/dev/null | grep -i "CONFIG_$(echo $m | tr a-z A-Z)=" || echo "no /sys/module entry"; fi; done
 s kconfig; ls /proc/config.gz /boot/config-$(uname -r) 2>&1
+# kube-proxy iptables mode needs statistic (multi-endpoint load balancing) and
+# recent (ClientIP affinity); Cilium's default tunnel needs VXLAN or GENEVE.
+zcat /proc/config.gz | grep -E "^(# )?CONFIG_(NETFILTER_XT_MATCH_(STATISTIC|RECENT|ADDRTYPE|COMMENT|CONNTRACK|MULTIPORT|SOCKET|PHYSDEV)|NETFILTER_XT_(MARK|NAT|TARGET_MASQUERADE|TARGET_CT|TARGET_TPROXY)|NFT_(NUMGEN|CT|NAT|MASQ|FIB_INET|REJECT|COMPAT)|IP_VS|IP_SET|VXLAN|GENEVE|NETKIT|BRIDGE_NETFILTER|INET_UDP_DIAG|BPF_SYSCALL|BPF_JIT|CGROUP_BPF|NET_CLS_BPF)[ =]"
 s sysctl; sysctl net.bridge.bridge-nf-call-iptables net.ipv4.ip_forward net.ipv6.conf.all.forwarding net.ipv6.conf.all.disable_ipv6 2>&1
 s btf; ls -la /sys/kernel/btf/vmlinux
 s bpf; cat /proc/sys/kernel/unprivileged_bpf_disabled; sudo bpftool version 2>&1 | head -1; mount | grep -E "bpf|tracefs" ; cat /sys/kernel/security/lsm 2>/dev/null
