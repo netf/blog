@@ -1,0 +1,183 @@
+# Tenant A owns payments. Tenant B is an ordinary tenant whose user, mallory, has
+# the built-in `edit` ClusterRole in tenant-b only.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tenant-a
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tenant-b
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments
+  namespace: tenant-a
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: payments}}
+  template:
+    metadata: {labels: {app: payments}}
+    spec:
+      containers:
+      - name: payments
+        image: svcguard-lab:1
+        imagePullPolicy: Never
+        args: [serve, --name, payments-tenant-a, --cert, /certs/payments.crt, --key, /certs/payments.key]
+        ports: [{containerPort: 8443}, {containerPort: 8080}]
+        readinessProbe: {tcpSocket: {port: 8080}, periodSeconds: 2}
+        volumeMounts: [{name: certs, mountPath: /certs}]
+      volumes: [{name: certs, secret: {secretName: payments-tls}}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments
+  namespace: tenant-a
+spec:
+  ipFamilyPolicy: PreferDualStack
+  selector: {app: payments}
+  ports:
+  - {name: https, port: 443, targetPort: 8443}
+  - {name: http, port: 80, targetPort: 8080}
+---
+# Tenant A's LoadBalancer, the address other teams and VMs use for payments.
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments-lb
+  namespace: tenant-a
+spec:
+  type: LoadBalancer
+  selector: {app: payments}
+  ports:
+  - {name: https, port: 443, targetPort: 8443}
+---
+# The victim: checkout calls payments.internal (an out-of-cluster host) and the
+# payments LoadBalancer IP. The lab client runs via kubectl exec.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: tenant-a
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: checkout}}
+  template:
+    metadata: {labels: {app: checkout}}
+    spec:
+      containers:
+      - name: checkout
+        image: svcguard-lab:1
+        imagePullPolicy: Never
+        command: [sleep, infinity]
+        volumeMounts: [{name: certs, mountPath: /certs}]
+      volumes: [{name: certs, secret: {secretName: lab-ca}}]
+---
+# Payments only accepts traffic from its own namespace and from the shared
+# ingress tiers (which publish /api for tenant A).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: payments-ingress
+  namespace: tenant-a
+spec:
+  podSelector: {matchLabels: {app: payments}}
+  policyTypes: [Ingress]
+  ingress:
+  - from:
+    - podSelector: {}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: envoy-gateway-system}}
+    - namespaceSelector: {matchLabels: {kubernetes.io/metadata.name: traefik}}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: payments-public
+  namespace: tenant-a
+spec:
+  parentRefs: [{name: shared, namespace: infra}]
+  hostnames: [pay.example.com]
+  rules:
+  - matches: [{path: {type: PathPrefix, value: /api}}]
+    backendRefs: [{name: payments, port: 80}]
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: payments-public
+  namespace: tenant-a
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: pay.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend: {service: {name: payments, port: {number: 80}}}
+---
+# Tenant B's attacker workload: answers with its own identity and a self-signed
+# cert for payments.internal.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: impostor
+  namespace: tenant-b
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: impostor}}
+  template:
+    metadata: {labels: {app: impostor}}
+    spec:
+      containers:
+      - name: impostor
+        image: svcguard-lab:1
+        imagePullPolicy: Never
+        args: [serve, --name, impostor-tenant-b, --cert, /certs/attacker.crt, --key, /certs/attacker.key]
+        ports: [{containerPort: 8443}, {containerPort: 8080}]
+        readinessProbe: {tcpSocket: {port: 8080}, periodSeconds: 2}
+        volumeMounts: [{name: certs, mountPath: /certs}]
+      volumes: [{name: certs, secret: {secretName: attacker-tls}}]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mallory-edit
+  namespace: tenant-b
+subjects: [{kind: User, name: mallory, apiGroup: rbac.authorization.k8s.io}]
+roleRef: {kind: ClusterRole, name: edit, apiGroup: rbac.authorization.k8s.io}
+---
+# MIS-SCOPED ROLE (lab only). A second tenant-B identity that someone granted
+# services/status and EndpointSlice write, the kind of "just make the operator
+# work" grant that shows up in real clusters. A normal tenant does not have this.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: misscoped-network-writer
+  namespace: tenant-b
+rules:
+- apiGroups: [""]
+  resources: [services/status]
+  verbs: [get, patch, update]
+- apiGroups: [discovery.k8s.io]
+  resources: [endpointslices]
+  verbs: [get, list, create, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mallory-ops-edit
+  namespace: tenant-b
+subjects: [{kind: User, name: mallory-ops, apiGroup: rbac.authorization.k8s.io}]
+roleRef: {kind: ClusterRole, name: edit, apiGroup: rbac.authorization.k8s.io}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mallory-ops-misscoped
+  namespace: tenant-b
+subjects: [{kind: User, name: mallory-ops, apiGroup: rbac.authorization.k8s.io}]
+roleRef: {kind: Role, name: misscoped-network-writer, apiGroup: rbac.authorization.k8s.io}
