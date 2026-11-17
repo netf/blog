@@ -1,0 +1,30 @@
+# Cilium v1.20.4, kube-proxy replacement. Native routing because the lab kernel
+# has no VXLAN/GENEVE (CONFIG_VXLAN/CONFIG_GENEVE not set); all Kind nodes share
+# one Docker bridge, so direct node routes work.
+kubeProxyReplacement: true
+k8sServiceHost: svcg-cilium-control-plane
+k8sServicePort: 6443
+routingMode: native
+autoDirectNodeRoutes: true
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+ipv6NativeRoutingCIDR: fd00:10:244::/56
+ipv4:
+  enabled: true
+ipv6:
+  enabled: true
+ipam:
+  mode: kubernetes
+enableIPv4Masquerade: true
+enableIPv6Masquerade: true
+bpf:
+  masquerade: true
+operator:
+  replicas: 1
+image:
+  useDigest: true
+# The lab kernel lacks the iptables CT target (CONFIG_NETFILTER_XT_TARGET_CT),
+# which only Cilium's L7 proxy rules use. Service load balancing is pure eBPF
+# and does not depend on it. Ingress in this lab is Envoy Gateway / Traefik.
+l7Proxy: false
+envoy:
+  enabled: false

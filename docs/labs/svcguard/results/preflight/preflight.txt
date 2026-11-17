@@ -1,0 +1,124 @@
+
+### nproc
+4
+
+### free
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi        10Gi       1.1Gi        17Mi       3.9Gi       4.7Gi
+Swap:             0B          0B          0B
+
+### balloon
+balloon_inflate 2621440
+balloon_deflate 0
+balloon_migrate 0
+sum RSS MiB 997.562
+
+### df
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdc        254G   11G  244G   4% /
+/dev/vdc        254G   11G  244G   4% /var/lib/docker
+
+### virt
+kvm
+console=ttyS0 root=/dev/vda random.trust_cpu=on ip=172.30.0.2::172.30.0.1:255.255.255.0::eth0:off rw loglevel=7 earlyprintk=ttyS0 print-fatal-signals=1 systemd.unified_cgroup_hierarchy=1 systemd.setenv=SWAP_SIZE_MB=0 reboot=k panic=1 nomodule kvm.enable_virt_at_load=0 i8042.noaux=1 i8042.nomux=1 i8042.dumbkbd=1 clocksource=kvm-clock tsc=unstable nosoftlockup root=/dev/vda rw
+tini
+
+### os
+Ubuntu 24.04.5 LTS
+6.12.113+
+
+### cgroup
+cgroup2fs
+cpuset cpu io memory hugetlb pids
+
+### iptables
+iptables v1.8.10 (nf_tables)
+iptables v1.8.10 (legacy)
+-P FORWARD DROP
+-A FORWARD -j DOCKER-USER
+-A FORWARD -j DOCKER-FORWARD
+nftables v1.0.9 (Old Doc Yak #3)
+
+### nft-usable
+table inet preflight {
+	chain c {
+		type filter hook input priority filter; policy accept;
+	}
+}
+NFT_OK
+
+### modules
+ls: cannot access '/lib/modules': No such file or directory
+0
+br_netfilter: no /sys/module entry
+overlay: present
+nf_conntrack: present
+ip_vs: no /sys/module entry
+nf_tables: CONFIG_NF_TABLES=y
+xt_socket: no /sys/module entry
+
+### kconfig
+ls: cannot access '/boot/config-6.12.113+': No such file or directory
+/proc/config.gz
+
+### sysctl
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
+net.ipv6.conf.all.disable_ipv6 = 0
+
+### btf
+-r--r--r-- 1 root root 5530818 Nov 17 08:35 /sys/kernel/btf/vmlinux
+
+### bpf
+2
+sudo: bpftool: command not found
+bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
+tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)
+capability,landlock,selinux,bpf
+### netns-tc
+qdisc noqueue 0: root refcnt 2 
+qdisc clsact ffff: parent ffff:fff1 
+NETNS_TC_OK
+
+### docker
+server 29.10.0 client 29.10.0
+ Storage Driver: overlayfs
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 2
+ Security Options:
+  cgroupns
+ Kernel Version: 6.12.113+
+ Docker Root Dir: /var/lib/docker
+ Firewall Backend: iptables
+
+### tools
+kind v0.33.0 go1.26.7 linux/amd64
+Client Version: v1.37.2
+v3.22.1+gd6c1a0e
+cilium-cli: v0.20.3 compiled with go1.27.3 on linux/amd64
+Python 3.12.3
+jq-1.7
+
+### egress
+https://registry-1.docker.io/v2/ 401
+https://ghcr.io/v2/ 401
+https://quay.io/v2/ 401
+https://registry.k8s.io/v2/ 401
+https://helm.cilium.io/index.yaml 200
+https://charts.jetstack.io/index.yaml 200
+https://traefik.github.io/charts/index.yaml 200
+https://metallb.github.io/metallb/index.yaml 200
+https://strimzi.io/charts/index.yaml 200
+https://dl.k8s.io/release/stable.txt 200
+
+### limits
+524288
+63994
+
+### clock
+Tue Nov 17 08:38:53 AM UTC 2026
+./scripts/01-preflight.sh: line 27: chronyc: command not found
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
+ntp offset s (1s resolution): 0
