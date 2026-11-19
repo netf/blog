@@ -93,8 +93,12 @@ yet valid" or an old-key token looks unexpired.
 - **External signer is mutually exclusive with key files.** In v1.37.2
   `--service-account-signing-endpoint` cannot be combined with `--service-account-key-file`
   (`results/preflight/sources.md`). So in arm D the old file key's public half must be returned
-  by the signer's `FetchKeys` during migration, and legacy Secret tokens (signed by the
-  controller-manager's file key) need `exclude_from_oidc_discovery` entries there. This is a
+  by the signer's `FetchKeys` during migration. kubeadm points both the API server's
+  `--service-account-signing-key-file` and the controller-manager's
+  `--service-account-private-key-file` at the same `/etc/kubernetes/pki/sa.key`
+  (`cmd/kubeadm/app/phases/controlplane/manifests.go`), so on a kubeadm cluster that key signed
+  bound tokens too and must stay in OIDC discovery until they expire. Only a key that signed
+  legacy Secret tokens alone may be published with `exclude_from_oidc_discovery`. This is a
   design consequence, not a blocker.
 - **SoftHSM:** latest upstream is 2.7.0 (2026-01-20); Ubuntu 24.04 ships 2.6.1. The signer image
   will build 2.7.0 from source; the host's 2.6.1 is only for poking at tokens.

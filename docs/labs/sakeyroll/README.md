@@ -23,8 +23,10 @@ See [`environment.md`](environment.md). Two things need a decision before the fi
 - v1.37.2's external signer is `v1.ExternalJWTSigner` (`Sign`, `FetchKeys`, `Metadata`) on a Unix
   socket, flag `--service-account-signing-endpoint`, gate `ExternalServiceAccountTokenSigner` GA
   and locked on. The flag is mutually exclusive with `--service-account-key-file`, so during the
-  move to the signer, the signer must publish the old file key (and the legacy-token key, as
-  `exclude_from_oidc_discovery`).
+  move to the signer, the signer must publish the old file key. On kubeadm clusters the API
+  server and the controller-manager sign with the same `sa.key`, so that key stays in OIDC
+  discovery; only a key that signed legacy Secret tokens alone gets
+  `exclude_from_oidc_discovery`.
 - Two `service-account-key-file` entries in a Kind `kubeadmConfigPatches` collapse into one and
   replace the default `sa.pub`, which broke the cluster. Rotation steps therefore edit the
   static pod manifests on each control plane.
