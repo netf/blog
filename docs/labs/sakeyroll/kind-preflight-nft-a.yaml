@@ -1,0 +1,19 @@
+# Preflight cluster A: lab topology with kube-proxy in nftables mode. The second
+# verification key is mounted and added by hand (see environment.md: repeated
+# extraArgs collapse to one).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: pf-a
+networking:
+  kubeProxyMode: nftables
+nodes:
+  - role: control-plane
+    extraMounts: &m
+      - hostPath: /tmp/sakeyroll-pf
+        containerPath: /etc/sakeyroll
+        readOnly: true
+  - role: control-plane
+    extraMounts: *m
+  - role: control-plane
+    extraMounts: *m
+  - role: worker

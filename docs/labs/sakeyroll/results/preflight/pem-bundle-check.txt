@@ -1,0 +1,8 @@
+# 2026-11-19 on pf-a-control-plane: one --service-account-key-file pointing at a PEM bundle (sa.pub + sa-next.pub)
+36:    - --service-account-issuer=https://kubernetes.default.svc.cluster.local
+37:    - --service-account-key-file=/etc/kubernetes/pki/sa-bundle.pub
+38:    - --service-account-signing-key-file=/etc/kubernetes/pki/sa.key
+== JWKS from pf-a-control-plane (kubectl --server https://localhost:6443, direct, not via LB)
+[{"kid":"_u6rqIUObjwtthhFQjSHwSYAWdjGKADjrlEJm6KPf1s","alg":"RS256"},{"kid":"1_qkak276vg1pRqvih0dzSgspRe-yTC98Edif0aeqps","alg":"RS256"}]
+== JWKS from pf-a-control-plane2 (kubectl --server https://localhost:6443, direct, not via LB)
+[{"kid":"_u6rqIUObjwtthhFQjSHwSYAWdjGKADjrlEJm6KPf1s","alg":"RS256"}]
