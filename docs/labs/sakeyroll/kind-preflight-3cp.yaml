@@ -1,0 +1,11 @@
+# Throwaway preflight cluster: the lab topology (3 control planes, 1 worker)
+# with Kind's default kube-proxy mode (iptables), to check whether the
+# dataplane works on this kernel before anything is measured.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: pf-3cp
+nodes:
+  - role: control-plane
+  - role: control-plane
+  - role: control-plane
+  - role: worker

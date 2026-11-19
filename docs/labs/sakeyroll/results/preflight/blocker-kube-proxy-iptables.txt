@@ -1,0 +1,66 @@
+# 2026-11-19, kind v0.33.0, kindest/node:v1.37.2 (local build), 3 control planes + 1 worker, kube-proxy default mode
+
+$ kubectl get nodes
+NAME                    STATUS   ROLES           AGE     VERSION
+pf-3cp-control-plane    Ready    control-plane   2m37s   v1.37.2
+pf-3cp-control-plane2   Ready    control-plane   2m3s    v1.37.2
+pf-3cp-control-plane3   Ready    control-plane   109s    v1.37.2
+pf-3cp-worker           Ready    <none>          108s    v1.37.2
+
+$ kubectl get endpointslices -l kubernetes.io/service-name=kubernetes
+NAME         ADDRESSTYPE   PORTS   ENDPOINTS                          AGE
+kubernetes   IPv4          6443    172.18.0.3,172.18.0.4,172.18.0.6   2m35s
+
+$ kubectl -n kube-system logs pod/kube-proxy-jldbc | grep -E 'Proxier|statistic|RULE_APPEND|Sync failed' | head -8
+I1119 08:51:48.783954       1 server_linux.go:144] "Using iptables Proxier"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	line 36: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-JD5MR3NA4I4DYORP
+	line 44: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-TCOU7JCQXEZGVUNU
+	line 52: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+	line 60: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+I1119 08:51:48.967707       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+
+$ kubectl -n kube-system logs pod/kube-proxy-p2tdh | grep -E 'Proxier|statistic|RULE_APPEND|Sync failed' | head -8
+I1119 08:52:04.191046       1 server_linux.go:144] "Using iptables Proxier"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	line 37: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+	line 38: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+	line 48: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-TCOU7JCQXEZGVUNU
+	line 56: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+	line 64: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-JD5MR3NA4I4DYORP
+I1119 08:52:04.384207       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+
+$ kubectl -n kube-system logs pod/kube-proxy-p9qxq | grep -E 'Proxier|statistic|RULE_APPEND|Sync failed' | head -8
+I1119 08:51:22.653163       1 server_linux.go:144] "Using iptables Proxier"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	line 30: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+I1119 08:51:42.543658       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	line 43: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+I1119 08:51:44.103849       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+
+$ kubectl -n kube-system logs pod/kube-proxy-wkbtz | grep -E 'Proxier|statistic|RULE_APPEND|Sync failed' | head -8
+I1119 08:52:11.934821       1 server_linux.go:144] "Using iptables Proxier"
+	exit status 4: Warning: Extension statistic revision 0 not supported, missing kernel module?
+	line 37: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-ERIFXISQEP7F7OF4
+	line 45: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-JD5MR3NA4I4DYORP
+	line 53: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+	line 54: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-NPX46M4PTMTKRN6Y
+	line 64: RULE_APPEND failed (No such file or directory): rule in chain KUBE-SVC-TCOU7JCQXEZGVUNU
+I1119 08:52:12.135769       1 proxier.go:660] "Sync failed" ipFamily="IPv4" retryingTime="30s"
+
+$ pod on pf-3cp-worker: curl https://kubernetes.default.svc/api x5 with its projected token, then nslookup
+000 5.001927s
+FAIL exit 28
+000 5.001549s
+FAIL exit 28
+000 5.002084s
+FAIL exit 28
+000 5.001363s
+FAIL exit 28
+000 5.001679s
+FAIL exit 28
+;; connection timed out; no servers could be reached
+

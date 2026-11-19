@@ -1,0 +1,30 @@
+# 2026-11-19: cluster pf-a (3 CP + 1 worker) and pf-b (1 CP + 1 worker) running at the same time, kubeProxyMode: nftables
+== pf-a kube-proxy
+pod/kube-proxy-4nnnc: Using nftables Proxier sync_failures=0
+pod/kube-proxy-7v7ml: Using nftables Proxier sync_failures=0
+pod/kube-proxy-7zb4m: Using nftables Proxier sync_failures=0
+pod/kube-proxy-g7mz2: Using nftables Proxier sync_failures=0
+== pf-b kube-proxy
+pod/kube-proxy-5fp88: Using nftables Proxier sync_failures=0
+pod/kube-proxy-xbq7h: Using nftables Proxier sync_failures=0
+kubernetes svc endpoints: ["172.18.0.5"] ["172.18.0.6"] ["172.18.0.8"]
+== pod on pf-a-worker: 30 x curl https://kubernetes.default.svc/api with projected token (count, status, remote ip), nslookup
+     30 200 10.96.0.1
+Name:	kubernetes.default.svc.cluster.local
+Address: 10.96.0.1
+
+== memory with both clusters up
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       8.9Gi       3.8Gi        72Mi       3.3Gi       6.7Gi
+Swap:             0B          0B          0B
+balloon_inflate 2621440
+balloon_deflate 1048576
+balloon_migrate 39559
+sum RSS MiB 4724.04
+pf-a-external-load-balancer 17.49MiB / 15.63GiB 0.16%
+pf-a-control-plane 678.3MiB / 15.63GiB 6.08%
+pf-a-worker 181.9MiB / 15.63GiB 2.33%
+pf-a-control-plane3 545.6MiB / 15.63GiB 5.36%
+pf-a-control-plane2 544MiB / 15.63GiB 4.92%
+pf-b-control-plane 610.1MiB / 15.63GiB 7.34%
+pf-b-worker 127.7MiB / 15.63GiB 0.55%
