@@ -1,0 +1,62 @@
+2026-11-22T13:35:47.038+00:00 start
+2026-11-22T13:35:47.275+00:00 read file 1/30
+2026-11-22T13:36:47.281+00:00 read file 2/30
+2026-11-22T13:37:47.289+00:00 read file 3/30
+2026-11-22T13:38:47.295+00:00 read file 4/30
+2026-11-22T13:39:47.301+00:00 read file 5/30
+2026-11-22T13:40:47.307+00:00 read file 6/30
+2026-11-22T13:41:47.313+00:00 read file 7/30
+2026-11-22T13:42:47.318+00:00 read file 8/30
+2026-11-22T13:43:47.325+00:00 read file 9/30
+2026-11-22T13:44:47.330+00:00 read file 10/30
+2026-11-22T13:45:47.936+00:00 FAILED Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/catalog/rest/__init__.py", line 1114, in _load_credentials
+    response.raise_for_status()
+  File "/usr/local/lib/python3.12/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: http://polaris-f:8181/api/catalog/v1/lake_f/namespaces/fail/tables/f2_pyshim_src/credentials
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 216, in run
+    rec.update(runner(a, dur, principals.get(a.arm, {}).get(a.engine), log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 58, in job_pyiceberg
+    with src.io.new_input(f).open() as fh:
+         ^^^^^^^^^^^^^^^^^^^
+  File "/lab/kit/lakegate_client.py", line 36, in new_input
+    maybe_refresh()
+  File "/lab/kit/lakegate_client.py", line 28, in maybe_refresh
+    fresh = catalog.load_credentials(ident, table.location())
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/catalog/rest/__init__.py", line 1126, in load_credentials
+    credentials_response = self._load_credentials(identifier)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/tenacity/__init__.py", line 404, in wrapped_f
+    return copy(f, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/tenacity/__init__.py", line 550, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/tenacity/__init__.py", line 440, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/tenacity/__init__.py", line 462, in <lambda>
+    self._add_action_func(lambda rs: rs.outcome.result())
+                                     ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/usr/local/lib/python3.12/site-packages/tenacity/__init__.py", line 553, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/catalog/rest/__init__.py", line 1116, in _load_credentials
+    _handle_non_200_response(exc, {404: NoSuchTableError})
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/catalog/rest/response.py", line 121, in _handle_non_200_response
+    raise exception(response) from exc
+pyiceberg.exceptions.ServerError: SdkClientException: Received an UnknownHostException when attempting to interact with a service. See cause for the exact endpoint that is failing to resolve. If this is happening on an endpoint that previously worked, there may be a network connectivity issue or your DNS cache could be storing endpoints for too long.
+
+2026-11-22T13:45:47.936+00:00 end ok=False

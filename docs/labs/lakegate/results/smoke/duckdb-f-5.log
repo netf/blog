@@ -1,0 +1,36 @@
+2026-11-22T10:42:14.885+00:00 start
+2026-11-22T10:42:15.369+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 146, in run
+    rec.update(RUNNERS[a.engine](a, dur, principals[a.arm][a.engine], log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 83, in job_duckdb
+    con.create_function("slow", slow, ["VARCHAR"], "VARCHAR", side_effects=True)
+_duckdb.InvalidInputException: Invalid Input Error: 'numpy' is required for this operation, but it wasn't installed
+
+2026-11-22T10:42:15.372+00:00 end ok=False
+2026-11-22T10:46:08.661+00:00 start
+2026-11-22T10:46:09.045+00:00 row 1
+2026-11-22T10:46:11.045+00:00 row 2
+2026-11-22T10:46:13.046+00:00 row 3
+2026-11-22T10:46:15.046+00:00 row 4
+2026-11-22T10:46:17.047+00:00 row 5
+2026-11-22T10:46:19.070+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 146, in run
+    rec.update(RUNNERS[a.engine](a, dur, principals[a.arm][a.engine], log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 85, in job_duckdb
+    con.execute(f"INSERT INTO lg.ops.{tgt_name} SELECT id, slow(v) FROM lg.ops.{src_name}")
+_duckdb.TransactionException: TransactionContext Error: Failed to commit: Failed to commit Iceberg transaction: Request to 'http://polaris-f:8181/api/catalog/v1' returned a non-200 status code (Forbidden_403). 
+ message: Principal 'duckdb_f' with activated PrincipalRoles '[r_duckdb_f]' and activated grants via '[r_duckdb_f]' is not authorized for op COMMIT_TRANSACTION
+ type: ForbiddenException
+ reason: Forbidden
+
+
+2026-11-22T10:46:19.073+00:00 end ok=False
+2026-11-22T10:46:52.776+00:00 start
+2026-11-22T10:46:53.119+00:00 row 1
+2026-11-22T10:46:55.120+00:00 row 2
+2026-11-22T10:46:57.120+00:00 row 3
+2026-11-22T10:46:59.120+00:00 row 4
+2026-11-22T10:47:01.121+00:00 row 5
+2026-11-22T10:47:03.153+00:00 end ok=True

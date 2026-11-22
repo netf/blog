@@ -1,0 +1,105 @@
+# lakegate lab stack. Pins recorded in environment.md ("Pins used for measurement").
+name: lakegate
+x-polaris: &polaris
+  image: apache/polaris:1.9.0@sha256:bc548500f5ba8e798b7f8e107ad0b8fbd5b5c6d0c5437f56c5ca101219b796d0
+  depends_on: [minio, sts]
+  mem_limit: 1g
+x-polaris-env: &polaris-env
+  POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: polaris
+  AWS_SECRET_ACCESS_KEY: polaris-secret-key
+  QUARKUS_HTTP_ACCESS_LOG_ENABLED: "true"
+  QUARKUS_HTTP_ACCESS_LOG_PATTERN: 'ACCESS %{time,yyyy-MM-dd''T''HH:mm:ss.SSS} "%r" %s %D'
+  JAVA_OPTS_APPEND: "-Xmx640m"
+
+services:
+  minio:
+    # Chainguard's fork build; upstream MinIO no longer publishes images.
+    image: cgr.dev/chainguard/minio@sha256:548147b5fc95a67e3e45285dff7e0e50326c3eb1977c6218039461771156c5e7
+    command: ["server", "/data"]
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+      MINIO_AUDIT_WEBHOOK_ENABLE_lg: "on"
+      MINIO_AUDIT_WEBHOOK_ENDPOINT_lg: http://audit:8000/minio
+    ports: ["9000:9000"]
+    depends_on: [audit]
+
+  audit:
+    image: lakegate-py:1
+    command: ["python", "-u", "kit/audit_collector.py", "/lab/results/audit"]
+    volumes: [".:/lab"]
+
+  # STS goes through this proxy so "STS down" can be tested while S3 stays up.
+  sts:
+    image: alpine/socat@sha256:5aa280c6fc5bee94dbd2bbdf2a58d30f50396eaa110be84b03636945b157ae68
+    command: ["-d", "tcp-listen:9000,fork,reuseaddr", "tcp:minio:9000"]
+  # Failure-test catalog (lake_f) only, so "STS down" there cannot touch arms B and C.
+  sts-f:
+    image: alpine/socat@sha256:5aa280c6fc5bee94dbd2bbdf2a58d30f50396eaa110be84b03636945b157ae68
+    command: ["-d", "tcp-listen:9000,fork,reuseaddr", "tcp:minio:9000"]
+
+  polaris-b:
+    <<: *polaris
+    environment:
+      <<: *polaris-env
+    ports: ["8181:8181"]
+  polaris-c:
+    <<: *polaris
+    environment: &polaris-c-env
+      <<: *polaris-env
+      polaris.features."STORAGE_CREDENTIAL_DURATION_SECONDS": "900"
+      polaris.features."STORAGE_CREDENTIAL_CACHE_DURATION_SECONDS": "450"
+    ports: ["8183:8181"]
+  polaris-f:
+    <<: *polaris
+    environment: *polaris-c-env
+    ports: ["8185:8181"]
+
+  lk-db:
+    image: postgres:17@sha256:223efeb196329b55b3b9a13db144956411dbc18e727e59f681c3e0aede6475cf
+    environment: {POSTGRES_PASSWORD: postgres}
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 2s, retries: 30}
+  lk-migrate:
+    image: &lkimage quay.io/lakekeeper/catalog:v0.15.1@sha256:22dcb6044c106a962c242b70051bd226bd50c9134c763121d8713c37fe9a70ec
+    command: ["migrate"]
+    restart: on-failure:5
+    environment: &lkenv
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://postgres:postgres@lk-db:5432/postgres
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://postgres:postgres@lk-db:5432/postgres
+      LAKEKEEPER__PG_ENCRYPTION_KEY: lakegate-lab-only-key
+      LAKEKEEPER__BASE_URI: http://lakekeeper:8181
+    depends_on: {lk-db: {condition: service_healthy}}
+  lakekeeper:
+    image: *lkimage
+    command: ["serve"]
+    environment: *lkenv
+    ports: ["8282:8181"]
+    depends_on: {lk-migrate: {condition: service_completed_successfully}}
+
+  trino:
+    image: trinodb/trino:484@sha256:2704eb53935af5e582d63d6033e9bf99d20c325e9b0e30b1016ef59a4773979f
+    profiles: [engines]
+    mem_limit: 3g
+    volumes:
+      - ./config/trino/catalog:/etc/trino/catalog:ro
+      - ./config/trino/config.properties:/etc/trino/config.properties:ro
+      - ./config/trino/jvm.config:/etc/trino/jvm.config:ro
+    ports: ["8080:8080"]
+
+  spark:
+    # apache/spark:4.1.4-python3 + boto3/requests (images/spark)
+    image: lakegate-spark:1
+    profiles: [engines]
+    user: root
+    command: ["sleep", "infinity"]
+    environment: {AWS_REGION: us-east-1}
+    volumes: [".:/lab", "./jars:/opt/lakegate-jars:ro"]
+    working_dir: /lab
+
+  py:
+    image: lakegate-py:1
+    command: ["sleep", "infinity"]
+    environment: {AWS_REGION: us-east-1}
+    volumes: [".:/lab"]

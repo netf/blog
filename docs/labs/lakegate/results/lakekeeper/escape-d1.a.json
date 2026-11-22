@@ -1,0 +1,85 @@
+{
+  "own_location": "s3://lake/lk/01a202df-4d71-73b6-a7b9-aa0414521fe2",
+  "expires_in_s": 871,
+  "own": {
+    "read_data": {
+      "allowed": true,
+      "detail": "905"
+    },
+    "read_metadata": {
+      "allowed": true,
+      "detail": "296"
+    },
+    "list": {
+      "allowed": true,
+      "detail": "2"
+    },
+    "write": {
+      "allowed": true,
+      "detail": "200"
+    }
+  },
+  "bucket_root_list": {
+    "allowed": false,
+    "detail": "AccessDenied"
+  },
+  "list_buckets": {
+    "allowed": true,
+    "detail": "['lake']"
+  },
+  "write_elsewhere": {
+    "allowed": false,
+    "detail": "AccessDenied"
+  },
+  "others": {
+    "s3://lake/lk/01a202df-4ded-75b2-9c99-14e6cfeccf76": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    },
+    "s3://lake/lk/01a202df-4e35-726d-ad9a-a6d3ece85a1d": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    }
+  },
+  "others_readable": [],
+  "svcacct_create": {
+    "allowed": false,
+    "detail": "mc: <ERROR> Unable to add a new service account. Access Denied."
+  }
+}

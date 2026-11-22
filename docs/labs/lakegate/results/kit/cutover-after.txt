@@ -1,0 +1,11 @@
+lakegate cut-over checklist  2026-11-22T14:08:58Z  catalog=lake_c
+[PASS] bucket-wide keys outside the catalog services: none
+[PASS] credential TTL 900s (target <= 900s), cache 450s; a stolen key lives up to 900s
+[PASS] lake_c: table location overlap allowed = false
+[PASS] lake_c: kmsUnavailable=True (MinIO STS rejects Polaris' default kms:* statement)
+[PASS] 310 table locations, shared or nested: none
+[PASS] catalog-wide data grants on engine roles: none
+[WARN] TABLE_CREATE held by ['r_duckdb_c:namespace/canary', 'r_duckdb_c:namespace/ops'] (DuckDB's commit endpoint needs it)
+[FAIL] canary 2026-11-22T13:22:38+00:00: 3/4 engines ran past the TTL; failing: ['trino-c-20-20261122T130222Z-trino']
+[WARN] PyIceberg jobs that outlive TTL-300s=600s: ['pyiceberg 30min', 'pyiceberg 61min', 'pyiceberg 120min'] (must use lakegate_client.refreshing); Trino INSERTs must not hold an output file open longer than 600s
+verdict: BLOCKED (remove bucket-wide keys only when READY)

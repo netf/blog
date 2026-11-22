@@ -1,0 +1,147 @@
+{
+  "own_location": "s3://lake/lake_b/ops/src_spark_61",
+  "expires_in_s": 3599,
+  "own": {
+    "read_data": {
+      "allowed": true,
+      "detail": "960"
+    },
+    "read_metadata": {
+      "allowed": true,
+      "detail": "766"
+    },
+    "list": {
+      "allowed": true,
+      "detail": "2"
+    },
+    "write": {
+      "allowed": true,
+      "detail": "200"
+    }
+  },
+  "bucket_root_list": {
+    "allowed": false,
+    "detail": "AccessDenied"
+  },
+  "list_buckets": {
+    "allowed": true,
+    "detail": "['lake']"
+  },
+  "write_elsewhere": {
+    "allowed": false,
+    "detail": "AccessDenied"
+  },
+  "others": {
+    "s3://lake/lake_b/hr/t000": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    },
+    "s3://lake/lake_b/sales/t000": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    },
+    "s3://lake/lake_b/ops/tgt_spark_61": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    },
+    "s3://lake/lake_b/ops/src_trino_61": {
+      "read_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "read_metadata": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "delete_data": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    },
+    "s3://lake/lake_b/ops/src_spark_61_x": {
+      "read_data": {
+        "allowed": null,
+        "detail": "no file"
+      },
+      "read_metadata": {
+        "allowed": null,
+        "detail": "no file"
+      },
+      "list": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      },
+      "write": {
+        "allowed": false,
+        "detail": "AccessDenied"
+      }
+    }
+  },
+  "others_readable": [],
+  "svcacct_create": {
+    "allowed": false,
+    "detail": "mc: <ERROR> Unable to add a new service account. Access Denied."
+  }
+}

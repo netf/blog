@@ -1,0 +1,32 @@
+2026-11-22T11:04:43.038+00:00 start
+2026-11-22T11:04:43.991+00:00 read file 1/30
+2026-11-22T11:05:43.996+00:00 read file 2/30
+2026-11-22T11:06:44.003+00:00 read file 3/30
+2026-11-22T11:07:44.010+00:00 read file 4/30
+2026-11-22T11:08:44.019+00:00 read file 5/30
+2026-11-22T11:09:44.025+00:00 read file 6/30
+2026-11-22T11:10:44.030+00:00 read file 7/30
+2026-11-22T11:11:44.037+00:00 read file 8/30
+2026-11-22T11:12:44.044+00:00 read file 9/30
+2026-11-22T11:13:44.050+00:00 read file 10/30
+2026-11-22T11:14:44.056+00:00 read file 11/30
+2026-11-22T11:15:44.061+00:00 read file 12/30
+2026-11-22T11:16:44.066+00:00 read file 13/30
+2026-11-22T11:17:44.072+00:00 read file 14/30
+2026-11-22T11:18:44.078+00:00 read file 15/30
+2026-11-22T11:19:44.083+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 216, in run
+    rec.update(runner(a, dur, principals.get(a.arm, {}).get(a.engine), log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 58, in job_pyiceberg
+    with src.io.new_input(f).open() as fh:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 340, in open
+    input_file = self._filesystem.open_input_file(self._path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 815, in pyarrow._fs.FileSystem.open_input_file
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When reading information for key 'lake_f/fail/f0_pyice_src/data/00000-0-888f58a6-b6fc-4780-bf54-050114cdbac3.parquet' in bucket 'lake': AWS Error ACCESS_DENIED during HeadObject operation: No response body.
+
+2026-11-22T11:19:44.083+00:00 end ok=False

@@ -1,0 +1,23 @@
+2026-11-22T12:19:48.610+00:00 start
+2026-11-22T12:19:48.825+00:00 read file 1/30
+2026-11-22T12:20:48.831+00:00 read file 2/30
+2026-11-22T12:21:48.838+00:00 read file 3/30
+2026-11-22T12:22:48.844+00:00 read file 4/30
+2026-11-22T12:23:48.850+00:00 read file 5/30
+2026-11-22T12:36:16.669+00:00 refreshed credentials for fail.f1b_pyshim_src; new expiry in -91s
+2026-11-22T12:36:16.677+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 216, in run
+    rec.update(runner(a, dur, principals.get(a.arm, {}).get(a.engine), log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 58, in job_pyiceberg
+    with src.io.new_input(f).open() as fh:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 340, in open
+    input_file = self._filesystem.open_input_file(self._path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 815, in pyarrow._fs.FileSystem.open_input_file
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When reading information for key 'lake_f/fail/f1b_pyshim_src/data/00000-0-270d6fa7-ead5-4a71-a69f-0a99c7016ecc.parquet' in bucket 'lake': AWS Error ACCESS_DENIED during HeadObject operation: No response body.
+
+2026-11-22T12:36:16.677+00:00 end ok=False

@@ -1,0 +1,10 @@
+lakegate cut-over checklist  2026-11-22T11:06:45Z  catalog=lake_y
+[FAIL] bucket-wide keys outside the catalog services: ['pyiceberg-a (lake-rw)', 'spark-a (lake-rw)', 'trino-a (lake-rw)', 'duckdb-a (lake-rw)']
+[PASS] credential TTL 900s (target <= 900s), cache 450s; a stolen key lives up to 900s
+[FAIL] lake_y: table location overlap allowed = true
+[PASS] lake_y: kmsUnavailable=True (MinIO STS rejects Polaris' default kms:* statement)
+[FAIL] 7 table locations, shared or nested: ['x.a s3://lake/lake_y/x/a/ contains x.reg', 'x.reg s3://lake/lake_y/x/a/ contains x.ov', 'x.ov s3://lake/lake_y/x/a/ contains x.nest', 'x.r_old s3://lake/lake_y/x/r/ contains x.r']
+[PASS] catalog-wide data grants on engine roles: none
+[FAIL] no canary result at results/canary/latest.json
+[WARN] jobs on clients without native refresh that outlive TTL-300s=600s: ['pyiceberg 30min', 'pyiceberg 61min', 'pyiceberg 120min', 'duckdb 30min', 'duckdb 61min', 'duckdb 120min'] (PyIceberg: use lakegate_client.refreshing; DuckDB: split into statements or move engine)
+verdict: BLOCKED (remove bucket-wide keys only when READY)

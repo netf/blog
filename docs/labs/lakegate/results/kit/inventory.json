@@ -1,0 +1,844 @@
+{
+  "window": {
+    "start": "2026-11-22T10:50:42.080185+00:00",
+    "end": "2026-11-22T10:55:11.405225+00:00"
+  },
+  "keys": {
+    "duckdb-a": {
+      "tables_read": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61"
+      ],
+      "tables_written": [
+        "ops.tgt_duckdb_120",
+        "ops.tgt_duckdb_30",
+        "ops.tgt_duckdb_5",
+        "ops.tgt_duckdb_61"
+      ],
+      "tables_touched": 13,
+      "requests": 453,
+      "non_table_requests": {},
+      "user_agents": {
+        "duckdb/v2.0.1(linux_amd64)": 453
+      },
+      "first_seen": "2026-11-22T10:50:43.732801238Z",
+      "last_seen": "2026-11-22T10:52:45.860423246Z"
+    },
+    "polaris": {
+      "tables_read": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "marketing.t000",
+        "marketing.t001",
+        "marketing.t002",
+        "marketing.t003",
+        "marketing.t004",
+        "marketing.t005",
+        "marketing.t006",
+        "marketing.t007",
+        "marketing.t008",
+        "marketing.t009",
+        "marketing.t010",
+        "marketing.t011",
+        "marketing.t012",
+        "marketing.t013",
+        "marketing.t014",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61",
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "ops.src_trino_120",
+        "ops.src_trino_30",
+        "ops.src_trino_5",
+        "ops.src_trino_61",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "tables_written": [
+        "ops.tgt_duckdb_120",
+        "ops.tgt_duckdb_30",
+        "ops.tgt_duckdb_5",
+        "ops.tgt_duckdb_61",
+        "ops.tgt_pyiceberg_120",
+        "ops.tgt_pyiceberg_30",
+        "ops.tgt_pyiceberg_5",
+        "ops.tgt_pyiceberg_61",
+        "ops.tgt_spark_120",
+        "ops.tgt_spark_30",
+        "ops.tgt_spark_5",
+        "ops.tgt_spark_61",
+        "ops.tgt_trino_120",
+        "ops.tgt_trino_30",
+        "ops.tgt_trino_5",
+        "ops.tgt_trino_61"
+      ],
+      "tables_touched": 92,
+      "requests": 141,
+      "non_table_requests": {},
+      "user_agents": {
+        "s3fileio/{iceberg-version=Apache": 141
+      },
+      "first_seen": "2026-11-22T10:50:42.932868914Z",
+      "last_seen": "2026-11-22T10:55:11.331220985Z"
+    },
+    "pyiceberg-a": {
+      "tables_read": [
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "tables_written": [
+        "ops.tgt_pyiceberg_120",
+        "ops.tgt_pyiceberg_30",
+        "ops.tgt_pyiceberg_5",
+        "ops.tgt_pyiceberg_61"
+      ],
+      "tables_touched": 18,
+      "requests": 1202,
+      "non_table_requests": {},
+      "user_agents": {
+        "aws-sdk-cpp/1.11.900": 1202
+      },
+      "first_seen": "2026-11-22T10:50:43.295210091Z",
+      "last_seen": "2026-11-22T10:52:46.035839135Z"
+    },
+    "spark-a": {
+      "tables_read": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "tables_written": [
+        "ops.tgt_spark_120",
+        "ops.tgt_spark_30",
+        "ops.tgt_spark_5",
+        "ops.tgt_spark_61"
+      ],
+      "tables_touched": 38,
+      "requests": 550,
+      "non_table_requests": {},
+      "user_agents": {
+        "s3fileio/{engine-version=4.1.4,": 550
+      },
+      "first_seen": "2026-11-22T10:50:51.64685496Z",
+      "last_seen": "2026-11-22T10:52:54.789429163Z"
+    },
+    "trino-a": {
+      "tables_read": [
+        "marketing.t000",
+        "marketing.t001",
+        "marketing.t002",
+        "marketing.t003",
+        "marketing.t004",
+        "marketing.t005",
+        "marketing.t006",
+        "marketing.t007",
+        "marketing.t008",
+        "marketing.t009",
+        "marketing.t010",
+        "marketing.t011",
+        "marketing.t012",
+        "marketing.t013",
+        "marketing.t014",
+        "ops.src_trino_120",
+        "ops.src_trino_30",
+        "ops.src_trino_5",
+        "ops.src_trino_61",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004"
+      ],
+      "tables_written": [
+        "ops.tgt_trino_120",
+        "ops.tgt_trino_30",
+        "ops.tgt_trino_5",
+        "ops.tgt_trino_61"
+      ],
+      "tables_touched": 28,
+      "requests": 524,
+      "non_table_requests": {},
+      "user_agents": {
+        "aws-sdk-java/2.55.12": 524
+      },
+      "first_seen": "2026-11-22T10:50:43.165760662Z",
+      "last_seen": "2026-11-22T10:55:11.306472214Z"
+    }
+  },
+  "jobs": {
+    "duckdb-a-sweep": {
+      "tables_in_window": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "duckdb-a-5",
+        "duckdb-a-30",
+        "duckdb-a-61",
+        "duckdb-a-120"
+      ],
+      "separable": false
+    },
+    "pyiceberg-a-sweep": {
+      "tables_in_window": [
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "pyiceberg-a-5",
+        "pyiceberg-a-30",
+        "pyiceberg-a-61",
+        "pyiceberg-a-120"
+      ],
+      "separable": false
+    },
+    "trino-a-sweep": {
+      "tables_in_window": [
+        "marketing.t000",
+        "marketing.t001",
+        "marketing.t002",
+        "marketing.t003",
+        "marketing.t004",
+        "marketing.t005",
+        "marketing.t006",
+        "marketing.t007",
+        "marketing.t008",
+        "marketing.t009",
+        "marketing.t010",
+        "marketing.t011",
+        "marketing.t012",
+        "marketing.t013",
+        "marketing.t014",
+        "ops.src_trino_30",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "trino-a-30"
+      ],
+      "separable": false
+    },
+    "duckdb-a-5": {
+      "tables_in_window": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61",
+        "ops.tgt_duckdb_5"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "duckdb-a-sweep",
+        "duckdb-a-30",
+        "duckdb-a-61",
+        "duckdb-a-120"
+      ],
+      "separable": false
+    },
+    "pyiceberg-a-5": {
+      "tables_in_window": [
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "ops.tgt_pyiceberg_5",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "pyiceberg-a-sweep",
+        "pyiceberg-a-30",
+        "pyiceberg-a-61",
+        "pyiceberg-a-120"
+      ],
+      "separable": false
+    },
+    "spark-a-sweep": {
+      "tables_in_window": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "spark-a-5",
+        "spark-a-30",
+        "spark-a-61",
+        "spark-a-120"
+      ],
+      "separable": false
+    },
+    "spark-a-5": {
+      "tables_in_window": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "ops.tgt_spark_5",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "spark-a-sweep",
+        "spark-a-30",
+        "spark-a-61",
+        "spark-a-120"
+      ],
+      "separable": false
+    },
+    "duckdb-a-30": {
+      "tables_in_window": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61",
+        "ops.tgt_duckdb_30",
+        "ops.tgt_duckdb_5"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "duckdb-a-sweep",
+        "duckdb-a-5",
+        "duckdb-a-61",
+        "duckdb-a-120"
+      ],
+      "separable": false
+    },
+    "pyiceberg-a-30": {
+      "tables_in_window": [
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "ops.tgt_pyiceberg_30",
+        "ops.tgt_pyiceberg_5",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "pyiceberg-a-sweep",
+        "pyiceberg-a-5",
+        "pyiceberg-a-61",
+        "pyiceberg-a-120"
+      ],
+      "separable": false
+    },
+    "trino-a-30": {
+      "tables_in_window": [
+        "marketing.t000",
+        "marketing.t001",
+        "marketing.t002",
+        "marketing.t003",
+        "marketing.t004",
+        "marketing.t005",
+        "marketing.t006",
+        "marketing.t007",
+        "marketing.t008",
+        "marketing.t009",
+        "marketing.t010",
+        "marketing.t011",
+        "marketing.t012",
+        "marketing.t013",
+        "marketing.t014",
+        "ops.src_trino_30",
+        "ops.tgt_trino_30",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "trino-a-sweep"
+      ],
+      "separable": false
+    },
+    "spark-a-30": {
+      "tables_in_window": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "ops.tgt_spark_30",
+        "ops.tgt_spark_5",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "spark-a-sweep",
+        "spark-a-5",
+        "spark-a-61",
+        "spark-a-120"
+      ],
+      "separable": false
+    },
+    "duckdb-a-61": {
+      "tables_in_window": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61",
+        "ops.tgt_duckdb_30",
+        "ops.tgt_duckdb_5",
+        "ops.tgt_duckdb_61"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "duckdb-a-sweep",
+        "duckdb-a-5",
+        "duckdb-a-30",
+        "duckdb-a-120"
+      ],
+      "separable": false
+    },
+    "pyiceberg-a-61": {
+      "tables_in_window": [
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "ops.tgt_pyiceberg_30",
+        "ops.tgt_pyiceberg_5",
+        "ops.tgt_pyiceberg_61",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "pyiceberg-a-sweep",
+        "pyiceberg-a-5",
+        "pyiceberg-a-30",
+        "pyiceberg-a-120"
+      ],
+      "separable": false
+    },
+    "spark-a-61": {
+      "tables_in_window": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "ops.tgt_spark_30",
+        "ops.tgt_spark_5",
+        "ops.tgt_spark_61",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "spark-a-sweep",
+        "spark-a-5",
+        "spark-a-30",
+        "spark-a-120"
+      ],
+      "separable": false
+    },
+    "duckdb-a-120": {
+      "tables_in_window": [
+        "hr.t000",
+        "hr.t001",
+        "hr.t002",
+        "hr.t003",
+        "hr.t004",
+        "ops.src_duckdb_120",
+        "ops.src_duckdb_30",
+        "ops.src_duckdb_5",
+        "ops.src_duckdb_61",
+        "ops.tgt_duckdb_120",
+        "ops.tgt_duckdb_30",
+        "ops.tgt_duckdb_5",
+        "ops.tgt_duckdb_61"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "duckdb-a-sweep",
+        "duckdb-a-5",
+        "duckdb-a-30",
+        "duckdb-a-61"
+      ],
+      "separable": false
+    },
+    "pyiceberg-a-120": {
+      "tables_in_window": [
+        "ops.src_pyiceberg_120",
+        "ops.src_pyiceberg_30",
+        "ops.src_pyiceberg_5",
+        "ops.src_pyiceberg_61",
+        "ops.tgt_pyiceberg_120",
+        "ops.tgt_pyiceberg_30",
+        "ops.tgt_pyiceberg_5",
+        "ops.tgt_pyiceberg_61",
+        "product.t000",
+        "product.t001",
+        "product.t002",
+        "product.t003",
+        "product.t004",
+        "product.t005",
+        "product.t006",
+        "product.t007",
+        "product.t008",
+        "product.t009"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "pyiceberg-a-sweep",
+        "pyiceberg-a-5",
+        "pyiceberg-a-30",
+        "pyiceberg-a-61"
+      ],
+      "separable": false
+    },
+    "spark-a-120": {
+      "tables_in_window": [
+        "finance.t000",
+        "finance.t001",
+        "finance.t002",
+        "finance.t003",
+        "finance.t004",
+        "finance.t005",
+        "finance.t006",
+        "finance.t007",
+        "finance.t008",
+        "finance.t009",
+        "ops.src_spark_120",
+        "ops.src_spark_30",
+        "ops.src_spark_5",
+        "ops.src_spark_61",
+        "ops.tgt_spark_120",
+        "ops.tgt_spark_30",
+        "ops.tgt_spark_5",
+        "ops.tgt_spark_61",
+        "sales.t000",
+        "sales.t001",
+        "sales.t002",
+        "sales.t003",
+        "sales.t004",
+        "sales.t005",
+        "sales.t006",
+        "sales.t007",
+        "sales.t008",
+        "sales.t009",
+        "sales.t010",
+        "sales.t011",
+        "sales.t012",
+        "sales.t013",
+        "sales.t014",
+        "sales.t015",
+        "sales.t016",
+        "sales.t017",
+        "sales.t018",
+        "sales.t019"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "spark-a-sweep",
+        "spark-a-5",
+        "spark-a-30",
+        "spark-a-61"
+      ],
+      "separable": false
+    },
+    "trino-a-5": {
+      "tables_in_window": [
+        "ops.src_trino_120",
+        "ops.src_trino_5",
+        "ops.src_trino_61",
+        "ops.tgt_trino_5"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "trino-a-61",
+        "trino-a-120"
+      ],
+      "separable": false
+    },
+    "trino-a-61": {
+      "tables_in_window": [
+        "ops.src_trino_120",
+        "ops.src_trino_5",
+        "ops.src_trino_61",
+        "ops.tgt_trino_5",
+        "ops.tgt_trino_61"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "trino-a-5",
+        "trino-a-120"
+      ],
+      "separable": false
+    },
+    "trino-a-120": {
+      "tables_in_window": [
+        "ops.src_trino_120",
+        "ops.src_trino_5",
+        "ops.src_trino_61",
+        "ops.tgt_trino_120",
+        "ops.tgt_trino_5",
+        "ops.tgt_trino_61"
+      ],
+      "overlapping_jobs_on_same_key": [
+        "trino-a-5",
+        "trino-a-61"
+      ],
+      "separable": false
+    }
+  },
+  "jobs_separable": 0,
+  "jobs_total": 20
+}

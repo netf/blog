@@ -1,0 +1,17 @@
+{
+  "mode": "plain",
+  "shape": "burst",
+  "workers": 50,
+  "wall_s": 0.2,
+  "errors": 0,
+  "error_codes": [],
+  "loadTable": {
+    "n": 100,
+    "per_s": 438.0,
+    "p50_ms": 52.5,
+    "p95_ms": 121.2,
+    "p99_ms": 135.9,
+    "max_ms": 141.7,
+    "mean_ms": 58.9
+  }
+}

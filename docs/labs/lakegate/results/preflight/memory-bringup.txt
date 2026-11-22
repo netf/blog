@@ -1,0 +1,21 @@
+# docker stats peak per container (MiB) during idle + tpch sf1 count on Trino + SparkPi(2000) local[4] driver 2g
+lakegate-preflight-lakekeeper-1                33
+lakegate-preflight-lk-db-1                     67
+lakegate-preflight-minio-1                     59
+lakegate-preflight-polaris-1                  284
+lakegate-preflight-spark-1                    697
+lakegate-preflight-trino-1                   1527
+sum of per-container peaks                   2668
+
+# trino:
+"6001215"
+# spark:
+Pi is roughly 3.1414729157073644
+
+# host after load
+               total        used        free      shared  buff/cache   available
+Mem:           16003        4931        6293          40        5149       11072
+Swap:              0           0           0
+balloon_inflate 2621440
+balloon_deflate 2097152
+balloon_migrate 0

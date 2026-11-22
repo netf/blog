@@ -1,0 +1,42 @@
+{
+  "create_catalog": [
+    201,
+    "{\"type\":\"INTERNAL\",\"name\":\"lake\",\"properties\":{\"default-base-location\":\"s3://lake/wh\"},\"createTimestamp\":1795343045041,\"lastUpdateTimestamp\":0,\"entityVersion\":1,\"storageConfigInfo\":{\"roleArn\":\"arn:aws:iam::000000000000:role/lakegate\",\"allowedKmsKeys\":[],\"encryptionKeys\":[],\"decryptionKeys\":[],\"regio"
+  ],
+  "loadTable_config_keys": [
+    "client.refresh-credentials-endpoint",
+    "client.region",
+    "s3.access-key-id",
+    "s3.endpoint",
+    "s3.path-style-access",
+    "s3.secret-access-key",
+    "s3.session-token",
+    "s3.session-token-expires-at-ms"
+  ],
+  "storage_credentials": [
+    {
+      "prefix": "s3://lake/wh/d1/a",
+      "keys": [
+        "s3.access-key-id",
+        "s3.secret-access-key",
+        "s3.session-token",
+        "s3.session-token-expires-at-ms"
+      ]
+    }
+  ],
+  "expires_in_s": 898.9987118244171,
+  "refresh_endpoint": "v1/lake/namespaces/d1/tables/a/credentials",
+  "credentials_endpoint": [
+    200,
+    [
+      "storage-credentials"
+    ]
+  ],
+  "list_own_prefix": "ALLOWED ['wh/d1/a/data/00000-0-7cd96008-9041-4952-995a-ff4396707b38.parquet', 'wh/d1/a/metadata/00000-23d54bb9-8d9a-4e3a-9831-5b",
+  "list_other_prefix": "DENIED AccessDenied",
+  "list_bucket_root": "DENIED AccessDenied",
+  "read_other_table_data": "DENIED AccessDenied",
+  "write_outside": "DENIED AccessDenied",
+  "table_a_location": "s3://lake/wh/d1/a",
+  "table_b_location": "s3://lake/wh/d2/b"
+}

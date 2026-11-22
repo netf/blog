@@ -1,0 +1,59 @@
+2026-11-22T10:57:27.927+00:00 start
+2026-11-22T10:57:32.974+00:00 read file 1/120
+2026-11-22T10:58:32.979+00:00 read file 2/120
+2026-11-22T10:59:32.984+00:00 read file 3/120
+2026-11-22T11:00:32.989+00:00 read file 4/120
+2026-11-22T11:01:32.994+00:00 read file 5/120
+2026-11-22T11:02:33.000+00:00 read file 6/120
+2026-11-22T11:03:33.006+00:00 read file 7/120
+2026-11-22T11:04:33.011+00:00 read file 8/120
+2026-11-22T11:05:33.016+00:00 read file 9/120
+2026-11-22T11:06:33.022+00:00 read file 10/120
+2026-11-22T11:07:33.027+00:00 read file 11/120
+2026-11-22T11:08:33.034+00:00 read file 12/120
+2026-11-22T11:09:33.041+00:00 read file 13/120
+2026-11-22T11:10:33.047+00:00 read file 14/120
+2026-11-22T11:11:33.053+00:00 read file 15/120
+2026-11-22T11:12:33.060+00:00 read file 16/120
+2026-11-22T11:13:33.067+00:00 read file 17/120
+2026-11-22T11:14:33.073+00:00 read file 18/120
+2026-11-22T11:15:33.078+00:00 read file 19/120
+2026-11-22T11:16:33.083+00:00 read file 20/120
+2026-11-22T11:17:33.090+00:00 read file 21/120
+2026-11-22T11:18:33.096+00:00 read file 22/120
+2026-11-22T11:19:33.106+00:00 read file 23/120
+2026-11-22T11:20:33.111+00:00 read file 24/120
+2026-11-22T11:21:33.117+00:00 read file 25/120
+2026-11-22T11:22:33.123+00:00 read file 26/120
+2026-11-22T11:24:48.545+00:00 read file 27/120
+2026-11-22T11:25:48.556+00:00 read file 28/120
+2026-11-22T11:26:48.563+00:00 read file 29/120
+2026-11-22T11:27:48.571+00:00 read file 30/120
+2026-11-22T11:28:48.577+00:00 read file 31/120
+2026-11-22T11:29:48.585+00:00 read file 32/120
+2026-11-22T11:30:48.592+00:00 read file 33/120
+2026-11-22T11:31:48.598+00:00 read file 34/120
+2026-11-22T11:32:48.603+00:00 read file 35/120
+2026-11-22T11:33:48.609+00:00 read file 36/120
+2026-11-22T11:34:48.615+00:00 read file 37/120
+2026-11-22T11:35:48.621+00:00 read file 38/120
+2026-11-22T11:36:48.627+00:00 read file 39/120
+2026-11-22T11:37:48.633+00:00 read file 40/120
+2026-11-22T11:38:48.639+00:00 read file 41/120
+2026-11-22T11:39:48.644+00:00 read file 42/120
+2026-11-22T11:40:48.646+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 182, in run
+    p = argparse.ArgumentParser()
+                       ^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 52, in job_pyiceberg
+    if a.refresh_shim:
+             ^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 340, in open
+    input_file = self._filesystem.open_input_file(self._path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 815, in pyarrow._fs.FileSystem.open_input_file
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When reading information for key 'lake_b/ops/src_pyiceberg_120/data/00000-0-47a6c761-1882-4f20-958c-1e680daa1ae2.parquet' in bucket 'lake': AWS Error ACCESS_DENIED during HeadObject operation: No response body.
+
+2026-11-22T11:40:48.647+00:00 end ok=False

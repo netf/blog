@@ -1,0 +1,5 @@
+2026-11-22T11:03:57.307+00:00 start
+2026-11-22T11:03:57.603+00:00 appended file 1/2 (not committed)
+2026-11-22T11:03:58.641+00:00 appended file 2/2 (not committed)
+2026-11-22T11:03:59.659+00:00 committed
+2026-11-22T11:03:59.659+00:00 end ok=True

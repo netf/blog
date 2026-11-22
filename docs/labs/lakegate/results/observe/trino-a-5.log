@@ -1,0 +1,23 @@
+2026-11-22T10:50:42.986+00:00 start
+2026-11-22T10:50:43.276+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 178, in run
+    rec.update(RUNNERS[a.engine](a, dur, principals[a.arm][a.engine], log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 106, in job_trino
+    cur.execute(TRINO_FN % (sec, sec))
+  File "/usr/local/lib/python3.12/site-packages/trino/dbapi.py", line 670, in execute
+    self._iterator = iter(self._query.execute())
+                          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/trino/client.py", line 1026, in execute
+    new_rows = self.fetch()
+               ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/trino/client.py", line 1080, in fetch
+    status = self._request.process(response)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/trino/client.py", line 770, in process
+    raise self._process_error(response["error"], response.get("id"))
+trino.exceptions.TrinoUserError: TrinoUserError(type=USER_ERROR, name=ALREADY_EXISTS, message="Function already exists", query_id=20261122_105043_00004_w8zh5)
+
+2026-11-22T10:50:43.276+00:00 end ok=False
+2026-11-22T10:53:07.779+00:00 start
+2026-11-22T10:53:13.341+00:00 end ok=True

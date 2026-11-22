@@ -1,0 +1,8 @@
+jars/*.jar
+# principal secrets and vended keys
+state/
+# raw MinIO audit log (large); results/audit/README.md says how to regenerate, summaries are committed
+results/audit/audit.jsonl
+config/trino/catalog/[abcf].properties
+config/trino/catalog/lk.properties
+__pycache__/

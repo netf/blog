@@ -1,0 +1,8 @@
+ok c canary ['spark', 'trino', 'pyiceberg', 'duckdb', 'spark_regressed']
+grants ok 
+ALERT spark-c-20-20261122T130222Z-spark_regressed 904.7s : org.apache.spark.SparkException: Job aborted due to stage failure: Task 0 in stage 0.0 failed 1 times, most recent failure: Lost task 0.0 in stage 0.0 (TID 0) (069c8d90006e executor driver): softwar
+ok    pyiceberg-c-20-20261122T130222Z-pyiceberg 1200.5s 
+ok    duckdb-c-20-20261122T130222Z-duckdb 1200.7s 
+ALERT trino-c-20-20261122T130222Z-trino 1201.3s TrinoExternalError: TrinoExternalError(type=EXTERNAL, name=HIVE_WRITER_CLOSE_ERROR, message="Error committing write to Parquet file", query_id=20261122_130229_00012_zetnh)
+ok    spark-c-20-20261122T130222Z-spark 1204.6s 
+exit=1

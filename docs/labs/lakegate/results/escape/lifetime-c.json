@@ -1,0 +1,6 @@
+{
+  "issued_expires_in_s": 711,
+  "last_ok_after_s": 690,
+  "first_denied_after_s": 720,
+  "denied_with": "InvalidAccessKeyId"
+}
