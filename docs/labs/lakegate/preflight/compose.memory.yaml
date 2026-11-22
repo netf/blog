@@ -1,0 +1,49 @@
+# Preflight only: brings every service of the planned stack up once to measure memory.
+# MinIO here is the Chainguard build because upstream images no longer exist (see environment.md);
+# nothing in this file is used for a measurement.
+name: lakegate-preflight
+services:
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    ports: ["9000:9000"]
+  polaris:
+    image: apache/polaris:1.9.0
+    environment:
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+      AWS_REGION: us-east-1
+    ports: ["8181:8181", "8182:8182"]
+  lk-db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      retries: 30
+  lk-migrate:
+    image: quay.io/lakekeeper/catalog:v0.15.1
+    command: ["migrate"]
+    restart: on-failure:5
+    environment: &lkenv
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://postgres:postgres@lk-db:5432/postgres
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://postgres:postgres@lk-db:5432/postgres
+      LAKEKEEPER__PG_ENCRYPTION_KEY: preflight-only-key
+    depends_on:
+      lk-db: {condition: service_healthy}
+  lakekeeper:
+    image: quay.io/lakekeeper/catalog:v0.15.1
+    command: ["serve"]
+    environment: *lkenv
+    ports: ["8282:8181"]
+    depends_on:
+      lk-migrate: {condition: service_completed_successfully}
+  trino:
+    image: trinodb/trino:484
+    ports: ["8080:8080"]
+  spark:
+    image: apache/spark:4.3.0
+    command: ["sleep", "infinity"]

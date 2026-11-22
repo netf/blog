@@ -1,0 +1,21 @@
+# Preflight feasibility probe only (stand-in MinIO, see environment.md). Answers:
+# does Polaris 1.9.0 vend MinIO STS credentials, scoped, with a refresh endpoint, out of the box?
+name: lakegate-probe
+services:
+  minio:
+    image: cgr.dev/chainguard/minio:latest
+    command: ["server", "/data"]
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    ports: ["9000:9000"]
+  polaris:
+    image: apache/polaris:1.9.0
+    environment:
+      POLARIS_BOOTSTRAP_CREDENTIALS: POLARIS,root,s3cr3t
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: polaris
+      AWS_SECRET_ACCESS_KEY: polaris-secret
+      polaris.features."STORAGE_CREDENTIAL_DURATION_SECONDS": "900"
+      polaris.features."STORAGE_CREDENTIAL_CACHE_DURATION_SECONDS": "450"
+    ports: ["8181:8181"]

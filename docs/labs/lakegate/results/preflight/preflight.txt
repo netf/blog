@@ -1,0 +1,84 @@
+
+## compute
+4
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi       2.9Gi       7.9Gi        17Mi       5.1Gi        12Gi
+Swap:             0B          0B          0B
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vdc        254G   16G  238G   7% /
+/dev/vdc        254G   16G  238G   7% /var/lib/docker
+kvm
+console=ttyS0 root=/dev/vda random.trust_cpu=on ip=172.30.0.2::172.30.0.1:255.255.255.0::eth0:off rw loglevel=7 earlyprintk=ttyS0 print-fatal-signals=1 systemd.unified_cgroup_hierarchy=1 systemd.setenv=SWAP_SIZE_MB=0 reboot=k panic=1 nomodule kvm.enable_virt_at_load=0 i8042.noaux=1 i8042.nomux=1 i8042.dumbkbd=1 clocksource=kvm-clock tsc=unstable nosoftlockup root=/dev/vda rw
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+PID1: tini
+process RSS total: 895 MiB
+balloon_inflate 2621440
+balloon_deflate 2097152
+balloon_migrate 0
+
+## kernel
+6.12.113+
+cgroup2fs
+cpuset cpu io memory hugetlb pids
+iptables v1.8.10 (nf_tables)
+-P FORWARD DROP
+-A FORWARD -o docker0 -j ACCEPT
+-A FORWARD -i docker0 -j ACCEPT
+nftables v1.0.9 (Old Doc Yak #3)
+ls: cannot access '/lib/modules': No such file or directory
+net.bridge.bridge-nf-call-iptables=1
+
+## container-tooling
+docker client 29.10.0 server 29.10.0
+storage=overlayfs cgroupdriver=cgroupfs cgroup=v2 root=/var/lib/docker security=[name=seccomp,profile=builtin name=cgroupns]
+Docker Compose version v5.8.0
+kind: not installed (not used)
+
+## tools
+openjdk version "21.0.13.0.3" 2026-10-24
+pyiceberg 0.12.0 duckdb 2.0.1 pyarrow 26.0.1
+[('avro', '4176191c96'), ('httpfs', 'f71cfdb4bf'), ('iceberg', 'f979b5b28a')]
+   /___/ .__/\_,_/_/ /_/\_\   version 4.3.0
+Using Scala version 2.13.18, OpenJDK 64-Bit Server VM, 21.0.13
+Trino CLI 484
+minio version RELEASE.2026-11-16T00-11-40Z (commit-id=ee9fee0715118245ff4d9149c102608653748196)
+mc version DEVELOPMENT.GOGET (commit-id=DEVELOPMENT.GOGET)
+apache/polaris:1.9.0 apache/polaris@sha256:bc548500f5ba8e798b7f8e107ad0b8fbd5b5c6d0c5437f56c5ca101219b796d0
+quay.io/lakekeeper/catalog:v0.15.1 quay.io/lakekeeper/catalog@sha256:22dcb6044c106a962c242b70051bd226bd50c9134c763121d8713c37fe9a70ec
+apache/spark:4.3.0 apache/spark@sha256:3dedc5c8665a6f472e2f0a3a828207a79a30785090ef325d3af219cb90a73d63
+trinodb/trino:484 trinodb/trino@sha256:2704eb53935af5e582d63d6033e9bf99d20c325e9b0e30b1016ef59a4773979f
+cgr.dev/chainguard/minio:latest cgr.dev/chainguard/minio@sha256:548147b5fc95a67e3e45285dff7e0e50326c3eb1977c6218039461771156c5e7
+postgres:17 postgres@sha256:223efeb196329b55b3b9a13db144956411dbc18e727e59f681c3e0aede6475cf
+
+## upstream-minio
+minio/minio:latest: not pullable
+minio/minio:RELEASE.2025-09-07T16-13-09Z: not pullable
+quay.io/minio/minio:latest: not pullable
+quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z: not pullable
+minio/mc:latest: not pullable
+{"isArchived":true,"pushedAt":"2026-04-24T17:54:39Z"}
+
+## iceberg-spark-runtimes
+iceberg-spark-runtime-3.2_2.13
+iceberg-spark-runtime-3.3_2.13
+iceberg-spark-runtime-3.4_2.13
+iceberg-spark-runtime-3.5_2.13
+iceberg-spark-runtime-4.0_2.13
+iceberg-spark-runtime-4.1_2.13
+<latest>1.12.0
+
+## network
+401 https://registry-1.docker.io/v2/
+401 https://quay.io/v2/
+401 https://cgr.dev/v2/
+200 https://repo1.maven.org/maven2/
+200 https://pypi.org/simple/
+301 https://extensions.duckdb.org/
+netns + tc clsact: ok
+
+## clock-and-limits
+ulimit -n 524288
+ls: cannot access '/etc/chrony*': No such file or directory
+ls: cannot access '/etc/systemd/timesyncd.conf': No such file or directory
+SNTP offset vs time.google.com (s, 1 s resolution): -0.2
