@@ -13,7 +13,8 @@ p = argparse.ArgumentParser()
 p.add_argument("--arm", required=True)
 p.add_argument("--table", default="ops.src_spark_5")
 a = p.parse_args()
-spark = session(a.arm, lg.load_state("principals.json")[a.arm]["spark"], [])
+principal = lg.load_state("principals.json")[a.arm]["spark"]
+spark = session(a.arm, principal, [])
 jvm = spark._jvm
 cat = spark._jsparkSession.sessionState().catalogManager().catalog("lg")
 ns, tb = a.table.split(".")
@@ -24,5 +25,7 @@ table = cat.loadTable(ident).table()
 ser = jvm.org.apache.iceberg.spark.source.SerializableTableWithSize.copyOf(table)
 props = dict(ser.io().properties())
 out = {k: (v if any(s in k for s in SAFE) else f"<redacted, {len(v)} chars>") for k, v in sorted(props.items())}
-print("FILEIO_PROPS " + json.dumps({"arm": a.arm, "table": a.table, "io_class": ser.io().getClass().getName(), "props": out}))
+same = props.get("credential") == f"{principal[0]}:{principal[1]}"
+print("FILEIO_PROPS " + json.dumps({"arm": a.arm, "table": a.table, "io_class": ser.io().getClass().getName(),
+                                    "credential_is_the_principal_client_id_and_secret": same, "props": out}))
 spark.stop()

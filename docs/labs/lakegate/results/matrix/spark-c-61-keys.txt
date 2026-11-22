@@ -1,0 +1,12 @@
+# STS keys seen by MinIO for one Spark job (spark-c-61, arm C, TTL 900 s), from the audit log.
+# src = ops.src_spark_61 (TABLE_READ_DATA), tgt = ops.tgt_spark_61 (TABLE_WRITE_DATA)
+src  FV6TE118  10:57:45 -> 11:08:45  12 GetObject   read-only policy (GetObject, ListBucket on prefix)
+src  MIAZFJ6H  11:09:46 -> 11:19:46  11 GetObject   read-only
+src  PGBGTYTT  11:20:46 -> 11:32:01  11 GetObject   read-only
+src  G17GAVUT  11:33:01 -> 11:45:01  13 GetObject   read-only
+src  HCM51FQ4  11:46:01 -> 11:58:29  12 GetObject   read-only
+src  JKVDP7N6  11:59:29 -> 12:00:29   2 GetObject   read-only
+tgt  DPCU7L4J  10:57:40 -> 11:00:47   3 GetObject   (metadata reads at planning) read-only policy
+tgt  VVB91XN7  12:01:29               4 PutObject + Head + Get   write policy (adds PutObject, DeleteObject), minted at write time
+tgt  QB4SDW06  12:01:29               3 GetObject   (commit-time metadata reads)
+# FV6TE118 is also the key the blast-radius test got at 11:00 via spark_c's catalog credential: Polaris' credential cache.

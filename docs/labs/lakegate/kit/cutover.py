@@ -95,9 +95,10 @@ def check_canary(path):
 
 def check_non_refreshing(ttl):
     margin = ttl - 300
-    long_jobs = [f"{e} {d}min" for e in ("pyiceberg", "duckdb") for d in lg.DURATIONS if d * 60 > margin]
-    return ("WARN", f"jobs on clients without native refresh that outlive TTL-300s={margin}s: {long_jobs} "
-                    "(PyIceberg: use lakegate_client.refreshing; DuckDB: split into statements or move engine)")
+    # Measured on lab day: PyIceberg 0.12.0 never refreshes; Trino 484 refreshes reads but not an open writer.
+    long_jobs = [f"pyiceberg {d}min" for d in lg.DURATIONS if d * 60 > margin]
+    return ("WARN", f"PyIceberg jobs that outlive TTL-300s={margin}s: {long_jobs} (must use lakegate_client.refreshing); "
+                    f"Trino INSERTs must not hold an output file open longer than {margin}s")
 
 
 def main():

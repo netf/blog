@@ -6,7 +6,9 @@
 #      PyIceberg through lakegate_client.refreshing(); DuckDB has no refresh path
 set -uo pipefail
 cd "$(dirname "$0")/.."
-OUT=matrix
+# OUT/DURATIONS overridable: the 120-minute jobs were rerun (results/incidents.md)
+OUT=${OUT:-matrix}
+DURATIONS=${DURATIONS:-5,30,61,120}
 mkdir -p results/$OUT
 date -u +%FT%TZ > results/$OUT/started.txt
 ( while true; do docker stats --no-stream --format "$(date -u +%FT%TZ)\t{{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}" >> results/$OUT/docker-stats.tsv; sleep 30; done ) &
@@ -15,11 +17,11 @@ for arm in a b c; do
   shim=""; sconf=""
   if [ $arm = c ]; then shim="--refresh-shim"; sconf="--conf spark.sql.catalog.lg.client.refresh-credentials-enabled=true"; fi
   for e in pyiceberg duckdb trino; do
-    docker compose exec -T py python jobs/py_jobs.py --engine $e --arm $arm $shim --out $OUT > results/$OUT/run-$e-$arm.out 2>&1 &
+    docker compose exec -T py python jobs/py_jobs.py --engine $e --arm $arm $shim --durations $DURATIONS --out $OUT > results/$OUT/run-$e-$arm.out 2>&1 &
   done
-  docker compose exec -T spark jobs/spark-submit.sh jobs/spark_jobs.py --arm $arm $sconf --out $OUT > results/$OUT/run-spark-$arm.out 2>&1 &
+  docker compose exec -T spark jobs/spark-submit.sh jobs/spark_jobs.py --arm $arm $sconf --durations $DURATIONS --out $OUT > results/$OUT/run-spark-$arm.out 2>&1 &
 done
 wait $(jobs -p | grep -v "^$SAMPLER$")
 kill $SAMPLER
-for p in polaris-b polaris-c; do docker compose logs --no-color --since "$(cat results/$OUT/started.txt)" $p | grep ' ACCESS ' > results/$OUT/access-$p.log; done
+for p in polaris-b polaris-c; do docker compose logs --no-color --since "$(cat results/$OUT/started.txt)" $p | grep -a ' ACCESS ' > results/$OUT/access-$p.log; done
 date -u +%FT%TZ > results/$OUT/finished.txt

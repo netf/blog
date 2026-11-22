@@ -1,5 +1,20 @@
 # Environment preflight: lakegate
 
+## Status at the end of the lab (2026-11-22 14:10Z)
+
+Measured: arms A/B/C for 5, 30 and 61-minute jobs on all four engines, blast radius and escape
+tests, shared-location tests, all failure tests except clock skew (dropped), Lakekeeper probe and
+canary, load test, migration kit end to end, canary, cut-over.
+
+**Not measured: the 120-minute jobs.** The platform paused this VM five times during the run, twice
+for about 12 minutes, which is longer than the 5-minute refresh margin; both 120-minute attempts
+were inside one of the long pauses. Evidence and options: `results/incidents.md`. Everything else
+that overlapped a long pause was discarded and rerun.
+
+Peak memory with everything running (48 matrix jobs, phase-1 failure tests, Lakekeeper canary;
+sum of `docker stats` over 290 samples): **10.3 GiB at 11:10:48Z**, on 15 GiB. No container was
+OOM-killed. Trino sat at 2.6 of its 3 GiB limit at the busiest point.
+
 ## Decisions (Piotr, 2026-11-22 10:30Z) and pins used for measurement
 
 1. **MinIO:** Chainguard's fork-built image, not upstream MinIO (upstream stopped publishing images).
@@ -155,7 +170,22 @@ against the Chainguard MinIO (`results/preflight/polaris-minio-probe.json`).
 stores, and they warn that MinIO does not verify every part of a signed request, so remote signing
 is unsafe on MinIO ("Use vended credentials with these stores").
 
-**Which clients call the refresh endpoint.** This is from source at the pinned tags, not yet run:
+**Observed on lab day (supersedes the source-only table below, which was wrong about DuckDB):**
+each client ran past a 900 s TTL on Polaris (matrix arm C, failure-test control F0, canary) and on
+Lakekeeper (TTL 900 s).
+
+| Client | Refresh observed | Long job past the TTL | Evidence |
+|---|---|---|---|
+| Spark 4.1.4 / Iceberg 1.12.0 | Yes, reads and writes: one 61-minute job used 6 successive read keys for its source and a fresh write key for its target | passes (Polaris B, C, F0; Lakekeeper) | `results/matrix/spark-c-61-keys.txt`, matrix, canary |
+| Trino 484 | Reads only. The source was read with a new key about every 10 minutes, but the Parquet writer keeps the key it had when it opened and its final `PutObject` fails: `HIVE_WRITER_CLOSE_ERROR ... The Access Key Id you provided does not exist in our records` | fails whenever the writer outlives the key (30 and 61 min in C, 61 min in B, canary, Lakekeeper) | matrix, F0 audit timeline, canary, `trino-lk-20-lk` |
+| PyIceberg 0.12.0 | No | fails at expiry (15.0 min at TTL 900 s; 42–43 min in B because the key came from Polaris' cache); passes with `lakegate_client.refreshing()` | matrix, F0, canary |
+| DuckDB 2.0.1 (iceberg `f979b5b28a`) | Yes: `GET .../credentials` before writing; a new statement after the TTL works; a 17-minute open transaction committed | passes (61 min in B and C, Lakekeeper, canary) | Polaris C access log 11:28:48, `results/failure/duckdb-statements-*.json` |
+
+My source reading missed DuckDB's refresh because the search excluded lines containing
+`IRCAPI::GetTableCredentials`, which is the call site (`ReVendVendedCredentials` in
+`src/catalog/rest/storage/iceberg_table_secret_provider.cpp`).
+
+**Which clients call the refresh endpoint (morning, from source only):**
 
 | Client (pinned) | Calls `client.refresh-credentials-endpoint`? | Evidence |
 |---|---|---|

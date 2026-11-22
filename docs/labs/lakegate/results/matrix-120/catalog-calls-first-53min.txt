@@ -1,0 +1,14 @@
+# Catalog calls per 120-minute job, 13:01:27 to 13:54:21 (52.9 min, before the VM pause)
+# columns: catalog engine loadTable(GET src+tgt) credentials(src+tgt) | arm C refresh rate per table-hour
+lake_a spark loadTable 2 credentials 0 src refreshes/h 0.0
+lake_a trino loadTable 2 credentials 0 src refreshes/h 0.0
+lake_a pyiceberg loadTable 2 credentials 0 src refreshes/h 0.0
+lake_a duckdb loadTable 2 credentials 0 src refreshes/h 0.0
+lake_b spark loadTable 2 credentials 1 src refreshes/h 1.1
+lake_b trino loadTable 2 credentials 0 src refreshes/h 0.0
+lake_b pyiceberg loadTable 2 credentials 0 src refreshes/h 0.0
+lake_b duckdb loadTable 2 credentials 0 src refreshes/h 0.0
+lake_c spark loadTable 2 credentials 4 src refreshes/h 4.5
+lake_c trino loadTable 2 credentials 5 src refreshes/h 5.7
+lake_c pyiceberg loadTable 2 credentials 5 src refreshes/h 5.7
+lake_c duckdb loadTable 2 credentials 1 src refreshes/h 1.1

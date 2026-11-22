@@ -55,3 +55,6 @@ Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
 {"job": "spark-a-5", "engine": "spark", "arm": "a", "duration_min": 5, "tag": "", "src": "src_spark_5", "tgt": "tgt_spark_5", "start": "2026-11-22T10:57:38.030+00:00", "ok": true, "end": "2026-11-22T11:02:45.971+00:00", "elapsed_s": 307.9}
 {"job": "spark-a-30", "engine": "spark", "arm": "a", "duration_min": 30, "tag": "", "src": "src_spark_30", "tgt": "tgt_spark_30", "start": "2026-11-22T10:57:38.030+00:00", "ok": true, "end": "2026-11-22T11:29:01.624+00:00", "elapsed_s": 1883.6}
 {"job": "spark-a-61", "engine": "spark", "arm": "a", "duration_min": 61, "tag": "", "src": "src_spark_61", "tgt": "tgt_spark_61", "start": "2026-11-22T10:57:38.031+00:00", "ok": true, "end": "2026-11-22T12:01:29.261+00:00", "elapsed_s": 3831.2}
+26/11/22 12:54:11 ERROR AppendDataExec: Data source write support IcebergBatchWrite(table=lg.ops.tgt_spark_120, format=PARQUET) is aborting.
+26/11/22 12:54:11 WARN SparkWrite: Skipping cleanup of written files
+26/11/22 12:54:11 ERROR AppendDataExec: Data source write support IcebergBatchWrite(table=lg.ops.tgt_spark_120, format=PARQUET) aborted.

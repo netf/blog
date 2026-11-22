@@ -5,7 +5,8 @@ phase1  F0 control (nothing broken), F3 credentials expire inside an open transa
         F4 source table renamed at minute 2, Lakekeeper canary (TTL 900 s, 20-minute jobs)
 phase2  F1a catalog unreachable from minute 2 to minute 22 of a 30-minute job
 phase3  F1b catalog unreachable from minute 8 to minute 14 (back before the key expires)
-phase4  F2 STS unreachable from minute 2 to minute 22 (shared STS proxy: run after the matrix)
+phase3_rerun  the same on fresh tables (f1c_*): the first F1b overlapped the VM pause
+phase4  F2 STS unreachable from minute 2 to minute 22 (lake_f has its own proxy, sts-f)
 phase5  Trino on Lakekeeper (needs the lk Trino catalog, i.e. a Trino restart: after the matrix)
 
 "Unreachable" = the container is disconnected from the Compose network, so connections fail fast
@@ -111,9 +112,15 @@ def phase3():
     run_all(std_jobs("f1b"), [(480, disconnect("polaris-f"), "catalog DOWN"), (840, reconnect("polaris-f"), "catalog UP")])
 
 
+def phase3_rerun():
+    """F1b again on fresh tables: the first F1b run overlapped the VM pause (results/incidents.md)."""
+    mk("f", "fail", 30, *[f"f1c_{e}" for e in ("spark", "trino", "pyshim")])
+    run_all(std_jobs("f1c"), [(480, disconnect("polaris-f"), "catalog DOWN"), (840, reconnect("polaris-f"), "catalog UP")])
+
+
 def phase4():
     mk("f", "fail", 30, *[f"f2_{e}" for e in ("spark", "trino", "pyshim")])
-    run_all(std_jobs("f2"), [(120, disconnect("sts"), "STS DOWN"), (1320, reconnect("sts"), "STS UP")])
+    run_all(std_jobs("f2"), [(120, disconnect("sts-f"), "STS DOWN"), (1320, reconnect("sts-f"), "STS UP")])
 
 
 def phase5():

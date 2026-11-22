@@ -1,0 +1,76 @@
+2026-11-22T13:01:31.465+00:00 start
+2026-11-22T13:01:33.113+00:00 read file 1/120
+2026-11-22T13:02:33.127+00:00 read file 2/120
+2026-11-22T13:03:33.134+00:00 read file 3/120
+2026-11-22T13:04:33.140+00:00 read file 4/120
+2026-11-22T13:05:33.147+00:00 read file 5/120
+2026-11-22T13:06:33.154+00:00 read file 6/120
+2026-11-22T13:07:33.161+00:00 read file 7/120
+2026-11-22T13:08:33.171+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T13:08:33.177+00:00 read file 8/120
+2026-11-22T13:09:33.184+00:00 read file 9/120
+2026-11-22T13:10:33.190+00:00 read file 10/120
+2026-11-22T13:11:33.197+00:00 read file 11/120
+2026-11-22T13:12:33.204+00:00 read file 12/120
+2026-11-22T13:13:33.211+00:00 read file 13/120
+2026-11-22T13:14:33.218+00:00 read file 14/120
+2026-11-22T13:15:33.223+00:00 read file 15/120
+2026-11-22T13:16:33.230+00:00 read file 16/120
+2026-11-22T13:17:33.237+00:00 read file 17/120
+2026-11-22T13:18:33.247+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T13:18:33.251+00:00 read file 18/120
+2026-11-22T13:19:33.257+00:00 read file 19/120
+2026-11-22T13:20:33.262+00:00 read file 20/120
+2026-11-22T13:21:33.268+00:00 read file 21/120
+2026-11-22T13:22:33.273+00:00 read file 22/120
+2026-11-22T13:23:33.277+00:00 read file 23/120
+2026-11-22T13:24:33.283+00:00 read file 24/120
+2026-11-22T13:25:33.289+00:00 read file 25/120
+2026-11-22T13:26:33.295+00:00 read file 26/120
+2026-11-22T13:27:33.301+00:00 read file 27/120
+2026-11-22T13:28:33.309+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T13:28:33.313+00:00 read file 28/120
+2026-11-22T13:29:33.319+00:00 read file 29/120
+2026-11-22T13:30:33.324+00:00 read file 30/120
+2026-11-22T13:31:33.328+00:00 read file 31/120
+2026-11-22T13:32:33.333+00:00 read file 32/120
+2026-11-22T13:33:33.338+00:00 read file 33/120
+2026-11-22T13:34:33.343+00:00 read file 34/120
+2026-11-22T13:35:33.349+00:00 read file 35/120
+2026-11-22T13:36:33.354+00:00 read file 36/120
+2026-11-22T13:37:33.360+00:00 read file 37/120
+2026-11-22T13:38:33.368+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T13:38:33.373+00:00 read file 38/120
+2026-11-22T13:39:33.378+00:00 read file 39/120
+2026-11-22T13:40:33.384+00:00 read file 40/120
+2026-11-22T13:41:33.390+00:00 read file 41/120
+2026-11-22T13:42:33.395+00:00 read file 42/120
+2026-11-22T13:43:33.400+00:00 read file 43/120
+2026-11-22T13:44:33.405+00:00 read file 44/120
+2026-11-22T13:45:33.410+00:00 read file 45/120
+2026-11-22T13:46:33.415+00:00 read file 46/120
+2026-11-22T13:47:33.420+00:00 read file 47/120
+2026-11-22T13:48:33.428+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T13:48:33.433+00:00 read file 48/120
+2026-11-22T13:49:33.438+00:00 read file 49/120
+2026-11-22T13:50:33.443+00:00 read file 50/120
+2026-11-22T13:51:33.448+00:00 read file 51/120
+2026-11-22T13:52:33.453+00:00 read file 52/120
+2026-11-22T13:53:33.457+00:00 read file 53/120
+2026-11-22T14:06:58.518+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in -206s
+2026-11-22T14:06:58.524+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 216, in run
+    rec.update(runner(a, dur, principals.get(a.arm, {}).get(a.engine), log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 58, in job_pyiceberg
+    with src.io.new_input(f).open() as fh:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 340, in open
+    input_file = self._filesystem.open_input_file(self._path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 815, in pyarrow._fs.FileSystem.open_input_file
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When reading information for key 'lake_c/ops/src_pyiceberg_120/data/00000-0-6706adb5-e4aa-49e2-8b9a-060d41b16db1.parquet' in bucket 'lake': AWS Error ACCESS_DENIED during HeadObject operation: No response body.
+
+2026-11-22T14:06:58.525+00:00 end ok=False

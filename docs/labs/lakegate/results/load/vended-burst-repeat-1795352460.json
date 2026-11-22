@@ -1,0 +1,26 @@
+{
+  "mode": "vended",
+  "shape": "burst",
+  "workers": 50,
+  "wall_s": 0.3,
+  "errors": 0,
+  "error_codes": [],
+  "loadTable": {
+    "n": 100,
+    "per_s": 354.4,
+    "p50_ms": 73.2,
+    "p95_ms": 128.0,
+    "p99_ms": 154.0,
+    "max_ms": 156.5,
+    "mean_ms": 74.7
+  },
+  "credentials": {
+    "n": 50,
+    "per_s": 177.2,
+    "p50_ms": 22.5,
+    "p95_ms": 46.2,
+    "p99_ms": 73.4,
+    "max_ms": 73.4,
+    "mean_ms": 24.8
+  }
+}

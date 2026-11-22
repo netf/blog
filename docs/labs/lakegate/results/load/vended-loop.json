@@ -1,0 +1,35 @@
+{
+  "mode": "vended",
+  "shape": "loop",
+  "workers": 50,
+  "wall_s": 120.2,
+  "errors": 0,
+  "error_codes": [],
+  "loadTable": {
+    "n": 72004,
+    "per_s": 599.1,
+    "p50_ms": 52.8,
+    "p95_ms": 125.2,
+    "p99_ms": 179.7,
+    "max_ms": 386.3,
+    "mean_ms": 59.8
+  },
+  "credentials": {
+    "n": 36002,
+    "per_s": 299.6,
+    "p50_ms": 41.9,
+    "p95_ms": 99.1,
+    "p99_ms": 135.5,
+    "max_ms": 359.6,
+    "mean_ms": 47.1
+  },
+  "window": [
+    "2026-11-22T12:58:10.126Z",
+    "2026-11-22T13:00:13.645Z"
+  ],
+  "sts_assume_role_calls": 24,
+  "polaris_cpu_pct_max": 187.8,
+  "polaris_cpu_pct_mean": 158.9,
+  "cpu_samples": 60,
+  "sts_assume_role_calls_lake_c": 24
+}

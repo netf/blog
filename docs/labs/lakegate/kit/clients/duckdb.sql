@@ -1,6 +1,6 @@
--- DuckDB 2.0.1, iceberg extension f979b5b28a. No refresh during a statement or transaction:
--- each new transaction re-loads the table (and gets new credentials), so split long work into
--- statements that each finish inside the TTL, or run it on an engine that refreshes.
+-- DuckDB 2.0.1, iceberg extension f979b5b28a. Refreshes on its own: when a vended secret expires it
+-- calls GET .../credentials (seen before every write past the TTL; a statement 1,020 s after the
+-- first one and a 17-minute open transaction both worked at TTL 900 s).
 -- Writing needs TABLE_CREATE on the namespace (Polaris authorizes /transactions/commit with it).
 INSTALL iceberg; LOAD iceberg; LOAD httpfs;
 CREATE SECRET pol (TYPE iceberg, CLIENT_ID '<client_id>', CLIENT_SECRET '<client_secret>',

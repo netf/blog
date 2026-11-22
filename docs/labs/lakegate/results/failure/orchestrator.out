@@ -10,3 +10,21 @@
 2026-11-22T11:36:15+00:00 mk_tables f fail 30 ('f1a_spark', 'f1a_trino', 'f1a_pyshim'): ok f fail ['f1a_spark', 'f1a_trino', 'f1a_pyshim'] 
 2026-11-22T11:38:15+00:00 t+120s catalog DOWN: 0
 2026-11-22T11:59:42+00:00 t+1407s catalog UP: 0
+2026-11-22T12:19:43+00:00 === phase2 end
+2026-11-22T12:19:43+00:00 === phase3 start
+2026-11-22T12:19:48+00:00 mk_tables f fail 30 ('f1b_spark', 'f1b_trino', 'f1b_pyshim'): ok f fail ['f1b_spark', 'f1b_trino', 'f1b_pyshim'] 
+2026-11-22T12:39:15+00:00 t+1168s catalog DOWN: 0
+2026-11-22T12:39:16+00:00 t+1168s catalog UP: 0
+2026-11-22T12:39:16+00:00 === phase3 end
+2026-11-22T13:01:27+00:00 === phase3_rerun start
+2026-11-22T13:01:27+00:00 === phase5 start
+2026-11-22T13:01:41+00:00 mk_tables f fail 30 ('f1c_spark', 'f1c_trino', 'f1c_pyshim'): ok f fail ['f1c_spark', 'f1c_trino', 'f1c_pyshim'] 
+2026-11-22T13:09:41+00:00 t+480s catalog DOWN: 0
+2026-11-22T13:15:41+00:00 t+840s catalog UP: 0
+2026-11-22T13:21:40+00:00 === phase5 end
+2026-11-22T13:35:41+00:00 === phase3_rerun end
+2026-11-22T13:35:41+00:00 === phase4 start
+2026-11-22T13:35:46+00:00 mk_tables f fail 30 ('f2_spark', 'f2_trino', 'f2_pyshim'): ok f fail ['f2_spark', 'f2_trino', 'f2_pyshim'] 
+2026-11-22T13:37:46+00:00 t+120s STS DOWN: 0
+2026-11-22T14:10:11+00:00 t+2065s STS UP: 1
+2026-11-22T14:10:11+00:00 === phase4 end

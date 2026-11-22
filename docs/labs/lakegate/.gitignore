@@ -5,3 +5,4 @@ state/
 results/audit/audit.jsonl
 config/trino/catalog/[abcf].properties
 config/trino/catalog/lk.properties
+__pycache__/

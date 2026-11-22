@@ -1,0 +1,8 @@
+{
+  "checked_at": "2026-11-22T14:08:23+00:00",
+  "arm_a_static_key_created": "2026-11-22T10:38:43Z (MinIO audit AddUser)",
+  "arm_a_static_key_tables_readable": 300,
+  "spark_b_principal_created": "2026-11-22T10:41:56Z (Polaris access log)",
+  "spark_b_credential_token_and_loadTable_status": 200,
+  "spark_b_vended_key_reads_hr_t000": true
+}

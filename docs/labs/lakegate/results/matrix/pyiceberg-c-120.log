@@ -76,3 +76,36 @@
 2026-11-22T12:08:14.290+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
 2026-11-22T12:08:14.297+00:00 read file 69/120
 2026-11-22T12:09:14.303+00:00 read file 70/120
+2026-11-22T12:10:14.311+00:00 read file 71/120
+2026-11-22T12:11:14.317+00:00 read file 72/120
+2026-11-22T12:12:14.324+00:00 read file 73/120
+2026-11-22T12:13:14.332+00:00 read file 74/120
+2026-11-22T12:14:14.339+00:00 read file 75/120
+2026-11-22T12:15:14.347+00:00 read file 76/120
+2026-11-22T12:16:14.354+00:00 read file 77/120
+2026-11-22T12:17:14.361+00:00 read file 78/120
+2026-11-22T12:18:14.374+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in 900s
+2026-11-22T12:18:14.380+00:00 read file 79/120
+2026-11-22T12:19:14.387+00:00 read file 80/120
+2026-11-22T12:20:14.394+00:00 read file 81/120
+2026-11-22T12:21:14.401+00:00 read file 82/120
+2026-11-22T12:22:14.408+00:00 read file 83/120
+2026-11-22T12:23:14.415+00:00 read file 84/120
+2026-11-22T12:24:14.422+00:00 read file 85/120
+2026-11-22T12:36:42.238+00:00 refreshed credentials for ops.src_pyiceberg_120; new expiry in -208s
+2026-11-22T12:36:42.246+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 182, in run
+    p = argparse.ArgumentParser()
+                       ^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 52, in job_pyiceberg
+    if a.refresh_shim:
+             ^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 340, in open
+    input_file = self._filesystem.open_input_file(self._path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 815, in pyarrow._fs.FileSystem.open_input_file
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When reading information for key 'lake_c/ops/src_pyiceberg_120/data/00000-0-ae14ba20-d221-4229-af2f-35549ce56d4a.parquet' in bucket 'lake': AWS Error ACCESS_DENIED during HeadObject operation: No response body.
+
+2026-11-22T12:36:42.250+00:00 end ok=False

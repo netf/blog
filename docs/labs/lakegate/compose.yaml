@@ -35,6 +35,10 @@ services:
   sts:
     image: alpine/socat@sha256:5aa280c6fc5bee94dbd2bbdf2a58d30f50396eaa110be84b03636945b157ae68
     command: ["-d", "tcp-listen:9000,fork,reuseaddr", "tcp:minio:9000"]
+  # Failure-test catalog (lake_f) only, so "STS down" there cannot touch arms B and C.
+  sts-f:
+    image: alpine/socat@sha256:5aa280c6fc5bee94dbd2bbdf2a58d30f50396eaa110be84b03636945b157ae68
+    command: ["-d", "tcp-listen:9000,fork,reuseaddr", "tcp:minio:9000"]
 
   polaris-b:
     <<: *polaris
