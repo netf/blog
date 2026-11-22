@@ -1,0 +1,55 @@
+2026-11-22T11:04:43.746+00:00 start
+2026-11-22T11:04:44.190+00:00 appended file 1/20 (not committed)
+2026-11-22T11:05:44.220+00:00 appended file 2/20 (not committed)
+2026-11-22T11:06:44.262+00:00 appended file 3/20 (not committed)
+2026-11-22T11:07:44.297+00:00 appended file 4/20 (not committed)
+2026-11-22T11:08:44.335+00:00 appended file 5/20 (not committed)
+2026-11-22T11:09:44.368+00:00 appended file 6/20 (not committed)
+2026-11-22T11:10:44.405+00:00 appended file 7/20 (not committed)
+2026-11-22T11:11:44.445+00:00 appended file 8/20 (not committed)
+2026-11-22T11:12:44.479+00:00 appended file 9/20 (not committed)
+2026-11-22T11:13:44.520+00:00 appended file 10/20 (not committed)
+2026-11-22T11:14:44.562+00:00 appended file 11/20 (not committed)
+2026-11-22T11:15:44.599+00:00 appended file 12/20 (not committed)
+2026-11-22T11:16:44.640+00:00 appended file 13/20 (not committed)
+2026-11-22T11:17:44.681+00:00 appended file 14/20 (not committed)
+2026-11-22T11:18:44.732+00:00 appended file 15/20 (not committed)
+2026-11-22T11:19:44.742+00:00 FAILED Traceback (most recent call last):
+  File "/lab/jobs/py_jobs.py", line 216, in run
+    rec.update(runner(a, dur, principals.get(a.arm, {}).get(a.engine), log, src_name, tgt_name))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lab/jobs/py_jobs.py", line 74, in job_pyiceberg_tx
+    tx.append(pa.table({"id": [i], "v": [f"tx-{i}"]}, schema=tgt.schema().as_arrow()))
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/table/__init__.py", line 564, in append
+    for data_file in data_files:
+                     ^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 3020, in _dataframe_to_data_files
+    yield from write_file(
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/usr/local/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 2757, in write_data_file
+    writer.write(arrow_table)
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 2663, in write
+    fos = self._output_file.create(overwrite=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/pyiceberg/io/pyarrow.py", line 376, in create
+    output_file = self._filesystem.open_output_stream(self._path, buffer_size=self._buffer_size)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pyarrow/_fs.pyx", line 913, in pyarrow._fs.FileSystem.open_output_stream
+  File "pyarrow/error.pxi", line 155, in pyarrow.lib.pyarrow_internal_check_status
+  File "pyarrow/error.pxi", line 92, in pyarrow.lib.check_status
+OSError: When initiating multiple part upload for key 'lake_f/fail/f3_pyice_tgt/data/00000-0-b303ab63-70f7-444b-9a92-3f3c80634350.parquet' in bucket 'lake': AWS Error INVALID_ACCESS_KEY_ID during CreateMultipartUpload operation: The Access Key Id you provided does not exist in our records. (Request ID: 18EA5A065735ACE4)
+
+2026-11-22T11:19:44.742+00:00 end ok=False

@@ -1,0 +1,12 @@
+2026-11-22T11:04:23+00:00 === phase1 start
+2026-11-22T11:04:34+00:00 mk_tables f fail 30 ('f0_spark', 'f0_trino', 'f0_pyshim', 'f4_spark', 'f4_trino', 'f4_pyshim', 'f0_pyice', 'f0_duckdb'): ok f fail ['f0_spark', 'f0_trino', 'f0_pyshim', 'f4_spark', 'f4_trino', 'f4_pyshim', 'f0_pyice', 'f0_duckdb'] 
+2026-11-22T11:04:35+00:00 mk_tables f fail 1 ('f3_pyice', 'f3_pyshim', 'f3_duckdb'): ok f fail ['f3_pyice', 'f3_pyshim', 'f3_duckdb'] 
+2026-11-22T11:04:39+00:00 mk_tables lk fail 20 ('lk_spark', 'lk_pyshim', 'lk_pyice', 'lk_duckdb', 'lk_trino'): ok lk fail ['lk_spark', 'lk_pyshim', 'lk_pyice', 'lk_duckdb', 'lk_trino'] 
+2026-11-22T11:06:40+00:00 t+120s rename f4_spark_src: 204
+2026-11-22T11:06:40+00:00 t+120s rename f4_trino_src: 204
+2026-11-22T11:06:40+00:00 t+121s rename f4_pyshim_src: 204
+2026-11-22T11:36:10+00:00 === phase1 end
+2026-11-22T11:36:10+00:00 === phase2 start
+2026-11-22T11:36:15+00:00 mk_tables f fail 30 ('f1a_spark', 'f1a_trino', 'f1a_pyshim'): ok f fail ['f1a_spark', 'f1a_trino', 'f1a_pyshim'] 
+2026-11-22T11:38:15+00:00 t+120s catalog DOWN: 0
+2026-11-22T11:59:42+00:00 t+1407s catalog UP: 0

@@ -1,0 +1,18 @@
+{
+  "arm": "c",
+  "catalog": "lake_c",
+  "tables_in_lake": 300,
+  "s3_key": {
+    "tables_readable": 1,
+    "expires_in_s": 712
+  },
+  "fileio_bag": {
+    "tables_loadable": 38,
+    "tables_readable": 38,
+    "load_denied_by_status": {
+      "403": 262
+    },
+    "credential_lifetime": "until the client secret is rotated (Polaris client secrets do not expire)"
+  },
+  "elapsed_s": 3
+}

@@ -1,0 +1,35 @@
+{
+  "1_sibling": {
+    "a": {
+      "created": true,
+      "location": "s3://lake/lake_x/x/a"
+    },
+    "a_backup": {
+      "created": true,
+      "location": "s3://lake/lake_x/x/a_backup"
+    },
+    "a_key_reads_a_backup": {
+      "data": false,
+      "metadata": false
+    }
+  },
+  "2_rename_then_recreate": {
+    "r_old_location": "s3://lake/lake_x/x/r",
+    "new_r": {
+      "created": false,
+      "error": "ForbiddenError: ForbiddenException: Unable to create entity at location 's3://lake/lake_x/x/r' because it conflicts with existing table or namespace at location 's3://lake/lake_x/x/r/'"
+    }
+  },
+  "3_register_table": {
+    "registered": false,
+    "error": "ForbiddenError: ForbiddenException: Unable to create entity at location 's3://lake/lake_x/x/a' because it conflicts with existing table or namespace at location 's3://lake/lake_x/x/a/'"
+  },
+  "4_explicit_same_location": {
+    "created": false,
+    "error": "ForbiddenError: ForbiddenException: Unable to create entity at location 's3://lake/lake_x/x/a' because it conflicts with existing table or namespace at location 's3://lake/lake_x/x/a/'"
+  },
+  "4_explicit_nested_location": {
+    "created": false,
+    "error": "ForbiddenError: ForbiddenException: Unable to create entity at location 's3://lake/lake_x/x/a/nested' because it conflicts with existing table or namespace at location 's3://lake/lake_x/x/a/'"
+  }
+}

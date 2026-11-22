@@ -1,0 +1,156 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+26/11/22 10:57:32 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+26/11/22 10:57:34 INFO SparkContext: Running Spark version 4.1.4
+26/11/22 10:57:34 INFO SparkContext: OS info Linux, 6.12.113+, amd64
+26/11/22 10:57:34 INFO SparkContext: Java version 21.0.12.1+1-LTS
+26/11/22 10:57:34 INFO ResourceUtils: ==============================================================
+26/11/22 10:57:34 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/11/22 10:57:34 INFO ResourceUtils: ==============================================================
+26/11/22 10:57:34 INFO SparkContext: Submitted application: lakegate-b
+26/11/22 10:57:34 INFO SecurityManager: Changing view acls to: root
+26/11/22 10:57:34 INFO SecurityManager: Changing modify acls to: root
+26/11/22 10:57:34 INFO SecurityManager: Changing view acls groups to: root
+26/11/22 10:57:34 INFO SecurityManager: Changing modify acls groups to: root
+26/11/22 10:57:34 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: root groups with view permissions: EMPTY; users with modify permissions: root; groups with modify permissions: EMPTY; RPC SSL disabled
+26/11/22 10:57:34 INFO Utils: Successfully started service 'sparkDriver' on port 37077.
+26/11/22 10:57:34 INFO SparkEnv: Registering MapOutputTracker
+26/11/22 10:57:34 INFO SparkEnv: Registering BlockManagerMaster
+26/11/22 10:57:34 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/11/22 10:57:34 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/11/22 10:57:34 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/11/22 10:57:35 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-17c09770-ee22-431a-9062-19b35d530a6a
+26/11/22 10:57:35 INFO SparkEnv: Registering OutputCommitCoordinator
+26/11/22 10:57:35 INFO SparkContext: Added JAR file:///opt/lakegate-jars/iceberg-spark-runtime-4.1_2.13-1.12.0.jar at spark://069c8d90006e:37077/jars/iceberg-spark-runtime-4.1_2.13-1.12.0.jar with timestamp 1795345054263
+26/11/22 10:57:35 INFO SparkContext: Added JAR file:///opt/lakegate-jars/iceberg-aws-bundle-1.12.0.jar at spark://069c8d90006e:37077/jars/iceberg-aws-bundle-1.12.0.jar with timestamp 1795345054263
+26/11/22 10:57:35 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/11/22 10:57:35 INFO ResourceProfile: Limiting resource is cpu
+26/11/22 10:57:35 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/11/22 10:57:35 INFO SecurityManager: Changing view acls to: root
+26/11/22 10:57:35 INFO SecurityManager: Changing modify acls to: root
+26/11/22 10:57:35 INFO SecurityManager: Changing view acls groups to: root
+26/11/22 10:57:35 INFO SecurityManager: Changing modify acls groups to: root
+26/11/22 10:57:35 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: root groups with view permissions: EMPTY; users with modify permissions: root; groups with modify permissions: EMPTY; RPC SSL disabled
+26/11/22 10:57:35 INFO Executor: Starting executor ID driver on host 069c8d90006e
+26/11/22 10:57:35 INFO Executor: OS info Linux, 6.12.113+, amd64
+26/11/22 10:57:35 INFO Executor: Java version 21.0.12.1+1-LTS
+26/11/22 10:57:35 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/11/22 10:57:35 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@2a68dc2b for default.
+26/11/22 10:57:35 INFO Executor: Fetching spark://069c8d90006e:37077/jars/iceberg-spark-runtime-4.1_2.13-1.12.0.jar with timestamp 1795345054263
+26/11/22 10:57:35 INFO TransportClientFactory: Successfully created connection to 069c8d90006e/172.18.0.8:37077 after 28 ms (0 ms spent in bootstraps)
+26/11/22 10:57:35 INFO Utils: Fetching spark://069c8d90006e:37077/jars/iceberg-spark-runtime-4.1_2.13-1.12.0.jar to /tmp/spark-9c2a22af-120b-4f6b-8dc6-81fcf4ff0608/userFiles-550cc9ee-e262-41b9-8338-3043460db729/fetchFileTemp14863456001202934995.tmp
+26/11/22 10:57:35 INFO Executor: Adding file:/tmp/spark-9c2a22af-120b-4f6b-8dc6-81fcf4ff0608/userFiles-550cc9ee-e262-41b9-8338-3043460db729/iceberg-spark-runtime-4.1_2.13-1.12.0.jar to class loader default
+26/11/22 10:57:35 INFO Executor: Fetching spark://069c8d90006e:37077/jars/iceberg-aws-bundle-1.12.0.jar with timestamp 1795345054263
+26/11/22 10:57:35 INFO Utils: Fetching spark://069c8d90006e:37077/jars/iceberg-aws-bundle-1.12.0.jar to /tmp/spark-9c2a22af-120b-4f6b-8dc6-81fcf4ff0608/userFiles-550cc9ee-e262-41b9-8338-3043460db729/fetchFileTemp3819123424148520542.tmp
+26/11/22 10:57:35 INFO Executor: Adding file:/tmp/spark-9c2a22af-120b-4f6b-8dc6-81fcf4ff0608/userFiles-550cc9ee-e262-41b9-8338-3043460db729/iceberg-aws-bundle-1.12.0.jar to class loader default
+26/11/22 10:57:35 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 38401.
+26/11/22 10:57:35 INFO NettyBlockTransferService: Server created on 069c8d90006e:38401
+26/11/22 10:57:35 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/11/22 10:57:35 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 069c8d90006e, 38401, None)
+26/11/22 10:57:35 INFO BlockManagerMasterEndpoint: Registering block manager 069c8d90006e:38401 with 434.4 MiB RAM, BlockManagerId(driver, 069c8d90006e, 38401, None)
+26/11/22 10:57:35 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 069c8d90006e, 38401, None)
+26/11/22 10:57:35 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 069c8d90006e, 38401, None)
+26/11/22 10:57:39 WARN AuthManagers: Inferring rest.auth.type=oauth2 since property credential was provided. Please explicitly set rest.auth.type to avoid this warning.
+26/11/22 10:57:39 WARN OAuth2Manager: Iceberg REST client is missing the OAuth2 server URI configuration and defaults to http://polaris-b:8181/api/catalog/v1/oauth/tokens. This automatic fallback will be removed in a future Iceberg release. It is recommended to configure the OAuth2 endpoint using the 'oauth2-server-uri' property to be prepared. This warning will disappear if the OAuth2 endpoint is explicitly configured. See https://github.com/apache/iceberg/issues/10537
+{"job": "spark-b-5", "engine": "spark", "arm": "b", "duration_min": 5, "tag": "", "src": "src_spark_5", "tgt": "tgt_spark_5", "start": "2026-11-22T10:57:38.379+00:00", "ok": true, "end": "2026-11-22T11:02:46.579+00:00", "elapsed_s": 308.2}
+{"job": "spark-b-30", "engine": "spark", "arm": "b", "duration_min": 30, "tag": "", "src": "src_spark_30", "tgt": "tgt_spark_30", "start": "2026-11-22T10:57:38.380+00:00", "ok": true, "end": "2026-11-22T11:29:02.191+00:00", "elapsed_s": 1883.8}
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:35:51 WARN S3FileIO: Failed to refresh storage credentials
+java.lang.IllegalArgumentException: Invalid credentials endpoint: null
+	at org.apache.iceberg.relocated.com.google.common.base.Preconditions.checkArgument(Preconditions.java:142)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.<init>(VendedCredentialsProvider.java:59)
+	at org.apache.iceberg.aws.s3.VendedCredentialsProvider.create(VendedCredentialsProvider.java:85)
+	at org.apache.iceberg.aws.s3.S3FileIO.refreshStorageCredentials(S3FileIO.java:464)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+26/11/22 11:38:02 WARN AuthManagers: Inferring rest.auth.type=oauth2 since property credential was provided. Please explicitly set rest.auth.type to avoid this warning.
+26/11/22 11:38:02 WARN AuthManagers: Inferring rest.auth.type=oauth2 since property credential was provided. Please explicitly set rest.auth.type to avoid this warning.
+26/11/22 12:01:29 WARN AuthManagers: Inferring rest.auth.type=oauth2 since property credential was provided. Please explicitly set rest.auth.type to avoid this warning.
+{"job": "spark-b-61", "engine": "spark", "arm": "b", "duration_min": 61, "tag": "", "src": "src_spark_61", "tgt": "tgt_spark_61", "start": "2026-11-22T10:57:38.391+00:00", "ok": true, "end": "2026-11-22T12:01:29.745+00:00", "elapsed_s": 3831.4}

@@ -1,0 +1,62 @@
+{
+  "bootstrap": 400,
+  "create_warehouse": [
+    400,
+    "{\"error\":{\"message\":\"Storage profile overlaps with existing warehouse lk\",\"type\":\"CreateWarehouseStorageProfileOverlap\",\"code\":400,\"stack\":[\"Error ID: 01a202df-81d8-70d8-a081-c518b74f10f0\"]}}"
+  ],
+  "locations": {
+    "d1.a": "s3://lake/lk/01a202df-4d71-73b6-a7b9-aa0414521fe2",
+    "d1.a_backup": "s3://lake/lk/01a202df-4ded-75b2-9c99-14e6cfeccf76",
+    "d2.b": "s3://lake/lk/01a202df-4e35-726d-ad9a-a6d3ece85a1d"
+  },
+  "register_table_same_location": {
+    "ok": false,
+    "error": "TableAlreadyExistsError: AlreadyExistsException: The table UUID in this metadata file belongs to another table, view or generic table in this warehouse, possibly a dropped one. Register the file under the name of that table with overwrite, or restore the dropped table first."
+  },
+  "loadTable d1.a": {
+    "status": 200,
+    "latency_ms": 7,
+    "config_keys": [
+      "client.region",
+      "region",
+      "s3.access-key-id",
+      "s3.endpoint",
+      "s3.path-style-access",
+      "s3.region",
+      "s3.secret-access-key",
+      "s3.session-token",
+      "scan-planning-mode"
+    ],
+    "storage_credentials_prefixes": [
+      "s3://lake/lk/01a202df-4d71-73b6-a7b9-aa0414521fe2"
+    ],
+    "expires_in_s": 886,
+    "refresh_endpoint": "http://lakekeeper:8181/catalog/v1/01a202df-4cea-73ca-821f-ad41aa17a574/namespaces/d1/tables/a/credentials"
+  },
+  "loadTable d2.b": {
+    "status": 200,
+    "latency_ms": 2,
+    "config_keys": [
+      "client.region",
+      "region",
+      "s3.access-key-id",
+      "s3.endpoint",
+      "s3.path-style-access",
+      "s3.region",
+      "s3.secret-access-key",
+      "s3.session-token",
+      "scan-planning-mode"
+    ],
+    "storage_credentials_prefixes": [
+      "s3://lake/lk/01a202df-4e35-726d-ad9a-a6d3ece85a1d"
+    ],
+    "expires_in_s": 886,
+    "refresh_endpoint": "http://lakekeeper:8181/catalog/v1/01a202df-4cea-73ca-821f-ad41aa17a574/namespaces/d2/tables/b/credentials"
+  },
+  "credentials_endpoint": [
+    200,
+    [
+      "storage-credentials"
+    ]
+  ]
+}

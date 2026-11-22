@@ -1,0 +1,60 @@
+{
+  "fail.f3_pyice_tgt": {
+    "objects": 46,
+    "referenced": 1,
+    "orphans": 45,
+    "orphan_data_files": 15,
+    "orphan_manifests": 30,
+    "committed_snapshots": 0,
+    "sample": [
+      "lake_f/fail/f3_pyice_tgt/data/00000-0-00bde5f6-78e1-4b38-9e58-40cc13199fc9.parquet",
+      "lake_f/fail/f3_pyice_tgt/data/00000-0-02ec515d-c1e0-4fdf-ae83-46c46bc4314d.parquet",
+      "lake_f/fail/f3_pyice_tgt/data/00000-0-1ec13888-edae-41cd-9a3f-d8a46ebbdc12.parquet"
+    ]
+  },
+  "fail.f3_pyshim_tgt": {
+    "objects": 62,
+    "referenced": 62,
+    "orphans": 0,
+    "orphan_data_files": 0,
+    "orphan_manifests": 0,
+    "committed_snapshots": 20,
+    "sample": []
+  },
+  "fail.f3_duckdb_tgt": {
+    "objects": 8,
+    "referenced": 8,
+    "orphans": 0,
+    "orphan_data_files": 0,
+    "orphan_manifests": 0,
+    "committed_snapshots": 2,
+    "sample": []
+  },
+  "fail.f0_trino_tgt": {
+    "objects": 1,
+    "referenced": 1,
+    "orphans": 0,
+    "orphan_data_files": 0,
+    "orphan_manifests": 0,
+    "committed_snapshots": 0,
+    "sample": []
+  },
+  "fail.f4_spark_tgt": {
+    "objects": 1,
+    "referenced": 1,
+    "orphans": 0,
+    "orphan_data_files": 0,
+    "orphan_manifests": 0,
+    "committed_snapshots": 0,
+    "sample": []
+  },
+  "fail.f4_trino_tgt": {
+    "objects": 1,
+    "referenced": 1,
+    "orphans": 0,
+    "orphan_data_files": 0,
+    "orphan_manifests": 0,
+    "committed_snapshots": 0,
+    "sample": []
+  }
+}

@@ -1,6 +1,45 @@
 # Environment preflight: lakegate
 
-## Status: BLOCKED before the first measurement (two pinned components)
+## Decisions (Piotr, 2026-11-22 10:30Z) and pins used for measurement
+
+1. **MinIO:** Chainguard's fork-built image, not upstream MinIO (upstream stopped publishing images).
+   `cgr.dev/chainguard/minio@sha256:548147b5fc95a67e3e45285dff7e0e50326c3eb1977c6218039461771156c5e7`,
+   which reports `minio version RELEASE.2026-11-16T00-11-40Z (commit-id=ee9fee0715118245ff4d9149c102608653748196)`.
+   Client: `cgr.dev/chainguard/minio-client:latest` (reports `DEVELOPMENT.GOGET`).
+2. **Spark:** 4.1.4 (latest 4.1.x on lab day; the pitch said 4.3.0) with Iceberg 1.12.0's official
+   `iceberg-spark-runtime-4.1_2.13-1.12.0.jar` (sha1 `9e395e37…`) and `iceberg-aws-bundle-1.12.0.jar`
+   (sha1 `64d50122…`), both matching Maven Central's `.sha1`.
+3. **Clock skew test:** dropped.
+
+Re-pinned at 10:31Z, before the first measurement (nothing had moved since the morning preflight):
+
+| Component | Used | Digest / build |
+|---|---|---|
+| Polaris | 1.9.0 | `apache/polaris@sha256:bc548500…` |
+| Lakekeeper | v0.15.1 | `quay.io/lakekeeper/catalog@sha256:22dcb604…` |
+| Spark | 4.1.4 (Scala 2.13.17, Java 21.0.12) | `apache/spark:4.1.4-python3@sha256:847f91f8…` + boto3 1.44.9, requests 2.34.2 (`images/spark`) |
+| Iceberg Java | 1.12.0 | Spark: jars above. Trino 484 bundles `iceberg-core-1.12.0` too |
+| Trino | 484 | `trinodb/trino@sha256:2704eb53…` |
+| PyIceberg | 0.12.0 (`[pyarrow]`), pyarrow 26.0.1 | `images/py` on `python:3.12-slim` |
+| DuckDB | 2.0.1; iceberg `f979b5b28a`, httpfs `f71cfdb4bf`, avro `4176191c96` | `images/py` |
+| Other Python | boto3 1.44.9, requests 2.34.2, trino 0.340.0, numpy 2.3.5 | `images/py` |
+| STS proxy | socat 1.8.1.3 | `alpine/socat@sha256:5aa280c6…` |
+| Postgres (Lakekeeper) | 17 | `postgres@sha256:223efeb1…` |
+
+Lab-side settings that are part of the experiment (all in `compose.yaml` / `config/`):
+- Polaris B: defaults (`STORAGE_CREDENTIAL_DURATION_SECONDS` 3600, cache 1800). Polaris C and F:
+  900 / 450. OAuth token lifetime: default `max-token-generation=PT1H`. Persistence: in-memory.
+- Every Polaris catalog: `kmsUnavailable: true`, `stsEndpoint: http://sts:9000` (the proxy).
+- Lakekeeper warehouse: `flavor: s3-compat`, `sts-enabled: true`, `sts-token-validity-seconds: 900`, no
+  authentication (no IdP), so Lakekeeper was tested for vending, scoping and refresh, not grants.
+- Trino: `task.max-drivers-per-task=1` and `task.min-drivers-per-task=1` so a job query reads its
+  source files one at a time (otherwise three splits were read at once), `task.max-worker-threads=64`.
+- The Polaris access-log pattern asks for `%D`, but Quarkus prints `-` without
+  `quarkus.http.record-request-start-time=true`; request counts come from that log, latencies from
+  client-side timing (`kit/loadtest.py`). Not changed mid-run: restarting the in-memory Polaris
+  would have dropped the catalogs.
+
+## Preflight status (morning, superseded by the decisions above): BLOCKED before the first measurement (two pinned components)
 
 Recorded 2026-11-22. Nothing below is a measurement; no arm (A, B or C) has been run, and no post
 has been written. `scripts/01-preflight.sh` prints the raw facts (`results/preflight/preflight.txt`).
