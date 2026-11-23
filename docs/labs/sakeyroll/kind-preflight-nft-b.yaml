@@ -1,0 +1,9 @@
+# Preflight cluster B: the second (federated) cluster, kube-proxy nftables mode.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: pf-b
+networking:
+  kubeProxyMode: nftables
+nodes:
+  - role: control-plane
+  - role: worker
